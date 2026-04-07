@@ -1,61 +1,268 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>BkTowers</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
   <style>
-    body {
-      margin: 0;
-      font-family: Arial;
-      background: linear-gradient(135deg, #0a1f44, #1e3c72);
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      height: 100vh;
+    * {
+      box-sizing: border-box;
     }
 
-    .box {
-      background: white;
-      padding: 40px;
-      border-radius: 10px;
-      width: 320px;
+    body {
+      margin: 0;
+      min-height: 100vh;
+      font-family: Arial, sans-serif;
+      background: linear-gradient(135deg, #0a1f44, #1e3c72);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+    }
+
+    .login-box {
+      width: 100%;
+      max-width: 400px;
+      background: #ffffff;
+      border-radius: 18px;
+      box-shadow: 0 20px 50px rgba(0, 0, 0, 0.22);
+      padding: 36px 28px;
       text-align: center;
     }
 
-    h1 {
+    .brand {
+      font-size: 34px;
+      font-weight: 700;
       color: #0a1f44;
-      margin-bottom: 25px;
+      margin: 0 0 8px;
+      letter-spacing: 1px;
     }
 
-    input {
-      width: 100%;
-      padding: 10px;
-      margin-bottom: 15px;
+    .subtitle {
+      margin: 0 0 28px;
+      color: #6b7280;
+      font-size: 14px;
     }
 
-    button {
+    .form-group {
+      text-align: left;
+      margin-bottom: 16px;
+    }
+
+    .form-group label {
+      display: block;
+      margin-bottom: 8px;
+      color: #111827;
+      font-size: 14px;
+      font-weight: 600;
+    }
+
+    .form-group input {
       width: 100%;
-      padding: 10px;
-      background: #0a1f44;
-      color: white;
+      padding: 13px 14px;
+      border: 1px solid #d1d5db;
+      border-radius: 10px;
+      font-size: 14px;
+      outline: none;
+      transition: 0.2s ease;
+    }
+
+    .form-group input:focus {
+      border-color: #1e3c72;
+      box-shadow: 0 0 0 3px rgba(30, 60, 114, 0.12);
+    }
+
+    .login-btn {
+      width: 100%;
       border: none;
+      border-radius: 10px;
+      padding: 14px;
+      background: #0a1f44;
+      color: #ffffff;
+      font-size: 15px;
+      font-weight: 700;
       cursor: pointer;
+      transition: 0.2s ease;
+      margin-top: 6px;
+    }
+
+    .login-btn:hover {
+      background: #16366f;
+    }
+
+    .login-btn:disabled {
+      opacity: 0.7;
+      cursor: not-allowed;
+    }
+
+    .message {
+      margin-top: 16px;
+      font-size: 14px;
+      min-height: 20px;
+    }
+
+    .message.error {
+      color: #b91c1c;
+    }
+
+    .message.success {
+      color: #065f46;
     }
   </style>
 </head>
-
 <body>
+  <div class="login-box">
+    <h1 class="brand">BkTowers</h1>
+    <p class="subtitle">Login with your email and password</p>
 
-  <div class="box">
-    <h1>BkTowers</h1>
+    <div class="form-group">
+      <label for="email">Email</label>
+      <input
+        type="email"
+        id="email"
+        value="bktowers0@gmail.com"
+        placeholder="Enter your email"
+        autocomplete="username"
+      />
+    </div>
 
-    <input type="email" placeholder="Email">
-    <input type="password" placeholder="Password">
+    <div class="form-group">
+      <label for="password">Password</label>
+      <input
+        type="password"
+        id="password"
+        value="010096"
+        placeholder="Enter your password"
+        autocomplete="current-password"
+      />
+    </div>
 
-    <button>Login</button>
+    <button class="login-btn" id="loginBtn" onclick="login()">
+      Login
+    </button>
+
+    <div id="message" class="message"></div>
   </div>
 
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
+
+  <script>
+    const firebaseConfig = {
+      apiKey: "PUT_YOUR_API_KEY",
+      authDomain: "PUT_YOUR_AUTH_DOMAIN",
+      projectId: "PUT_YOUR_PROJECT_ID",
+      storageBucket: "PUT_YOUR_STORAGE_BUCKET",
+      messagingSenderId: "PUT_YOUR_MESSAGING_SENDER_ID",
+      appId: "PUT_YOUR_APP_ID"
+    };
+
+    firebase.initializeApp(firebaseConfig);
+
+    const auth = firebase.auth();
+    const db = firebase.firestore();
+
+    const emailInput = document.getElementById("email");
+    const passwordInput = document.getElementById("password");
+    const loginBtn = document.getElementById("loginBtn");
+    const messageBox = document.getElementById("message");
+
+    function setMessage(text, type = "") {
+      messageBox.textContent = text;
+      messageBox.className = "message";
+      if (type) {
+        messageBox.classList.add(type);
+      }
+    }
+
+    function setLoading(isLoading) {
+      loginBtn.disabled = isLoading;
+      loginBtn.textContent = isLoading ? "Logging in..." : "Login";
+    }
+
+    async function ensureUserDocument(user) {
+      const userRef = db.collection("users").doc(user.uid);
+      const userSnap = await userRef.get();
+
+      if (!userSnap.exists) {
+        await userRef.set({
+          name: "Main Admin",
+          email: user.email,
+          role: "admin",
+          active: true,
+          createdAt: firebase.firestore.FieldValue.serverTimestamp()
+        });
+      }
+
+      return userRef.get();
+    }
+
+    async function login() {
+      const email = emailInput.value.trim();
+      const password = passwordInput.value.trim();
+
+      if (!email || !password) {
+        setMessage("Please enter email and password.", "error");
+        return;
+      }
+
+      setMessage("");
+      setLoading(true);
+
+      try {
+        const userCredential = await auth.signInWithEmailAndPassword(email, password);
+        const user = userCredential.user;
+
+        const userDoc = await ensureUserDocument(user);
+        const userData = userDoc.data();
+
+        localStorage.setItem("userUid", user.uid);
+        localStorage.setItem("userEmail", user.email || "");
+        localStorage.setItem("userName", userData.name || "");
+        localStorage.setItem("userRole", userData.role || "employee");
+
+        setMessage("Login successful. Redirecting...", "success");
+
+        setTimeout(() => {
+          window.location.href = "dashboard.html";
+        }, 700);
+      } catch (error) {
+        setMessage(error.message, "error");
+      } finally {
+        setLoading(false);
+      }
+    }
+
+    passwordInput.addEventListener("keydown", function(event) {
+      if (event.key === "Enter") {
+        login();
+      }
+    });
+
+    emailInput.addEventListener("keydown", function(event) {
+      if (event.key === "Enter") {
+        login();
+      }
+    });
+
+    auth.onAuthStateChanged(async function(user) {
+      if (!user) return;
+
+      try {
+        const userDoc = await ensureUserDocument(user);
+        const userData = userDoc.data();
+
+        localStorage.setItem("userUid", user.uid);
+        localStorage.setItem("userEmail", user.email || "");
+        localStorage.setItem("userName", userData.name || "");
+        localStorage.setItem("userRole", userData.role || "employee");
+
+        window.location.href = "dashboard.html";
+      } catch (error) {
+        console.error(error);
+      }
+    });
+  </script>
 </body>
 </html>
