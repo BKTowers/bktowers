@@ -1,13 +1,12 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta charset="UTF-8">
   <title>BkTowers</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
   <style>
-    * {
-      box-sizing: border-box;
-    }
+    * { box-sizing: border-box; }
 
     body {
       margin: 0;
@@ -17,252 +16,126 @@
       display: flex;
       align-items: center;
       justify-content: center;
-      padding: 20px;
     }
 
     .login-box {
       width: 100%;
-      max-width: 400px;
-      background: #ffffff;
-      border-radius: 18px;
-      box-shadow: 0 20px 50px rgba(0, 0, 0, 0.22);
-      padding: 36px 28px;
+      max-width: 380px;
+      background: #fff;
+      padding: 35px 25px;
+      border-radius: 16px;
+      box-shadow: 0 15px 40px rgba(0,0,0,0.2);
       text-align: center;
     }
 
-    .brand {
-      font-size: 34px;
-      font-weight: 700;
+    .title {
+      font-size: 32px;
+      font-weight: bold;
       color: #0a1f44;
-      margin: 0 0 8px;
-      letter-spacing: 1px;
+      margin-bottom: 20px;
     }
 
-    .subtitle {
-      margin: 0 0 28px;
-      color: #6b7280;
-      font-size: 14px;
-    }
-
-    .form-group {
-      text-align: left;
-      margin-bottom: 16px;
-    }
-
-    .form-group label {
-      display: block;
-      margin-bottom: 8px;
-      color: #111827;
-      font-size: 14px;
-      font-weight: 600;
-    }
-
-    .form-group input {
+    input {
       width: 100%;
-      padding: 13px 14px;
-      border: 1px solid #d1d5db;
-      border-radius: 10px;
-      font-size: 14px;
-      outline: none;
-      transition: 0.2s ease;
+      padding: 12px;
+      margin-bottom: 15px;
+      border-radius: 8px;
+      border: 1px solid #ccc;
     }
 
-    .form-group input:focus {
-      border-color: #1e3c72;
-      box-shadow: 0 0 0 3px rgba(30, 60, 114, 0.12);
-    }
-
-    .login-btn {
+    button {
       width: 100%;
-      border: none;
-      border-radius: 10px;
-      padding: 14px;
+      padding: 12px;
       background: #0a1f44;
-      color: #ffffff;
-      font-size: 15px;
-      font-weight: 700;
+      color: white;
+      border: none;
+      border-radius: 8px;
       cursor: pointer;
-      transition: 0.2s ease;
-      margin-top: 6px;
     }
 
-    .login-btn:hover {
-      background: #16366f;
+    button:hover {
+      background: #163a75;
     }
 
-    .login-btn:disabled {
-      opacity: 0.7;
-      cursor: not-allowed;
-    }
-
-    .message {
-      margin-top: 16px;
+    .msg {
+      margin-top: 10px;
       font-size: 14px;
-      min-height: 20px;
-    }
-
-    .message.error {
-      color: #b91c1c;
-    }
-
-    .message.success {
-      color: #065f46;
+      color: red;
     }
   </style>
 </head>
+
 <body>
+
   <div class="login-box">
-    <h1 class="brand">BkTowers</h1>
-    <p class="subtitle">Login with your email and password</p>
+    <div class="title">BkTowers</div>
 
-    <div class="form-group">
-      <label for="email">Email</label>
-      <input
-        type="email"
-        id="email"
-        value="bktowers0@gmail.com"
-        placeholder="Enter your email"
-        autocomplete="username"
-      />
-    </div>
+    <input type="email" id="email" value="bktowers0@gmail.com">
+    <input type="password" id="password" value="010096">
 
-    <div class="form-group">
-      <label for="password">Password</label>
-      <input
-        type="password"
-        id="password"
-        value="010096"
-        placeholder="Enter your password"
-        autocomplete="current-password"
-      />
-    </div>
+    <button onclick="login()">Login</button>
 
-    <button class="login-btn" id="loginBtn" onclick="login()">
-      Login
-    </button>
-
-    <div id="message" class="message"></div>
+    <div class="msg" id="msg"></div>
   </div>
 
-  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
+  <!-- Firebase -->
+  <script type="module">
 
-  <script>
-   const firebaseConfig = {
-  apiKey: "AIzaSyDey3KL3qZUvZBVtFcB38xzBGx6qrG2WYY",
-  authDomain: "bktowers-4b822.firebaseapp.com",
-  projectId: "bktowers-4b822",
-  storageBucket: "bktowers-4b822.firebasestorage.app",
-  messagingSenderId: "336608827796",
-  appId: "1:336608827796:web:4957fe0d411220f6a69781"
-};
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/12.11.0/firebase-app.js";
+    import { getAuth, signInWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/12.11.0/firebase-auth.js";
+    import { getFirestore, doc, getDoc, setDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/12.11.0/firebase-firestore.js";
 
-    firebase.initializeApp(firebaseConfig);
+    const firebaseConfig = {
+      apiKey: "AIzaSyDey3KL3qZUvZBVtFcB38xzBGx6qrG2WYY",
+      authDomain: "bktowers-4b822.firebaseapp.com",
+      projectId: "bktowers-4b822",
+      storageBucket: "bktowers-4b822.firebasestorage.app",
+      messagingSenderId: "336608827796",
+      appId: "1:336608827796:web:4957fe0d411220f6a69781"
+    };
 
-    const auth = firebase.auth();
-    const db = firebase.firestore();
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+    const db = getFirestore(app);
 
-    const emailInput = document.getElementById("email");
-    const passwordInput = document.getElementById("password");
-    const loginBtn = document.getElementById("loginBtn");
-    const messageBox = document.getElementById("message");
+    window.login = async function () {
+      const email = document.getElementById("email").value;
+      const password = document.getElementById("password").value;
+      const msg = document.getElementById("msg");
 
-    function setMessage(text, type = "") {
-      messageBox.textContent = text;
-      messageBox.className = "message";
-      if (type) {
-        messageBox.classList.add(type);
-      }
-    }
-
-    function setLoading(isLoading) {
-      loginBtn.disabled = isLoading;
-      loginBtn.textContent = isLoading ? "Logging in..." : "Login";
-    }
-
-    async function ensureUserDocument(user) {
-      const userRef = db.collection("users").doc(user.uid);
-      const userSnap = await userRef.get();
-
-      if (!userSnap.exists) {
-        await userRef.set({
-          name: "Main Admin",
-          email: user.email,
-          role: "admin",
-          active: true,
-          createdAt: firebase.firestore.FieldValue.serverTimestamp()
-        });
-      }
-
-      return userRef.get();
-    }
-
-    async function login() {
-      const email = emailInput.value.trim();
-      const password = passwordInput.value.trim();
-
-      if (!email || !password) {
-        setMessage("Please enter email and password.", "error");
-        return;
-      }
-
-      setMessage("");
-      setLoading(true);
+      msg.innerText = "";
 
       try {
-        const userCredential = await auth.signInWithEmailAndPassword(email, password);
+        const userCredential = await signInWithEmailAndPassword(auth, email, password);
         const user = userCredential.user;
 
-        const userDoc = await ensureUserDocument(user);
-        const userData = userDoc.data();
+        const userRef = doc(db, "users", user.uid);
+        const userSnap = await getDoc(userRef);
 
-        localStorage.setItem("userUid", user.uid);
-        localStorage.setItem("userEmail", user.email || "");
-        localStorage.setItem("userName", userData.name || "");
-        localStorage.setItem("userRole", userData.role || "employee");
+        // إنشاء المستخدم تلقائيًا لو مش موجود
+        if (!userSnap.exists()) {
+          await setDoc(userRef, {
+            name: "Main Admin",
+            email: user.email,
+            role: "admin",
+            active: true,
+            createdAt: serverTimestamp()
+          });
+        }
 
-        setMessage("Login successful. Redirecting...", "success");
+        // حفظ البيانات
+        localStorage.setItem("uid", user.uid);
+        localStorage.setItem("email", user.email);
 
-        setTimeout(() => {
-          window.location.href = "dashboard.html";
-        }, 700);
-      } catch (error) {
-        setMessage(error.message, "error");
-      } finally {
-        setLoading(false);
-      }
-    }
-
-    passwordInput.addEventListener("keydown", function(event) {
-      if (event.key === "Enter") {
-        login();
-      }
-    });
-
-    emailInput.addEventListener("keydown", function(event) {
-      if (event.key === "Enter") {
-        login();
-      }
-    });
-
-    auth.onAuthStateChanged(async function(user) {
-      if (!user) return;
-
-      try {
-        const userDoc = await ensureUserDocument(user);
-        const userData = userDoc.data();
-
-        localStorage.setItem("userUid", user.uid);
-        localStorage.setItem("userEmail", user.email || "");
-        localStorage.setItem("userName", userData.name || "");
-        localStorage.setItem("userRole", userData.role || "employee");
-
+        // تحويل
         window.location.href = "dashboard.html";
+
       } catch (error) {
-        console.error(error);
+        msg.innerText = error.message;
       }
-    });
+    };
+
   </script>
+
 </body>
 </html>
