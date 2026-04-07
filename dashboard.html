@@ -1,43 +1,850 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>BkTowers Dashboard</title>
   <style>
+    * {
+      box-sizing: border-box;
+    }
+
     body {
       margin: 0;
       font-family: Arial, sans-serif;
-      background: #f5f7fb;
+      background: #f4f7fb;
+      color: #1f2937;
+    }
+
+    .layout {
       display: flex;
-      justify-content: center;
-      align-items: center;
       min-height: 100vh;
     }
 
-    .box {
-      background: white;
-      padding: 40px;
-      border-radius: 16px;
-      box-shadow: 0 10px 30px rgba(0,0,0,0.08);
-      text-align: center;
+    .sidebar {
+      width: 260px;
+      background: #0a1f44;
+      color: #fff;
+      padding: 24px 18px;
     }
 
-    h1 {
-      margin: 0 0 10px;
+    .brand {
+      font-size: 30px;
+      font-weight: 700;
+      margin-bottom: 8px;
+    }
+
+    .brand-sub {
+      font-size: 13px;
+      color: #c7d2fe;
+      margin-bottom: 28px;
+    }
+
+    .user-box {
+      background: rgba(255, 255, 255, 0.08);
+      border-radius: 14px;
+      padding: 14px;
+      margin-bottom: 24px;
+    }
+
+    .user-box div {
+      margin-bottom: 8px;
+      font-size: 14px;
+      word-break: break-word;
+    }
+
+    .side-links {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      margin-bottom: 24px;
+    }
+
+    .side-links a,
+    .side-links button {
+      width: 100%;
+      text-align: left;
+      padding: 12px 14px;
+      border-radius: 10px;
+      border: none;
+      text-decoration: none;
+      background: rgba(255, 255, 255, 0.08);
+      color: #fff;
+      cursor: pointer;
+      font-size: 14px;
+    }
+
+    .side-links a:hover,
+    .side-links button:hover {
+      background: rgba(255, 255, 255, 0.16);
+    }
+
+    .main {
+      flex: 1;
+      padding: 28px;
+    }
+
+    .topbar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 16px;
+      margin-bottom: 24px;
+      flex-wrap: wrap;
+    }
+
+    .page-title h1 {
+      margin: 0 0 6px;
+      font-size: 28px;
       color: #0a1f44;
     }
 
-    p {
+    .page-title p {
       margin: 0;
-      color: #666;
+      color: #6b7280;
+      font-size: 14px;
+    }
+
+    .logout-btn {
+      padding: 12px 16px;
+      background: #dc2626;
+      color: #fff;
+      border: none;
+      border-radius: 10px;
+      cursor: pointer;
+      font-size: 14px;
+      font-weight: 700;
+    }
+
+    .logout-btn:hover {
+      background: #b91c1c;
+    }
+
+    .stats {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(180px, 1fr));
+      gap: 16px;
+      margin-bottom: 24px;
+    }
+
+    .stat-card {
+      background: #fff;
+      border-radius: 16px;
+      padding: 18px;
+      box-shadow: 0 8px 24px rgba(15, 23, 42, 0.06);
+    }
+
+    .stat-card h3 {
+      margin: 0 0 10px;
+      font-size: 14px;
+      color: #6b7280;
+      font-weight: 600;
+    }
+
+    .stat-card .value {
+      font-size: 30px;
+      font-weight: 700;
+      color: #0a1f44;
+    }
+
+    .content-grid {
+      display: grid;
+      grid-template-columns: 1.1fr 1.4fr;
+      gap: 20px;
+      align-items: start;
+    }
+
+    .card {
+      background: #fff;
+      border-radius: 18px;
+      padding: 22px;
+      box-shadow: 0 8px 24px rgba(15, 23, 42, 0.06);
+    }
+
+    .card h2 {
+      margin: 0 0 18px;
+      font-size: 20px;
+      color: #0a1f44;
+    }
+
+    .form-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 14px;
+    }
+
+    .form-group {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .form-group.full {
+      grid-column: 1 / -1;
+    }
+
+    label {
+      font-size: 14px;
+      font-weight: 600;
+      color: #374151;
+    }
+
+    input,
+    select,
+    textarea {
+      width: 100%;
+      padding: 12px 13px;
+      border: 1px solid #d1d5db;
+      border-radius: 10px;
+      font-size: 14px;
+      background: #fff;
+    }
+
+    textarea {
+      min-height: 90px;
+      resize: vertical;
+    }
+
+    .plans-box {
+      border: 1px solid #e5e7eb;
+      border-radius: 12px;
+      padding: 14px;
+      background: #f9fafb;
+    }
+
+    .plan-row {
+      display: grid;
+      grid-template-columns: 140px 1fr;
+      gap: 12px;
+      align-items: center;
+      margin-bottom: 10px;
+    }
+
+    .plan-row:last-child {
+      margin-bottom: 0;
+    }
+
+    .plan-label {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-size: 14px;
+      font-weight: 600;
+    }
+
+    .actions {
+      display: flex;
+      gap: 10px;
+      margin-top: 16px;
+      flex-wrap: wrap;
+    }
+
+    .primary-btn,
+    .secondary-btn,
+    .danger-btn {
+      border: none;
+      border-radius: 10px;
+      padding: 12px 16px;
+      cursor: pointer;
+      font-size: 14px;
+      font-weight: 700;
+    }
+
+    .primary-btn {
+      background: #0a1f44;
+      color: #fff;
+    }
+
+    .primary-btn:hover {
+      background: #16366f;
+    }
+
+    .secondary-btn {
+      background: #e5e7eb;
+      color: #111827;
+    }
+
+    .secondary-btn:hover {
+      background: #d1d5db;
+    }
+
+    .danger-btn {
+      background: #dc2626;
+      color: #fff;
+      padding: 8px 12px;
+      font-size: 13px;
+    }
+
+    .danger-btn:hover {
+      background: #b91c1c;
+    }
+
+    .table-wrap {
+      overflow-x: auto;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      min-width: 900px;
+    }
+
+    th,
+    td {
+      padding: 12px 10px;
+      border-bottom: 1px solid #e5e7eb;
+      text-align: left;
+      font-size: 14px;
+      vertical-align: top;
+    }
+
+    th {
+      color: #374151;
+      background: #f9fafb;
+      font-weight: 700;
+    }
+
+    .status-badge {
+      display: inline-block;
+      padding: 6px 10px;
+      border-radius: 999px;
+      font-size: 12px;
+      font-weight: 700;
+    }
+
+    .status-available {
+      background: #dcfce7;
+      color: #166534;
+    }
+
+    .status-occupied {
+      background: #fee2e2;
+      color: #991b1b;
+    }
+
+    .status-maintenance {
+      background: #fef3c7;
+      color: #92400e;
+    }
+
+    .small-text {
+      font-size: 12px;
+      color: #6b7280;
+      line-height: 1.6;
+    }
+
+    .empty {
+      text-align: center;
+      color: #6b7280;
+      padding: 24px 0;
+    }
+
+    .message {
+      margin-top: 14px;
+      font-size: 14px;
+      min-height: 20px;
+    }
+
+    .message.success {
+      color: #065f46;
+    }
+
+    .message.error {
+      color: #b91c1c;
+    }
+
+    @media (max-width: 1200px) {
+      .stats {
+        grid-template-columns: repeat(2, minmax(180px, 1fr));
+      }
+
+      .content-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    @media (max-width: 850px) {
+      .layout {
+        flex-direction: column;
+      }
+
+      .sidebar {
+        width: 100%;
+      }
+
+      .stats {
+        grid-template-columns: 1fr;
+      }
+
+      .form-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .plan-row {
+        grid-template-columns: 1fr;
+      }
     }
   </style>
 </head>
 <body>
-  <div class="box">
-    <h1>Welcome to BkTowers</h1>
-    <p>Dashboard page is ready.</p>
+  <div class="layout">
+    <aside class="sidebar">
+      <div class="brand">BkTowers</div>
+      <div class="brand-sub">Property Management System</div>
+
+      <div class="user-box">
+        <div><strong>Name:</strong> <span id="sidebarUserName">-</span></div>
+        <div><strong>Email:</strong> <span id="sidebarUserEmail">-</span></div>
+        <div><strong>Role:</strong> <span id="sidebarUserRole">-</span></div>
+      </div>
+
+      <div class="side-links">
+        <a href="dashboard.html">Dashboard</a>
+        <a href="clients.html">Clients</a>
+        <a href="stays.html">Stays</a>
+        <a href="expenses.html">Expenses</a>
+        <a href="maintenance.html">Maintenance</a>
+        <a href="reports.html">Reports</a>
+        <button onclick="logout()">Logout</button>
+      </div>
+
+      <div class="small-text">
+        This page is the admin dashboard for adding and managing property units.
+      </div>
+    </aside>
+
+    <main class="main">
+      <div class="topbar">
+        <div class="page-title">
+          <h1>Dashboard</h1>
+          <p>Manage units, rental plans, and basic property data.</p>
+        </div>
+        <button class="logout-btn" onclick="logout()">Logout</button>
+      </div>
+
+      <section class="stats">
+        <div class="stat-card">
+          <h3>Total Units</h3>
+          <div class="value" id="totalUnits">0</div>
+        </div>
+        <div class="stat-card">
+          <h3>Available</h3>
+          <div class="value" id="availableUnits">0</div>
+        </div>
+        <div class="stat-card">
+          <h3>Occupied</h3>
+          <div class="value" id="occupiedUnits">0</div>
+        </div>
+        <div class="stat-card">
+          <h3>Maintenance</h3>
+          <div class="value" id="maintenanceUnits">0</div>
+        </div>
+      </section>
+
+      <section class="content-grid">
+        <div class="card">
+          <h2>Add New Unit</h2>
+
+          <div class="form-grid">
+            <div class="form-group">
+              <label for="propertyName">Property / Building Name</label>
+              <input type="text" id="propertyName" placeholder="Enter property name">
+            </div>
+
+            <div class="form-group">
+              <label for="unitNumber">Unit Number</label>
+              <input type="text" id="unitNumber" placeholder="Enter unit number">
+            </div>
+
+            <div class="form-group">
+              <label for="unitType">Unit Type</label>
+              <select id="unitType">
+                <option value="">Select unit type</option>
+                <option value="Apartment">Apartment</option>
+                <option value="Studio">Studio</option>
+                <option value="Room">Room</option>
+                <option value="Suite">Suite</option>
+                <option value="Villa">Villa</option>
+                <option value="Office">Office</option>
+                <option value="Shop">Shop</option>
+              </select>
+            </div>
+
+            <div class="form-group">
+              <label for="status">Status</label>
+              <select id="status">
+                <option value="available">Available</option>
+                <option value="occupied">Occupied</option>
+                <option value="maintenance">Maintenance</option>
+              </select>
+            </div>
+
+            <div class="form-group">
+              <label for="floor">Floor</label>
+              <input type="text" id="floor" placeholder="Enter floor">
+            </div>
+
+            <div class="form-group">
+              <label for="rooms">Rooms</label>
+              <input type="number" id="rooms" min="0" placeholder="Enter number of rooms">
+            </div>
+
+            <div class="form-group">
+              <label for="bathrooms">Bathrooms</label>
+              <input type="number" id="bathrooms" min="0" placeholder="Enter number of bathrooms">
+            </div>
+
+            <div class="form-group">
+              <label for="baseNotes">Notes</label>
+              <input type="text" id="baseNotes" placeholder="Any notes">
+            </div>
+
+            <div class="form-group full">
+              <label>Rental Plans</label>
+              <div class="plans-box">
+                <div class="plan-row">
+                  <div class="plan-label">
+                    <input type="checkbox" id="planDaily">
+                    <span>Daily</span>
+                  </div>
+                  <input type="number" id="priceDaily" min="0" step="0.01" placeholder="Daily price">
+                </div>
+
+                <div class="plan-row">
+                  <div class="plan-label">
+                    <input type="checkbox" id="planMonthly">
+                    <span>Monthly</span>
+                  </div>
+                  <input type="number" id="priceMonthly" min="0" step="0.01" placeholder="Monthly price">
+                </div>
+
+                <div class="plan-row">
+                  <div class="plan-label">
+                    <input type="checkbox" id="planQuarterly">
+                    <span>Quarterly</span>
+                  </div>
+                  <input type="number" id="priceQuarterly" min="0" step="0.01" placeholder="Quarterly price">
+                </div>
+
+                <div class="plan-row">
+                  <div class="plan-label">
+                    <input type="checkbox" id="planSemiAnnual">
+                    <span>Semi Annual</span>
+                  </div>
+                  <input type="number" id="priceSemiAnnual" min="0" step="0.01" placeholder="Semi annual price">
+                </div>
+
+                <div class="plan-row">
+                  <div class="plan-label">
+                    <input type="checkbox" id="planAnnual">
+                    <span>Annual</span>
+                  </div>
+                  <input type="number" id="priceAnnual" min="0" step="0.01" placeholder="Annual price">
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="actions">
+            <button class="primary-btn" onclick="addUnit()">Save Unit</button>
+            <button class="secondary-btn" onclick="clearForm()">Clear Form</button>
+          </div>
+
+          <div id="formMessage" class="message"></div>
+        </div>
+
+        <div class="card">
+          <h2>Units List</h2>
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr>
+                  <th>Property</th>
+                  <th>Unit</th>
+                  <th>Type</th>
+                  <th>Status</th>
+                  <th>Floor</th>
+                  <th>Rooms</th>
+                  <th>Bathrooms</th>
+                  <th>Rental Plans</th>
+                  <th>Action</th>
+                </tr>
+              </thead>
+              <tbody id="unitsTableBody">
+                <tr>
+                  <td colspan="9" class="empty">Loading units...</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+    </main>
   </div>
+
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/12.11.0/firebase-app.js";
+    import {
+      getAuth,
+      onAuthStateChanged,
+      signOut
+    } from "https://www.gstatic.com/firebasejs/12.11.0/firebase-auth.js";
+    import {
+      getFirestore,
+      collection,
+      addDoc,
+      getDocs,
+      deleteDoc,
+      doc,
+      serverTimestamp,
+      orderBy,
+      query
+    } from "https://www.gstatic.com/firebasejs/12.11.0/firebase-firestore.js";
+
+    const firebaseConfig = {
+      apiKey: "AIzaSyDey3KL3qZUvZBVtFcB38xzBGx6qrG2WYY",
+      authDomain: "bktowers-4b822.firebaseapp.com",
+      projectId: "bktowers-4b822",
+      storageBucket: "bktowers-4b822.firebasestorage.app",
+      messagingSenderId: "336608827796",
+      appId: "1:336608827796:web:4957fe0d411220f6a69781"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+    const db = getFirestore(app);
+
+    const totalUnitsEl = document.getElementById("totalUnits");
+    const availableUnitsEl = document.getElementById("availableUnits");
+    const occupiedUnitsEl = document.getElementById("occupiedUnits");
+    const maintenanceUnitsEl = document.getElementById("maintenanceUnits");
+    const unitsTableBody = document.getElementById("unitsTableBody");
+    const formMessage = document.getElementById("formMessage");
+
+    const userNameEl = document.getElementById("sidebarUserName");
+    const userEmailEl = document.getElementById("sidebarUserEmail");
+    const userRoleEl = document.getElementById("sidebarUserRole");
+
+    function setMessage(text, type = "") {
+      formMessage.textContent = text;
+      formMessage.className = "message";
+      if (type) {
+        formMessage.classList.add(type);
+      }
+    }
+
+    function getRentalPlans() {
+      const plans = [];
+
+      const planMap = [
+        { checked: "planDaily", price: "priceDaily", type: "daily", label: "Daily" },
+        { checked: "planMonthly", price: "priceMonthly", type: "monthly", label: "Monthly" },
+        { checked: "planQuarterly", price: "priceQuarterly", type: "quarterly", label: "Quarterly" },
+        { checked: "planSemiAnnual", price: "priceSemiAnnual", type: "semi_annual", label: "Semi Annual" },
+        { checked: "planAnnual", price: "priceAnnual", type: "annual", label: "Annual" }
+      ];
+
+      for (const item of planMap) {
+        const isChecked = document.getElementById(item.checked).checked;
+        const priceValue = document.getElementById(item.price).value;
+
+        if (isChecked) {
+          if (!priceValue || Number(priceValue) <= 0) {
+            throw new Error(`${item.label} price is required.`);
+          }
+
+          plans.push({
+            type: item.type,
+            price: Number(priceValue)
+          });
+        }
+      }
+
+      return plans;
+    }
+
+    function formatPlans(plans = []) {
+      if (!plans.length) return "-";
+
+      return plans
+        .map(plan => `${plan.type.replaceAll("_", " ")}: ${plan.price}`)
+        .join(" | ");
+    }
+
+    function getStatusBadge(status) {
+      if (status === "available") {
+        return `<span class="status-badge status-available">Available</span>`;
+      }
+
+      if (status === "occupied") {
+        return `<span class="status-badge status-occupied">Occupied</span>`;
+      }
+
+      return `<span class="status-badge status-maintenance">Maintenance</span>`;
+    }
+
+    function clearForm() {
+      document.getElementById("propertyName").value = "";
+      document.getElementById("unitNumber").value = "";
+      document.getElementById("unitType").value = "";
+      document.getElementById("status").value = "available";
+      document.getElementById("floor").value = "";
+      document.getElementById("rooms").value = "";
+      document.getElementById("bathrooms").value = "";
+      document.getElementById("baseNotes").value = "";
+
+      document.getElementById("planDaily").checked = false;
+      document.getElementById("planMonthly").checked = false;
+      document.getElementById("planQuarterly").checked = false;
+      document.getElementById("planSemiAnnual").checked = false;
+      document.getElementById("planAnnual").checked = false;
+
+      document.getElementById("priceDaily").value = "";
+      document.getElementById("priceMonthly").value = "";
+      document.getElementById("priceQuarterly").value = "";
+      document.getElementById("priceSemiAnnual").value = "";
+      document.getElementById("priceAnnual").value = "";
+
+      setMessage("");
+    }
+
+    async function loadUnits() {
+      unitsTableBody.innerHTML = `<tr><td colspan="9" class="empty">Loading units...</td></tr>`;
+
+      const q = query(collection(db, "units"), orderBy("createdAt", "desc"));
+      const snapshot = await getDocs(q);
+
+      let rows = "";
+      let total = 0;
+      let available = 0;
+      let occupied = 0;
+      let maintenance = 0;
+
+      snapshot.forEach((docSnap) => {
+        total++;
+
+        const unit = docSnap.data();
+
+        if (unit.status === "available") available++;
+        if (unit.status === "occupied") occupied++;
+        if (unit.status === "maintenance") maintenance++;
+
+        rows += `
+          <tr>
+            <td>${unit.propertyName || "-"}</td>
+            <td>${unit.unitNumber || "-"}</td>
+            <td>${unit.unitType || "-"}</td>
+            <td>${getStatusBadge(unit.status || "available")}</td>
+            <td>${unit.floor || "-"}</td>
+            <td>${unit.rooms ?? "-"}</td>
+            <td>${unit.bathrooms ?? "-"}</td>
+            <td>${formatPlans(unit.rentalPlans || [])}</td>
+            <td>
+              <button class="danger-btn" onclick="deleteUnit('${docSnap.id}')">Delete</button>
+            </td>
+          </tr>
+        `;
+      });
+
+      if (!rows) {
+        rows = `<tr><td colspan="9" class="empty">No units found.</td></tr>`;
+      }
+
+      unitsTableBody.innerHTML = rows;
+      totalUnitsEl.textContent = total;
+      availableUnitsEl.textContent = available;
+      occupiedUnitsEl.textContent = occupied;
+      maintenanceUnitsEl.textContent = maintenance;
+    }
+
+    async function addUnit() {
+      try {
+        const propertyName = document.getElementById("propertyName").value.trim();
+        const unitNumber = document.getElementById("unitNumber").value.trim();
+        const unitType = document.getElementById("unitType").value;
+        const status = document.getElementById("status").value;
+        const floor = document.getElementById("floor").value.trim();
+        const rooms = document.getElementById("rooms").value;
+        const bathrooms = document.getElementById("bathrooms").value;
+        const notes = document.getElementById("baseNotes").value.trim();
+        const rentalPlans = getRentalPlans();
+
+        if (!propertyName) {
+          throw new Error("Property name is required.");
+        }
+
+        if (!unitNumber) {
+          throw new Error("Unit number is required.");
+        }
+
+        if (!unitType) {
+          throw new Error("Unit type is required.");
+        }
+
+        if (!rentalPlans.length) {
+          throw new Error("Select at least one rental plan.");
+        }
+
+        await addDoc(collection(db, "units"), {
+          propertyName,
+          unitNumber,
+          unitType,
+          status,
+          floor,
+          rooms: rooms ? Number(rooms) : 0,
+          bathrooms: bathrooms ? Number(bathrooms) : 0,
+          notes,
+          rentalPlans,
+          createdAt: serverTimestamp()
+        });
+
+        setMessage("Unit added successfully.", "success");
+        clearForm();
+        await loadUnits();
+      } catch (error) {
+        setMessage(error.message, "error");
+      }
+    }
+
+    async function deleteUnit(id) {
+      const confirmed = window.confirm("Are you sure you want to delete this unit?");
+      if (!confirmed) return;
+
+      try {
+        await deleteDoc(doc(db, "units", id));
+        await loadUnits();
+      } catch (error) {
+        alert(error.message);
+      }
+    }
+
+    async function logout() {
+      try {
+        await signOut(auth);
+        localStorage.clear();
+        window.location.href = "index.html";
+      } catch (error) {
+        alert(error.message);
+      }
+    }
+
+    window.addUnit = addUnit;
+    window.deleteUnit = deleteUnit;
+    window.logout = logout;
+    window.clearForm = clearForm;
+
+    onAuthStateChanged(auth, async (user) => {
+      if (!user) {
+        window.location.href = "index.html";
+        return;
+      }
+
+      userNameEl.textContent = localStorage.getItem("userName") || "Main Admin";
+      userEmailEl.textContent = localStorage.getItem("userEmail") || user.email || "-";
+      userRoleEl.textContent = localStorage.getItem("userRole") || "admin";
+
+      await loadUnits();
+    });
+  </script>
 </body>
 </html>
