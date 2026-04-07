@@ -1,43 +1,61 @@
-rules_version = '2';
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>BkTowers</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-service cloud.firestore {
-  match /databases/{database}/documents {
-
-    // المستخدم لازم يكون مسجل دخول
-    function isLoggedIn() {
-      return request.auth != null;
+  <style>
+    body {
+      margin: 0;
+      font-family: Arial;
+      background: linear-gradient(135deg, #0a1f44, #1e3c72);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
     }
 
-    // Collection users
-    match /users/{userId} {
-      allow read: if isLoggedIn();
-      allow write: if isLoggedIn(); // نضبطها بعدين للأدمن فقط
+    .box {
+      background: white;
+      padding: 40px;
+      border-radius: 10px;
+      width: 320px;
+      text-align: center;
     }
 
-    // الوحدات (الشقق)
-    match /units/{unitId} {
-      allow read: if isLoggedIn();
-      allow write: if isLoggedIn();
+    h1 {
+      color: #0a1f44;
+      margin-bottom: 25px;
     }
 
-    // العملاء
-    match /clients/{clientId} {
-      allow read, write: if isLoggedIn();
+    input {
+      width: 100%;
+      padding: 10px;
+      margin-bottom: 15px;
     }
 
-    // السكن
-    match /stays/{stayId} {
-      allow read, write: if isLoggedIn();
+    button {
+      width: 100%;
+      padding: 10px;
+      background: #0a1f44;
+      color: white;
+      border: none;
+      cursor: pointer;
     }
+  </style>
+</head>
 
-    // المصروفات
-    match /expenses/{expenseId} {
-      allow read, write: if isLoggedIn();
-    }
+<body>
 
-    // الصيانة
-    match /maintenance/{maintenanceId} {
-      allow read, write: if isLoggedIn();
-    }
-  }
-}
+  <div class="box">
+    <h1>BkTowers</h1>
+
+    <input type="email" placeholder="Email">
+    <input type="password" placeholder="Password">
+
+    <button>Login</button>
+  </div>
+
+</body>
+</html>
