@@ -4,7 +4,27 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>لوحة التحكم - BkTowers</title>
+
   <style>
+    :root {
+      --primary: #0a1f44;
+      --primary-2: #16366f;
+      --bg: #f3f6fb;
+      --card: #ffffff;
+      --text: #1f2937;
+      --muted: #6b7280;
+      --border: #e5e7eb;
+      --danger: #dc2626;
+      --success-bg: #dcfce7;
+      --success-text: #166534;
+      --warning-bg: #fef3c7;
+      --warning-text: #92400e;
+      --danger-bg: #fee2e2;
+      --danger-text: #991b1b;
+      --shadow: 0 10px 30px rgba(15, 23, 42, 0.08);
+      --radius: 18px;
+    }
+
     * {
       box-sizing: border-box;
     }
@@ -12,159 +32,238 @@
     body {
       margin: 0;
       font-family: Arial, sans-serif;
-      background: #f4f7fb;
-      color: #1f2937;
+      background: var(--bg);
+      color: var(--text);
     }
 
-    .layout {
+    .app-shell {
       display: flex;
       min-height: 100vh;
     }
 
     .sidebar {
-      width: 260px;
-      background: #0a1f44;
+      width: 280px;
+      background: linear-gradient(180deg, var(--primary), #08162f);
       color: #fff;
       padding: 24px 18px;
+      position: sticky;
+      top: 0;
+      height: 100vh;
+      overflow-y: auto;
+      flex-shrink: 0;
     }
 
     .brand {
-      font-size: 30px;
-      font-weight: 700;
-      margin-bottom: 8px;
+      font-size: 32px;
+      font-weight: 800;
+      margin-bottom: 6px;
+      letter-spacing: 0.5px;
     }
 
     .brand-sub {
-      font-size: 13px;
+      font-size: 14px;
       color: #c7d2fe;
-      margin-bottom: 28px;
-    }
-
-    .user-box {
-      background: rgba(255, 255, 255, 0.08);
-      border-radius: 14px;
-      padding: 14px;
       margin-bottom: 24px;
     }
 
-    .user-box div {
-      margin-bottom: 8px;
+    .user-card {
+      background: rgba(255, 255, 255, 0.08);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      border-radius: 16px;
+      padding: 14px;
+      margin-bottom: 20px;
+    }
+
+    .user-card .row {
+      margin-bottom: 10px;
       font-size: 14px;
+      line-height: 1.7;
       word-break: break-word;
     }
 
-    .side-links {
+    .user-card .row:last-child {
+      margin-bottom: 0;
+    }
+
+    .menu-title {
+      font-size: 12px;
+      color: #cbd5e1;
+      margin: 18px 6px 10px;
+    }
+
+    .nav-links {
       display: flex;
       flex-direction: column;
       gap: 10px;
-      margin-bottom: 24px;
     }
 
-    .side-links a,
-    .side-links button {
+    .nav-links a,
+    .nav-links button {
       width: 100%;
-      text-align: right;
-      padding: 12px 14px;
-      border-radius: 10px;
       border: none;
-      text-decoration: none;
+      border-radius: 14px;
+      padding: 13px 14px;
+      font-size: 14px;
       background: rgba(255, 255, 255, 0.08);
       color: #fff;
+      text-decoration: none;
+      text-align: right;
       cursor: pointer;
-      font-size: 14px;
+      transition: 0.2s ease;
+      font-family: inherit;
     }
 
-    .side-links a:hover,
-    .side-links button:hover {
+    .nav-links a:hover,
+    .nav-links button:hover {
       background: rgba(255, 255, 255, 0.16);
+    }
+
+    .nav-links a.active {
+      background: #ffffff;
+      color: var(--primary);
+      font-weight: 700;
+    }
+
+    .sidebar-note {
+      margin-top: 22px;
+      font-size: 12px;
+      color: #dbe4ff;
+      line-height: 1.8;
+      opacity: 0.9;
     }
 
     .main {
       flex: 1;
-      padding: 28px;
+      min-width: 0;
+      padding: 24px;
     }
 
     .topbar {
+      background: var(--card);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      padding: 18px 20px;
       display: flex;
-      justify-content: space-between;
       align-items: center;
+      justify-content: space-between;
       gap: 16px;
-      margin-bottom: 24px;
+      margin-bottom: 22px;
       flex-wrap: wrap;
     }
 
-    .page-title h1 {
+    .topbar-title h1 {
       margin: 0 0 6px;
       font-size: 28px;
-      color: #0a1f44;
+      color: var(--primary);
     }
 
-    .page-title p {
+    .topbar-title p {
       margin: 0;
-      color: #6b7280;
+      color: var(--muted);
       font-size: 14px;
     }
 
-    .logout-btn {
-      padding: 12px 16px;
-      background: #dc2626;
-      color: #fff;
+    .topbar-actions {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+
+    .logout-btn,
+    .action-btn {
       border: none;
-      border-radius: 10px;
+      border-radius: 12px;
+      padding: 12px 16px;
       cursor: pointer;
       font-size: 14px;
       font-weight: 700;
+      font-family: inherit;
+    }
+
+    .action-btn {
+      background: var(--primary);
+      color: #fff;
+    }
+
+    .action-btn:hover {
+      background: var(--primary-2);
+    }
+
+    .logout-btn {
+      background: var(--danger);
+      color: #fff;
     }
 
     .logout-btn:hover {
       background: #b91c1c;
     }
 
-    .stats {
+    .stats-grid {
       display: grid;
-      grid-template-columns: repeat(4, minmax(180px, 1fr));
-      gap: 16px;
-      margin-bottom: 24px;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 18px;
+      margin-bottom: 22px;
     }
 
     .stat-card {
-      background: #fff;
-      border-radius: 16px;
-      padding: 18px;
-      box-shadow: 0 8px 24px rgba(15, 23, 42, 0.06);
+      background: var(--card);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      padding: 20px;
+      min-height: 120px;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
     }
 
     .stat-card h3 {
-      margin: 0 0 10px;
+      margin: 0;
       font-size: 14px;
-      color: #6b7280;
-      font-weight: 600;
+      color: var(--muted);
+      font-weight: 700;
     }
 
     .stat-card .value {
-      font-size: 30px;
-      font-weight: 700;
-      color: #0a1f44;
+      font-size: 34px;
+      font-weight: 800;
+      color: var(--primary);
+      margin-top: 16px;
     }
 
-    .content-grid {
+    .dashboard-grid {
       display: grid;
-      grid-template-columns: 1.1fr 1.4fr;
-      gap: 20px;
+      grid-template-columns: 420px minmax(0, 1fr);
+      gap: 22px;
       align-items: start;
     }
 
-    .card {
-      background: #fff;
-      border-radius: 18px;
+    .panel {
+      background: var(--card);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
       padding: 22px;
-      box-shadow: 0 8px 24px rgba(15, 23, 42, 0.06);
+      min-width: 0;
     }
 
-    .card h2 {
-      margin: 0 0 18px;
-      font-size: 20px;
-      color: #0a1f44;
+    .panel-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      margin-bottom: 18px;
+      flex-wrap: wrap;
+    }
+
+    .panel-header h2 {
+      margin: 0;
+      font-size: 22px;
+      color: var(--primary);
+    }
+
+    .panel-header p {
+      margin: 0;
+      color: var(--muted);
+      font-size: 13px;
     }
 
     .form-grid {
@@ -185,7 +284,7 @@
 
     label {
       font-size: 14px;
-      font-weight: 600;
+      font-weight: 700;
       color: #374151;
     }
 
@@ -194,11 +293,20 @@
     textarea {
       width: 100%;
       padding: 12px 13px;
-      border: 1px solid #d1d5db;
-      border-radius: 10px;
+      border: 1px solid var(--border);
+      border-radius: 12px;
       font-size: 14px;
       background: #fff;
+      outline: none;
       font-family: inherit;
+      transition: 0.2s ease;
+    }
+
+    input:focus,
+    select:focus,
+    textarea:focus {
+      border-color: var(--primary);
+      box-shadow: 0 0 0 3px rgba(10, 31, 68, 0.08);
     }
 
     textarea {
@@ -207,15 +315,15 @@
     }
 
     .plans-box {
-      border: 1px solid #e5e7eb;
-      border-radius: 12px;
+      border: 1px solid var(--border);
+      border-radius: 16px;
       padding: 14px;
-      background: #f9fafb;
+      background: #f9fbff;
     }
 
     .plan-row {
       display: grid;
-      grid-template-columns: 140px 1fr;
+      grid-template-columns: 120px 1fr;
       gap: 12px;
       align-items: center;
       margin-bottom: 10px;
@@ -230,13 +338,13 @@
       align-items: center;
       gap: 10px;
       font-size: 14px;
-      font-weight: 600;
+      font-weight: 700;
     }
 
-    .actions {
+    .form-actions {
       display: flex;
       gap: 10px;
-      margin-top: 16px;
+      margin-top: 18px;
       flex-wrap: wrap;
     }
 
@@ -244,36 +352,37 @@
     .secondary-btn,
     .danger-btn {
       border: none;
-      border-radius: 10px;
+      border-radius: 12px;
       padding: 12px 16px;
       cursor: pointer;
       font-size: 14px;
       font-weight: 700;
       font-family: inherit;
+      transition: 0.2s ease;
     }
 
     .primary-btn {
-      background: #0a1f44;
+      background: var(--primary);
       color: #fff;
     }
 
     .primary-btn:hover {
-      background: #16366f;
+      background: var(--primary-2);
     }
 
     .secondary-btn {
-      background: #e5e7eb;
+      background: #eef2f7;
       color: #111827;
     }
 
     .secondary-btn:hover {
-      background: #d1d5db;
+      background: #e5e7eb;
     }
 
     .danger-btn {
-      background: #dc2626;
+      background: var(--danger);
       color: #fff;
-      padding: 8px 12px;
+      padding: 9px 14px;
       font-size: 13px;
     }
 
@@ -281,29 +390,67 @@
       background: #b91c1c;
     }
 
+    .message {
+      margin-top: 14px;
+      min-height: 20px;
+      font-size: 14px;
+      font-weight: 700;
+    }
+
+    .message.success {
+      color: #166534;
+    }
+
+    .message.error {
+      color: #b91c1c;
+    }
+
+    .table-tools {
+      display: flex;
+      justify-content: space-between;
+      gap: 12px;
+      flex-wrap: wrap;
+      margin-bottom: 14px;
+    }
+
+    .search-box {
+      max-width: 280px;
+      width: 100%;
+    }
+
     .table-wrap {
       overflow-x: auto;
+      border: 1px solid var(--border);
+      border-radius: 16px;
     }
 
     table {
       width: 100%;
       border-collapse: collapse;
-      min-width: 950px;
+      min-width: 980px;
+      background: #fff;
     }
 
     th,
     td {
-      padding: 12px 10px;
-      border-bottom: 1px solid #e5e7eb;
+      padding: 14px 12px;
+      border-bottom: 1px solid var(--border);
       text-align: right;
-      font-size: 14px;
       vertical-align: top;
+      font-size: 14px;
     }
 
     th {
+      background: #f8fafc;
       color: #374151;
-      background: #f9fafb;
-      font-weight: 700;
+      font-weight: 800;
+      position: sticky;
+      top: 0;
+      z-index: 1;
+    }
+
+    tbody tr:hover {
+      background: #fafcff;
     }
 
     .status-badge {
@@ -311,70 +458,68 @@
       padding: 6px 10px;
       border-radius: 999px;
       font-size: 12px;
-      font-weight: 700;
+      font-weight: 800;
+      white-space: nowrap;
     }
 
     .status-available {
-      background: #dcfce7;
-      color: #166534;
+      background: var(--success-bg);
+      color: var(--success-text);
     }
 
     .status-occupied {
-      background: #fee2e2;
-      color: #991b1b;
+      background: var(--danger-bg);
+      color: var(--danger-text);
     }
 
     .status-maintenance {
-      background: #fef3c7;
-      color: #92400e;
-    }
-
-    .small-text {
-      font-size: 12px;
-      color: #cbd5e1;
-      line-height: 1.8;
+      background: var(--warning-bg);
+      color: var(--warning-text);
     }
 
     .empty {
       text-align: center;
-      color: #6b7280;
-      padding: 24px 0;
+      color: var(--muted);
+      padding: 26px 0;
+      font-weight: 700;
     }
 
-    .message {
-      margin-top: 14px;
-      font-size: 14px;
-      min-height: 20px;
+    .plans-list {
+      line-height: 1.8;
+      white-space: normal;
     }
 
-    .message.success {
-      color: #065f46;
+    .mobile-menu-btn {
+      display: none;
     }
 
-    .message.error {
-      color: #b91c1c;
-    }
-
-    @media (max-width: 1200px) {
-      .stats {
-        grid-template-columns: repeat(2, minmax(180px, 1fr));
+    @media (max-width: 1400px) {
+      .stats-grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
       }
 
-      .content-grid {
+      .dashboard-grid {
         grid-template-columns: 1fr;
       }
     }
 
-    @media (max-width: 850px) {
-      .layout {
+    @media (max-width: 900px) {
+      .app-shell {
         flex-direction: column;
       }
 
       .sidebar {
         width: 100%;
+        height: auto;
+        position: relative;
+        border-radius: 0 0 22px 22px;
       }
 
-      .stats {
+      .main {
+        padding: 16px;
+      }
+
+      .stats-grid {
         grid-template-columns: 1fr;
       }
 
@@ -389,19 +534,20 @@
   </style>
 </head>
 <body>
-  <div class="layout">
+  <div class="app-shell">
     <aside class="sidebar">
       <div class="brand">BkTowers</div>
       <div class="brand-sub">نظام إدارة العقارات</div>
 
-      <div class="user-box">
-        <div><strong>الاسم:</strong> <span id="sidebarUserName">-</span></div>
-        <div><strong>البريد الإلكتروني:</strong> <span id="sidebarUserEmail">-</span></div>
-        <div><strong>الصلاحية:</strong> <span id="sidebarUserRole">-</span></div>
+      <div class="user-card">
+        <div class="row"><strong>الاسم:</strong> <span id="sidebarUserName">-</span></div>
+        <div class="row"><strong>البريد:</strong> <span id="sidebarUserEmail">-</span></div>
+        <div class="row"><strong>الصلاحية:</strong> <span id="sidebarUserRole">-</span></div>
       </div>
 
-      <div class="side-links">
-        <a href="dashboard.html">لوحة التحكم</a>
+      <div class="menu-title">القائمة الرئيسية</div>
+      <div class="nav-links">
+        <a href="dashboard.html" class="active">لوحة التحكم</a>
         <a href="clients.html">العملاء</a>
         <a href="stays.html">السكن والحجوزات</a>
         <a href="expenses.html">المصروفات</a>
@@ -410,42 +556,54 @@
         <button onclick="logout()">تسجيل الخروج</button>
       </div>
 
-      <div class="small-text">
-        هذه الصفحة مخصصة لإدارة الشقق والوحدات وإدخال البيانات الأساسية وأنظمة الإيجار.
+      <div class="sidebar-note">
+        من هنا تقدر تضيف الوحدات وتحدد حالة كل وحدة وأنظمة الإيجار الخاصة بها بشكل منظم.
       </div>
     </aside>
 
     <main class="main">
-      <div class="topbar">
-        <div class="page-title">
+      <section class="topbar">
+        <div class="topbar-title">
           <h1>لوحة التحكم</h1>
-          <p>إدارة الوحدات، الأسعار، وأنظمة الإيجار من مكان واحد.</p>
+          <p>واجهة إدارة الشقق والوحدات وأنظمة الإيجار بشكل احترافي وواضح.</p>
         </div>
-        <button class="logout-btn" onclick="logout()">تسجيل الخروج</button>
-      </div>
 
-      <section class="stats">
+        <div class="topbar-actions">
+          <button class="action-btn" onclick="document.getElementById('propertyName').focus()">إضافة وحدة جديدة</button>
+          <button class="logout-btn" onclick="logout()">تسجيل الخروج</button>
+        </div>
+      </section>
+
+      <section class="stats-grid">
         <div class="stat-card">
           <h3>إجمالي الوحدات</h3>
           <div class="value" id="totalUnits">0</div>
         </div>
+
         <div class="stat-card">
           <h3>الوحدات المتاحة</h3>
           <div class="value" id="availableUnits">0</div>
         </div>
+
         <div class="stat-card">
           <h3>الوحدات المشغولة</h3>
           <div class="value" id="occupiedUnits">0</div>
         </div>
+
         <div class="stat-card">
           <h3>وحدات تحت الصيانة</h3>
           <div class="value" id="maintenanceUnits">0</div>
         </div>
       </section>
 
-      <section class="content-grid">
-        <div class="card">
-          <h2>إضافة وحدة جديدة</h2>
+      <section class="dashboard-grid">
+        <div class="panel">
+          <div class="panel-header">
+            <div>
+              <h2>إضافة وحدة جديدة</h2>
+              <p>أدخل البيانات الأساسية وأنظمة الإيجار والأسعار.</p>
+            </div>
+          </div>
 
           <div class="form-grid">
             <div class="form-group">
@@ -547,7 +705,7 @@
             </div>
           </div>
 
-          <div class="actions">
+          <div class="form-actions">
             <button class="primary-btn" onclick="addUnit()">حفظ الوحدة</button>
             <button class="secondary-btn" onclick="clearForm()">تفريغ الحقول</button>
           </div>
@@ -555,8 +713,18 @@
           <div id="formMessage" class="message"></div>
         </div>
 
-        <div class="card">
-          <h2>قائمة الوحدات</h2>
+        <div class="panel">
+          <div class="panel-header">
+            <div>
+              <h2>قائمة الوحدات</h2>
+              <p>جميع الوحدات المضافة تظهر هنا مع حالتها وأنظمة الإيجار.</p>
+            </div>
+          </div>
+
+          <div class="table-tools">
+            <input type="text" id="searchInput" class="search-box" placeholder="ابحث برقم الوحدة أو اسم العقار">
+          </div>
+
           <div class="table-wrap">
             <table>
               <thead>
@@ -622,17 +790,18 @@
     const maintenanceUnitsEl = document.getElementById("maintenanceUnits");
     const unitsTableBody = document.getElementById("unitsTableBody");
     const formMessage = document.getElementById("formMessage");
+    const searchInput = document.getElementById("searchInput");
 
     const userNameEl = document.getElementById("sidebarUserName");
     const userEmailEl = document.getElementById("sidebarUserEmail");
     const userRoleEl = document.getElementById("sidebarUserRole");
 
+    let allUnits = [];
+
     function setMessage(text, type = "") {
       formMessage.textContent = text;
       formMessage.className = "message";
-      if (type) {
-        formMessage.classList.add(type);
-      }
+      if (type) formMessage.classList.add(type);
     }
 
     function getRentalPlans() {
@@ -667,18 +836,16 @@
 
     function formatPlans(plans = []) {
       if (!plans.length) return "-";
-      return plans.map(plan => `${plan.type}: ${plan.price}`).join(" | ");
+      return plans.map(plan => `${plan.type}: ${plan.price}`).join("<br>");
     }
 
     function getStatusBadge(status) {
       if (status === "available") {
         return `<span class="status-badge status-available">متاحة</span>`;
       }
-
       if (status === "occupied") {
         return `<span class="status-badge status-occupied">مشغولة</span>`;
       }
-
       return `<span class="status-badge status-maintenance">صيانة</span>`;
     }
 
@@ -707,21 +874,15 @@
       setMessage("");
     }
 
-    async function loadUnits() {
-      unitsTableBody.innerHTML = `<tr><td colspan="9" class="empty">جاري تحميل الوحدات...</td></tr>`;
-
-      const q = query(collection(db, "units"), orderBy("createdAt", "desc"));
-      const snapshot = await getDocs(q);
-
+    function renderUnits(units) {
       let rows = "";
-      let total = 0;
+      let total = units.length;
       let available = 0;
       let occupied = 0;
       let maintenance = 0;
 
-      snapshot.forEach((docSnap) => {
-        total++;
-        const unit = docSnap.data();
+      units.forEach((item) => {
+        const unit = item.data;
 
         if (unit.status === "available") available++;
         if (unit.status === "occupied") occupied++;
@@ -736,16 +897,16 @@
             <td>${unit.floor || "-"}</td>
             <td>${unit.rooms ?? "-"}</td>
             <td>${unit.bathrooms ?? "-"}</td>
-            <td>${formatPlans(unit.rentalPlans || [])}</td>
+            <td class="plans-list">${formatPlans(unit.rentalPlans || [])}</td>
             <td>
-              <button class="danger-btn" onclick="deleteUnit('${docSnap.id}')">حذف</button>
+              <button class="danger-btn" onclick="deleteUnit('${item.id}')">حذف</button>
             </td>
           </tr>
         `;
       });
 
       if (!rows) {
-        rows = `<tr><td colspan="9" class="empty">لا توجد وحدات مضافة حتى الآن.</td></tr>`;
+        rows = `<tr><td colspan="9" class="empty">لا توجد وحدات مطابقة.</td></tr>`;
       }
 
       unitsTableBody.innerHTML = rows;
@@ -753,6 +914,23 @@
       availableUnitsEl.textContent = available;
       occupiedUnitsEl.textContent = occupied;
       maintenanceUnitsEl.textContent = maintenance;
+    }
+
+    async function loadUnits() {
+      unitsTableBody.innerHTML = `<tr><td colspan="9" class="empty">جاري تحميل الوحدات...</td></tr>`;
+
+      const q = query(collection(db, "units"), orderBy("createdAt", "desc"));
+      const snapshot = await getDocs(q);
+
+      allUnits = [];
+      snapshot.forEach((docSnap) => {
+        allUnits.push({
+          id: docSnap.id,
+          data: docSnap.data()
+        });
+      });
+
+      renderUnits(allUnits);
     }
 
     async function addUnit() {
@@ -767,21 +945,10 @@
         const notes = document.getElementById("baseNotes").value.trim();
         const rentalPlans = getRentalPlans();
 
-        if (!propertyName) {
-          throw new Error("اسم العقار مطلوب.");
-        }
-
-        if (!unitNumber) {
-          throw new Error("رقم الوحدة مطلوب.");
-        }
-
-        if (!unitType) {
-          throw new Error("نوع الوحدة مطلوب.");
-        }
-
-        if (!rentalPlans.length) {
-          throw new Error("اختر نظام إيجار واحد على الأقل.");
-        }
+        if (!propertyName) throw new Error("اسم العقار مطلوب.");
+        if (!unitNumber) throw new Error("رقم الوحدة مطلوب.");
+        if (!unitType) throw new Error("نوع الوحدة مطلوب.");
+        if (!rentalPlans.length) throw new Error("اختر نظام إيجار واحد على الأقل.");
 
         await addDoc(collection(db, "units"), {
           propertyName,
@@ -826,6 +993,28 @@
       }
     }
 
+    function filterUnits() {
+      const keyword = searchInput.value.trim().toLowerCase();
+
+      if (!keyword) {
+        renderUnits(allUnits);
+        return;
+      }
+
+      const filtered = allUnits.filter((item) => {
+        const unit = item.data;
+        return (
+          String(unit.propertyName || "").toLowerCase().includes(keyword) ||
+          String(unit.unitNumber || "").toLowerCase().includes(keyword) ||
+          String(unit.unitType || "").toLowerCase().includes(keyword)
+        );
+      });
+
+      renderUnits(filtered);
+    }
+
+    searchInput.addEventListener("input", filterUnits);
+
     window.addUnit = addUnit;
     window.deleteUnit = deleteUnit;
     window.logout = logout;
@@ -837,9 +1026,10 @@
         return;
       }
 
+      const roleValue = localStorage.getItem("userRole") || "admin";
       userNameEl.textContent = localStorage.getItem("userName") || "المدير الرئيسي";
       userEmailEl.textContent = localStorage.getItem("userEmail") || user.email || "-";
-      userRoleEl.textContent = localStorage.getItem("userRole") || "admin";
+      userRoleEl.textContent = roleValue === "admin" ? "مدير" : "موظف";
 
       await loadUnits();
     });
