@@ -7,21 +7,23 @@
 
   <style>
     :root {
-      --primary: #0a1f44;
-      --primary-2: #16366f;
-      --bg: #f3f6fb;
+      --primary: #0b1f4d;
+      --primary-dark: #08173a;
+      --primary-light: #eef4ff;
+      --bg: #eef3f9;
       --card: #ffffff;
-      --text: #1f2937;
-      --muted: #6b7280;
-      --border: #e5e7eb;
-      --danger: #dc2626;
+      --text: #111827;
+      --muted: #4b5563;
+      --border: #d7deea;
+      --danger: #c62828;
+      --danger-dark: #a61f1f;
       --success-bg: #dcfce7;
       --success-text: #166534;
       --warning-bg: #fef3c7;
       --warning-text: #92400e;
       --danger-bg: #fee2e2;
       --danger-text: #991b1b;
-      --shadow: 0 10px 30px rgba(15, 23, 42, 0.08);
+      --shadow: 0 12px 30px rgba(15, 23, 42, 0.10);
       --radius: 18px;
     }
 
@@ -42,8 +44,8 @@
     }
 
     .sidebar {
-      width: 280px;
-      background: linear-gradient(180deg, var(--primary), #08162f);
+      width: 290px;
+      background: linear-gradient(180deg, var(--primary), var(--primary-dark));
       color: #fff;
       padding: 24px 18px;
       position: sticky;
@@ -51,24 +53,27 @@
       height: 100vh;
       overflow-y: auto;
       flex-shrink: 0;
+      border-left: 4px solid rgba(255,255,255,0.08);
     }
 
     .brand {
-      font-size: 32px;
+      font-size: 34px;
       font-weight: 800;
       margin-bottom: 6px;
-      letter-spacing: 0.5px;
+      letter-spacing: 0.3px;
+      color: #ffffff;
     }
 
     .brand-sub {
       font-size: 14px;
-      color: #c7d2fe;
+      color: #dbe6ff;
       margin-bottom: 24px;
+      font-weight: 700;
     }
 
     .user-card {
-      background: rgba(255, 255, 255, 0.08);
-      border: 1px solid rgba(255, 255, 255, 0.08);
+      background: rgba(255, 255, 255, 0.10);
+      border: 1px solid rgba(255, 255, 255, 0.14);
       border-radius: 16px;
       padding: 14px;
       margin-bottom: 20px;
@@ -77,8 +82,9 @@
     .user-card .row {
       margin-bottom: 10px;
       font-size: 14px;
-      line-height: 1.7;
+      line-height: 1.8;
       word-break: break-word;
+      color: #ffffff;
     }
 
     .user-card .row:last-child {
@@ -87,8 +93,9 @@
 
     .menu-title {
       font-size: 12px;
-      color: #cbd5e1;
+      color: #dbe6ff;
       margin: 18px 6px 10px;
+      font-weight: 700;
     }
 
     .nav-links {
@@ -104,32 +111,32 @@
       border-radius: 14px;
       padding: 13px 14px;
       font-size: 14px;
-      background: rgba(255, 255, 255, 0.08);
-      color: #fff;
+      background: rgba(255, 255, 255, 0.10);
+      color: #ffffff;
       text-decoration: none;
       text-align: right;
       cursor: pointer;
       transition: 0.2s ease;
       font-family: inherit;
+      font-weight: 700;
     }
 
     .nav-links a:hover,
     .nav-links button:hover {
-      background: rgba(255, 255, 255, 0.16);
+      background: rgba(255, 255, 255, 0.18);
     }
 
     .nav-links a.active {
       background: #ffffff;
       color: var(--primary);
-      font-weight: 700;
     }
 
     .sidebar-note {
       margin-top: 22px;
       font-size: 12px;
-      color: #dbe4ff;
-      line-height: 1.8;
-      opacity: 0.9;
+      color: #e5edff;
+      line-height: 1.9;
+      font-weight: 700;
     }
 
     .main {
@@ -149,18 +156,21 @@
       gap: 16px;
       margin-bottom: 22px;
       flex-wrap: wrap;
+      border: 1px solid #e4eaf3;
     }
 
     .topbar-title h1 {
       margin: 0 0 6px;
-      font-size: 28px;
+      font-size: 30px;
       color: var(--primary);
+      font-weight: 800;
     }
 
     .topbar-title p {
       margin: 0;
       color: var(--muted);
       font-size: 14px;
+      font-weight: 700;
     }
 
     .topbar-actions {
@@ -176,7 +186,7 @@
       padding: 12px 16px;
       cursor: pointer;
       font-size: 14px;
-      font-weight: 700;
+      font-weight: 800;
       font-family: inherit;
     }
 
@@ -186,7 +196,7 @@
     }
 
     .action-btn:hover {
-      background: var(--primary-2);
+      background: #163b86;
     }
 
     .logout-btn {
@@ -195,7 +205,7 @@
     }
 
     .logout-btn:hover {
-      background: #b91c1c;
+      background: var(--danger-dark);
     }
 
     .stats-grid {
@@ -214,17 +224,18 @@
       display: flex;
       flex-direction: column;
       justify-content: space-between;
+      border: 1px solid #e4eaf3;
     }
 
     .stat-card h3 {
       margin: 0;
       font-size: 14px;
       color: var(--muted);
-      font-weight: 700;
+      font-weight: 800;
     }
 
     .stat-card .value {
-      font-size: 34px;
+      font-size: 36px;
       font-weight: 800;
       color: var(--primary);
       margin-top: 16px;
@@ -232,7 +243,7 @@
 
     .dashboard-grid {
       display: grid;
-      grid-template-columns: 420px minmax(0, 1fr);
+      grid-template-columns: 430px minmax(0, 1fr);
       gap: 22px;
       align-items: start;
     }
@@ -243,6 +254,7 @@
       box-shadow: var(--shadow);
       padding: 22px;
       min-width: 0;
+      border: 1px solid #e4eaf3;
     }
 
     .panel-header {
@@ -256,14 +268,16 @@
 
     .panel-header h2 {
       margin: 0;
-      font-size: 22px;
+      font-size: 24px;
       color: var(--primary);
+      font-weight: 800;
     }
 
     .panel-header p {
       margin: 0;
       color: var(--muted);
       font-size: 13px;
+      font-weight: 700;
     }
 
     .form-grid {
@@ -284,8 +298,8 @@
 
     label {
       font-size: 14px;
-      font-weight: 700;
-      color: #374151;
+      font-weight: 800;
+      color: #1f2937;
     }
 
     input,
@@ -300,6 +314,14 @@
       outline: none;
       font-family: inherit;
       transition: 0.2s ease;
+      color: #111827;
+      font-weight: 700;
+    }
+
+    input::placeholder,
+    textarea::placeholder {
+      color: #6b7280;
+      font-weight: 600;
     }
 
     input:focus,
@@ -318,7 +340,7 @@
       border: 1px solid var(--border);
       border-radius: 16px;
       padding: 14px;
-      background: #f9fbff;
+      background: #f8fbff;
     }
 
     .plan-row {
@@ -338,7 +360,40 @@
       align-items: center;
       gap: 10px;
       font-size: 14px;
-      font-weight: 700;
+      font-weight: 800;
+      color: #111827;
+    }
+
+    .money-input {
+      display: flex;
+      align-items: stretch;
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      overflow: hidden;
+      background: #fff;
+    }
+
+    .money-input input {
+      border: none;
+      border-radius: 0;
+      box-shadow: none;
+    }
+
+    .money-input input:focus {
+      box-shadow: none;
+    }
+
+    .money-badge {
+      min-width: 58px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: var(--primary-light);
+      color: var(--primary);
+      font-size: 13px;
+      font-weight: 800;
+      border-right: 1px solid var(--border);
+      padding: 0 10px;
     }
 
     .form-actions {
@@ -350,13 +405,14 @@
 
     .primary-btn,
     .secondary-btn,
-    .danger-btn {
+    .danger-btn,
+    .edit-btn {
       border: none;
       border-radius: 12px;
       padding: 12px 16px;
       cursor: pointer;
       font-size: 14px;
-      font-weight: 700;
+      font-weight: 800;
       font-family: inherit;
       transition: 0.2s ease;
     }
@@ -367,16 +423,27 @@
     }
 
     .primary-btn:hover {
-      background: var(--primary-2);
+      background: #163b86;
     }
 
     .secondary-btn {
-      background: #eef2f7;
+      background: #edf2f7;
       color: #111827;
     }
 
     .secondary-btn:hover {
-      background: #e5e7eb;
+      background: #e1e8f0;
+    }
+
+    .edit-btn {
+      background: #dbeafe;
+      color: #1d4ed8;
+      padding: 9px 14px;
+      font-size: 13px;
+    }
+
+    .edit-btn:hover {
+      background: #bfdbfe;
     }
 
     .danger-btn {
@@ -387,14 +454,14 @@
     }
 
     .danger-btn:hover {
-      background: #b91c1c;
+      background: var(--danger-dark);
     }
 
     .message {
       margin-top: 14px;
       min-height: 20px;
       font-size: 14px;
-      font-weight: 700;
+      font-weight: 800;
     }
 
     .message.success {
@@ -414,7 +481,7 @@
     }
 
     .search-box {
-      max-width: 280px;
+      max-width: 320px;
       width: 100%;
     }
 
@@ -427,7 +494,7 @@
     table {
       width: 100%;
       border-collapse: collapse;
-      min-width: 980px;
+      min-width: 1040px;
       background: #fff;
     }
 
@@ -438,11 +505,13 @@
       text-align: right;
       vertical-align: top;
       font-size: 14px;
+      color: #111827;
+      font-weight: 700;
     }
 
     th {
-      background: #f8fafc;
-      color: #374151;
+      background: #f7faff;
+      color: #1f2937;
       font-weight: 800;
       position: sticky;
       top: 0;
@@ -450,7 +519,7 @@
     }
 
     tbody tr:hover {
-      background: #fafcff;
+      background: #fbfdff;
     }
 
     .status-badge {
@@ -481,16 +550,18 @@
       text-align: center;
       color: var(--muted);
       padding: 26px 0;
-      font-weight: 700;
+      font-weight: 800;
     }
 
     .plans-list {
-      line-height: 1.8;
+      line-height: 1.9;
       white-space: normal;
     }
 
-    .mobile-menu-btn {
-      display: none;
+    .actions-inline {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
     }
 
     @media (max-width: 1400px) {
@@ -557,7 +628,7 @@
       </div>
 
       <div class="sidebar-note">
-        من هنا تقدر تضيف الوحدات وتحدد حالة كل وحدة وأنظمة الإيجار الخاصة بها بشكل منظم.
+        من هذه الصفحة يمكنك إضافة الوحدات، تعديلها، حذفها، وتحديد أنظمة الإيجار والأسعار الخاصة بها.
       </div>
     </aside>
 
@@ -565,11 +636,11 @@
       <section class="topbar">
         <div class="topbar-title">
           <h1>لوحة التحكم</h1>
-          <p>واجهة إدارة الشقق والوحدات وأنظمة الإيجار بشكل احترافي وواضح.</p>
+          <p>إدارة الشقق والوحدات وحالاتها وأنظمة الإيجار من مكان واحد.</p>
         </div>
 
         <div class="topbar-actions">
-          <button class="action-btn" onclick="document.getElementById('propertyName').focus()">إضافة وحدة جديدة</button>
+          <button class="action-btn" onclick="focusAddForm()">إضافة وحدة جديدة</button>
           <button class="logout-btn" onclick="logout()">تسجيل الخروج</button>
         </div>
       </section>
@@ -600,7 +671,7 @@
         <div class="panel">
           <div class="panel-header">
             <div>
-              <h2>إضافة وحدة جديدة</h2>
+              <h2 id="formTitle">إضافة وحدة جديدة</h2>
               <p>أدخل البيانات الأساسية وأنظمة الإيجار والأسعار.</p>
             </div>
           </div>
@@ -667,7 +738,10 @@
                     <input type="checkbox" id="planDaily">
                     <span>يومي</span>
                   </div>
-                  <input type="number" id="priceDaily" min="0" step="0.01" placeholder="سعر الإيجار اليومي">
+                  <div class="money-input">
+                    <input type="number" id="priceDaily" min="0" step="0.01" placeholder="سعر الإيجار اليومي">
+                    <div class="money-badge">ر.س</div>
+                  </div>
                 </div>
 
                 <div class="plan-row">
@@ -675,7 +749,10 @@
                     <input type="checkbox" id="planMonthly">
                     <span>شهري</span>
                   </div>
-                  <input type="number" id="priceMonthly" min="0" step="0.01" placeholder="سعر الإيجار الشهري">
+                  <div class="money-input">
+                    <input type="number" id="priceMonthly" min="0" step="0.01" placeholder="سعر الإيجار الشهري">
+                    <div class="money-badge">ر.س</div>
+                  </div>
                 </div>
 
                 <div class="plan-row">
@@ -683,7 +760,10 @@
                     <input type="checkbox" id="planQuarterly">
                     <span>ربع سنوي</span>
                   </div>
-                  <input type="number" id="priceQuarterly" min="0" step="0.01" placeholder="سعر الإيجار الربع سنوي">
+                  <div class="money-input">
+                    <input type="number" id="priceQuarterly" min="0" step="0.01" placeholder="سعر الإيجار الربع سنوي">
+                    <div class="money-badge">ر.س</div>
+                  </div>
                 </div>
 
                 <div class="plan-row">
@@ -691,7 +771,10 @@
                     <input type="checkbox" id="planSemiAnnual">
                     <span>نصف سنوي</span>
                   </div>
-                  <input type="number" id="priceSemiAnnual" min="0" step="0.01" placeholder="سعر الإيجار النصف سنوي">
+                  <div class="money-input">
+                    <input type="number" id="priceSemiAnnual" min="0" step="0.01" placeholder="سعر الإيجار النصف سنوي">
+                    <div class="money-badge">ر.س</div>
+                  </div>
                 </div>
 
                 <div class="plan-row">
@@ -699,14 +782,17 @@
                     <input type="checkbox" id="planAnnual">
                     <span>سنوي</span>
                   </div>
-                  <input type="number" id="priceAnnual" min="0" step="0.01" placeholder="سعر الإيجار السنوي">
+                  <div class="money-input">
+                    <input type="number" id="priceAnnual" min="0" step="0.01" placeholder="سعر الإيجار السنوي">
+                    <div class="money-badge">ر.س</div>
+                  </div>
                 </div>
               </div>
             </div>
           </div>
 
           <div class="form-actions">
-            <button class="primary-btn" onclick="addUnit()">حفظ الوحدة</button>
+            <button class="primary-btn" onclick="saveUnit()" id="saveBtn">حفظ الوحدة</button>
             <button class="secondary-btn" onclick="clearForm()">تفريغ الحقول</button>
           </div>
 
@@ -717,12 +803,12 @@
           <div class="panel-header">
             <div>
               <h2>قائمة الوحدات</h2>
-              <p>جميع الوحدات المضافة تظهر هنا مع حالتها وأنظمة الإيجار.</p>
+              <p>جميع الوحدات المضافة تظهر هنا مع حالتها وأنظمة الإيجار الخاصة بها.</p>
             </div>
           </div>
 
           <div class="table-tools">
-            <input type="text" id="searchInput" class="search-box" placeholder="ابحث برقم الوحدة أو اسم العقار">
+            <input type="text" id="searchInput" class="search-box" placeholder="ابحث برقم الوحدة أو اسم العقار أو نوع الوحدة">
           </div>
 
           <div class="table-wrap">
@@ -737,7 +823,7 @@
                   <th>الغرف</th>
                   <th>الحمامات</th>
                   <th>أنظمة الإيجار</th>
-                  <th>إجراء</th>
+                  <th>الإجراءات</th>
                 </tr>
               </thead>
               <tbody id="unitsTableBody">
@@ -768,7 +854,8 @@
       doc,
       serverTimestamp,
       orderBy,
-      query
+      query,
+      updateDoc
     } from "https://www.gstatic.com/firebasejs/12.11.0/firebase-firestore.js";
 
     const firebaseConfig = {
@@ -791,17 +878,25 @@
     const unitsTableBody = document.getElementById("unitsTableBody");
     const formMessage = document.getElementById("formMessage");
     const searchInput = document.getElementById("searchInput");
+    const formTitle = document.getElementById("formTitle");
+    const saveBtn = document.getElementById("saveBtn");
 
     const userNameEl = document.getElementById("sidebarUserName");
     const userEmailEl = document.getElementById("sidebarUserEmail");
     const userRoleEl = document.getElementById("sidebarUserRole");
 
     let allUnits = [];
+    let editingUnitId = null;
 
     function setMessage(text, type = "") {
       formMessage.textContent = text;
       formMessage.className = "message";
       if (type) formMessage.classList.add(type);
+    }
+
+    function focusAddForm() {
+      document.getElementById("propertyName").focus();
+      window.scrollTo({ top: 0, behavior: "smooth" });
     }
 
     function getRentalPlans() {
@@ -836,7 +931,7 @@
 
     function formatPlans(plans = []) {
       if (!plans.length) return "-";
-      return plans.map(plan => `${plan.type}: ${plan.price}`).join("<br>");
+      return plans.map(plan => `${plan.type}: ${plan.price} ر.س`).join("<br>");
     }
 
     function getStatusBadge(status) {
@@ -850,6 +945,8 @@
     }
 
     function clearForm() {
+      editingUnitId = null;
+
       document.getElementById("propertyName").value = "";
       document.getElementById("unitNumber").value = "";
       document.getElementById("unitType").value = "";
@@ -871,7 +968,65 @@
       document.getElementById("priceSemiAnnual").value = "";
       document.getElementById("priceAnnual").value = "";
 
+      formTitle.textContent = "إضافة وحدة جديدة";
+      saveBtn.textContent = "حفظ الوحدة";
       setMessage("");
+    }
+
+    function fillFormForEdit(item) {
+      const unit = item.data;
+      editingUnitId = item.id;
+
+      document.getElementById("propertyName").value = unit.propertyName || "";
+      document.getElementById("unitNumber").value = unit.unitNumber || "";
+      document.getElementById("unitType").value = unit.unitType || "";
+      document.getElementById("status").value = unit.status || "available";
+      document.getElementById("floor").value = unit.floor || "";
+      document.getElementById("rooms").value = unit.rooms ?? "";
+      document.getElementById("bathrooms").value = unit.bathrooms ?? "";
+      document.getElementById("baseNotes").value = unit.notes || "";
+
+      document.getElementById("planDaily").checked = false;
+      document.getElementById("planMonthly").checked = false;
+      document.getElementById("planQuarterly").checked = false;
+      document.getElementById("planSemiAnnual").checked = false;
+      document.getElementById("planAnnual").checked = false;
+
+      document.getElementById("priceDaily").value = "";
+      document.getElementById("priceMonthly").value = "";
+      document.getElementById("priceQuarterly").value = "";
+      document.getElementById("priceSemiAnnual").value = "";
+      document.getElementById("priceAnnual").value = "";
+
+      const plans = unit.rentalPlans || [];
+
+      plans.forEach((plan) => {
+        if (plan.type === "يومي") {
+          document.getElementById("planDaily").checked = true;
+          document.getElementById("priceDaily").value = plan.price;
+        }
+        if (plan.type === "شهري") {
+          document.getElementById("planMonthly").checked = true;
+          document.getElementById("priceMonthly").value = plan.price;
+        }
+        if (plan.type === "ربع سنوي") {
+          document.getElementById("planQuarterly").checked = true;
+          document.getElementById("priceQuarterly").value = plan.price;
+        }
+        if (plan.type === "نصف سنوي") {
+          document.getElementById("planSemiAnnual").checked = true;
+          document.getElementById("priceSemiAnnual").value = plan.price;
+        }
+        if (plan.type === "سنوي") {
+          document.getElementById("planAnnual").checked = true;
+          document.getElementById("priceAnnual").value = plan.price;
+        }
+      });
+
+      formTitle.textContent = "تعديل الوحدة";
+      saveBtn.textContent = "حفظ التعديلات";
+      setMessage("");
+      focusAddForm();
     }
 
     function renderUnits(units) {
@@ -899,7 +1054,10 @@
             <td>${unit.bathrooms ?? "-"}</td>
             <td class="plans-list">${formatPlans(unit.rentalPlans || [])}</td>
             <td>
-              <button class="danger-btn" onclick="deleteUnit('${item.id}')">حذف</button>
+              <div class="actions-inline">
+                <button class="edit-btn" onclick="editUnit('${item.id}')">تعديل</button>
+                <button class="danger-btn" onclick="deleteUnit('${item.id}')">حذف</button>
+              </div>
             </td>
           </tr>
         `;
@@ -933,7 +1091,7 @@
       renderUnits(allUnits);
     }
 
-    async function addUnit() {
+    async function saveUnit() {
       try {
         const propertyName = document.getElementById("propertyName").value.trim();
         const unitNumber = document.getElementById("unitNumber").value.trim();
@@ -950,7 +1108,7 @@
         if (!unitType) throw new Error("نوع الوحدة مطلوب.");
         if (!rentalPlans.length) throw new Error("اختر نظام إيجار واحد على الأقل.");
 
-        await addDoc(collection(db, "units"), {
+        const payload = {
           propertyName,
           unitNumber,
           unitType,
@@ -959,16 +1117,31 @@
           rooms: rooms ? Number(rooms) : 0,
           bathrooms: bathrooms ? Number(bathrooms) : 0,
           notes,
-          rentalPlans,
-          createdAt: serverTimestamp()
-        });
+          rentalPlans
+        };
 
-        setMessage("تمت إضافة الوحدة بنجاح.", "success");
+        if (editingUnitId) {
+          await updateDoc(doc(db, "units", editingUnitId), payload);
+          setMessage("تم تعديل الوحدة بنجاح.", "success");
+        } else {
+          await addDoc(collection(db, "units"), {
+            ...payload,
+            createdAt: serverTimestamp()
+          });
+          setMessage("تمت إضافة الوحدة بنجاح.", "success");
+        }
+
         clearForm();
         await loadUnits();
       } catch (error) {
         setMessage(error.message, "error");
       }
+    }
+
+    function editUnit(id) {
+      const item = allUnits.find(unit => unit.id === id);
+      if (!item) return;
+      fillFormForEdit(item);
     }
 
     async function deleteUnit(id) {
@@ -977,6 +1150,9 @@
 
       try {
         await deleteDoc(doc(db, "units", id));
+        if (editingUnitId === id) {
+          clearForm();
+        }
         await loadUnits();
       } catch (error) {
         alert(error.message);
@@ -1015,10 +1191,12 @@
 
     searchInput.addEventListener("input", filterUnits);
 
-    window.addUnit = addUnit;
+    window.saveUnit = saveUnit;
+    window.editUnit = editUnit;
     window.deleteUnit = deleteUnit;
     window.logout = logout;
     window.clearForm = clearForm;
+    window.focusAddForm = focusAddForm;
 
     onAuthStateChanged(auth, async (user) => {
       if (!user) {
