@@ -1,1 +1,163 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<title>لوحة الموظف - BkTowers</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 
+<style>
+body {
+  margin: 0;
+  font-family: Arial;
+  background: #f0fdf4;
+}
+
+.sidebar {
+  width: 260px;
+  height: 100vh;
+  position: fixed;
+  background: linear-gradient(180deg, #065f46, #064e3b);
+  color: white;
+  padding: 20px;
+}
+
+.sidebar h2 {
+  margin-bottom: 20px;
+}
+
+.sidebar a {
+  display: block;
+  padding: 12px;
+  margin: 8px 0;
+  background: rgba(255,255,255,0.1);
+  border-radius: 10px;
+  color: white;
+  text-decoration: none;
+}
+
+.sidebar a:hover {
+  background: rgba(255,255,255,0.2);
+}
+
+.main {
+  margin-right: 260px;
+  padding: 25px;
+}
+
+.card {
+  background: white;
+  padding: 20px;
+  border-radius: 15px;
+  margin-bottom: 15px;
+  box-shadow: 0 10px 25px rgba(0,0,0,0.08);
+}
+
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.logout {
+  background: red;
+  color: white;
+  padding: 10px;
+  border: none;
+  border-radius: 10px;
+  cursor: pointer;
+}
+
+.logout:hover {
+  background: darkred;
+}
+</style>
+</head>
+
+<body>
+
+<div class="sidebar">
+  <h2>BkTowers</h2>
+
+  <a href="clients.html">العملاء</a>
+  <a href="stays.html">السكن والحجوزات</a>
+  <a href="revenues.html">الإيرادات</a>
+  <a href="expenses.html">المصروفات</a>
+  <a href="maintenance.html">الصيانة</a>
+  <a href="reports.html">التقارير</a>
+</div>
+
+<div class="main">
+
+  <div class="header">
+    <h2>لوحة الموظف</h2>
+    <button class="logout" onclick="logout()">تسجيل خروج</button>
+  </div>
+
+  <div class="card">
+    <h3>بيانات المستخدم</h3>
+    <p><strong>الاسم:</strong> <span id="name"></span></p>
+    <p><strong>البريد:</strong> <span id="email"></span></p>
+    <p><strong>الصلاحية:</strong> <span id="role"></span></p>
+  </div>
+
+  <div class="card">
+    <h3>الوصول السريع</h3>
+    <p>اختر من القائمة الجانبية للوصول للوظائف.</p>
+  </div>
+
+</div>
+
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/12.11.0/firebase-app.js";
+import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/12.11.0/firebase-auth.js";
+import { getFirestore, doc, getDoc } from "https://www.gstatic.com/firebasejs/12.11.0/firebase-firestore.js";
+
+const firebaseConfig = {
+  apiKey: "AIzaSyDey3KL3qZUvZBVtFcB38xzBGx6qrG2WYY",
+  authDomain: "bktowers-4b822.firebaseapp.com",
+  projectId: "bktowers-4b822",
+  storageBucket: "bktowers-4b822.firebasestorage.app",
+  messagingSenderId: "336608827796",
+  appId: "1:336608827796:web:4957fe0d411220f6a69781"
+};
+
+const app = initializeApp(firebaseConfig);
+const auth = getAuth(app);
+const db = getFirestore(app);
+
+onAuthStateChanged(auth, async (user) => {
+  if (!user) {
+    window.location.href = "index.html";
+    return;
+  }
+
+  const ref = doc(db, "users", user.uid);
+  const snap = await getDoc(ref);
+
+  if (!snap.exists()) {
+    window.location.href = "index.html";
+    return;
+  }
+
+  const data = snap.data();
+
+  // 🔴 منع الأدمن من دخول لوحة الموظف
+  if (data.role === "admin") {
+    window.location.href = "dashboard.html";
+    return;
+  }
+
+  document.getElementById("name").innerText = data.name;
+  document.getElementById("email").innerText = data.email;
+  document.getElementById("role").innerText = "موظف";
+});
+
+window.logout = async function () {
+  await signOut(auth);
+  localStorage.clear();
+  window.location.href = "index.html";
+};
+</script>
+
+</body>
+</html>
