@@ -4,8 +4,12 @@
   <meta charset="UTF-8">
   <title>BkTowers</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
   <style>
-    * { box-sizing: border-box; }
+    * {
+      box-sizing: border-box;
+    }
+
     body {
       margin: 0;
       min-height: 100vh;
@@ -16,31 +20,36 @@
       justify-content: center;
       padding: 20px;
     }
+
     .login-box {
       width: 100%;
-      max-width: 400px;
-      background: #fff;
+      max-width: 420px;
+      background: #ffffff;
       padding: 36px 28px;
       border-radius: 18px;
-      box-shadow: 0 20px 45px rgba(0,0,0,0.20);
+      box-shadow: 0 20px 45px rgba(0, 0, 0, 0.20);
       text-align: center;
     }
+
     .title {
       font-size: 34px;
       font-weight: 800;
       color: #0b1f4d;
       margin-bottom: 8px;
     }
+
     .subtitle {
       font-size: 14px;
       color: #4b5563;
       margin-bottom: 26px;
       font-weight: 700;
     }
+
     .form-group {
       text-align: right;
       margin-bottom: 14px;
     }
+
     .form-group label {
       display: block;
       margin-bottom: 8px;
@@ -48,6 +57,7 @@
       font-weight: 800;
       color: #1f2937;
     }
+
     .form-group input {
       width: 100%;
       padding: 13px 14px;
@@ -58,11 +68,19 @@
       font-weight: 700;
       color: #111827;
       outline: none;
+      transition: 0.2s ease;
     }
+
     .form-group input:focus {
       border-color: #0b1f4d;
-      box-shadow: 0 0 0 3px rgba(11,31,77,0.08);
+      box-shadow: 0 0 0 3px rgba(11, 31, 77, 0.08);
     }
+
+    .form-group input::placeholder {
+      color: #6b7280;
+      font-weight: 600;
+    }
+
     button {
       width: 100%;
       padding: 13px;
@@ -74,11 +92,14 @@
       font-size: 15px;
       font-weight: 800;
       font-family: inherit;
+      transition: 0.2s ease;
       margin-top: 4px;
     }
+
     button:hover {
       background: #163b86;
     }
+
     .msg {
       margin-top: 14px;
       font-size: 14px;
@@ -86,16 +107,30 @@
       font-weight: 700;
       color: #b91c1c;
     }
+
+    .hint {
+      margin-top: 18px;
+      background: #f8fbff;
+      border: 1px dashed #d7deea;
+      border-radius: 14px;
+      padding: 12px;
+      text-align: right;
+      font-size: 13px;
+      line-height: 1.8;
+      color: #4b5563;
+      font-weight: 700;
+    }
   </style>
 </head>
 <body>
+
   <div class="login-box">
     <div class="title">BkTowers</div>
     <div class="subtitle">تسجيل الدخول إلى النظام</div>
 
     <div class="form-group">
-      <label for="username">اسم المستخدم</label>
-      <input type="text" id="username" placeholder="اكتب اسم المستخدم">
+      <label for="loginValue">البريد الإلكتروني أو اسم المستخدم</label>
+      <input type="text" id="loginValue" placeholder="اكتب البريد الإلكتروني أو اسم المستخدم">
     </div>
 
     <div class="form-group">
@@ -104,13 +139,22 @@
     </div>
 
     <button onclick="login()">تسجيل الدخول</button>
+
     <div class="msg" id="msg"></div>
+
+    <div class="hint">
+      يمكنك الدخول بأحد الخيارين:
+      <br>
+      1) البريد الإلكتروني + كلمة المرور
+      <br>
+      2) اسم المستخدم + كلمة المرور
+    </div>
   </div>
 
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/12.11.0/firebase-app.js";
-    import { getAuth, signInWithEmailAndPassword, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/12.11.0/firebase-auth.js";
-    import { getFirestore, collection, query, where, getDocs, doc, getDoc } from "https://www.gstatic.com/firebasejs/12.11.0/firebase-firestore.js";
+    import { getAuth, signInWithEmailAndPassword, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/12.11.0/firebase-auth.js";
+    import { getFirestore, collection, query, where, getDocs, doc, getDoc, setDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/12.11.0/firebase-firestore.js";
 
     const firebaseConfig = {
       apiKey: "AIzaSyDey3KL3qZUvZBVtFcB38xzBGx6qrG2WYY",
@@ -131,58 +175,115 @@
       msg.innerText = text;
     }
 
+    function isEmail(value) {
+      return value.includes("@");
+    }
+
+    async function findUserByUsername(username) {
+      const q = query(collection(db, "users"), where("username", "==", username.toLowerCase()));
+      const snapshot = await getDocs(q);
+
+      if (snapshot.empty) {
+        return null;
+      }
+
+      return {
+        id: snapshot.docs[0].id,
+        data: snapshot.docs[0].data()
+      };
+    }
+
+    async function ensureAdminDocIfMissing(user) {
+      const userRef = doc(db, "users", user.uid);
+      const snap = await getDoc(userRef);
+
+      if (!snap.exists()) {
+        await setDoc(userRef, {
+          name: "المدير الرئيسي",
+          nationalId: "",
+          username: "admin",
+          email: user.email,
+          role: "admin",
+          active: true,
+          createdAt: serverTimestamp()
+        });
+        return await getDoc(userRef);
+      }
+
+      return snap;
+    }
+
     window.login = async function () {
-      const username = document.getElementById("username").value.trim().toLowerCase();
+      const loginValue = document.getElementById("loginValue").value.trim();
       const password = document.getElementById("password").value.trim();
 
       setMessage("");
 
-      if (!username || !password) {
-        setMessage("أدخل اسم المستخدم وكلمة المرور.");
+      if (!loginValue || !password) {
+        setMessage("أدخل البريد الإلكتروني أو اسم المستخدم مع كلمة المرور.");
         return;
       }
 
       try {
-        const q = query(collection(db, "users"), where("username", "==", username));
-        const snapshot = await getDocs(q);
+        let emailToLogin = "";
+        let expectedRole = null;
 
-        if (snapshot.empty) {
-          setMessage("اسم المستخدم غير موجود.");
+        if (isEmail(loginValue)) {
+          emailToLogin = loginValue;
+        } else {
+          const userRecord = await findUserByUsername(loginValue);
+
+          if (!userRecord) {
+            setMessage("اسم المستخدم غير موجود.");
+            return;
+          }
+
+          if (!userRecord.data.active) {
+            setMessage("هذا الحساب غير مفعل.");
+            return;
+          }
+
+          emailToLogin = userRecord.data.email;
+          expectedRole = userRecord.data.role || "employee";
+        }
+
+        const userCredential = await signInWithEmailAndPassword(auth, emailToLogin, password);
+        const user = userCredential.user;
+
+        let userSnap = await getDoc(doc(db, "users", user.uid));
+
+        if (!userSnap.exists()) {
+          userSnap = await ensureAdminDocIfMissing(user);
+        }
+
+        if (!userSnap.exists()) {
+          setMessage("بيانات المستخدم غير موجودة داخل النظام.");
+          await signOut(auth);
           return;
         }
 
-        const userRecord = snapshot.docs[0];
-        const userData = userRecord.data();
+        const userData = userSnap.data();
 
         if (!userData.active) {
           setMessage("هذا الحساب غير مفعل.");
+          await signOut(auth);
           return;
         }
-
-        const userCredential = await signInWithEmailAndPassword(auth, userData.email, password);
-        const user = userCredential.user;
-
-        const currentUserRef = doc(db, "users", user.uid);
-        const currentUserSnap = await getDoc(currentUserRef);
-
-        if (!currentUserSnap.exists()) {
-          setMessage("بيانات المستخدم غير مكتملة داخل النظام.");
-          return;
-        }
-
-        const currentUser = currentUserSnap.data();
 
         localStorage.setItem("userUid", user.uid);
-        localStorage.setItem("userName", currentUser.name || "");
-        localStorage.setItem("userEmail", currentUser.email || "");
-        localStorage.setItem("userRole", currentUser.role || "employee");
-        localStorage.setItem("username", currentUser.username || "");
+        localStorage.setItem("userName", userData.name || "");
+        localStorage.setItem("userEmail", userData.email || user.email || "");
+        localStorage.setItem("userRole", userData.role || "employee");
+        localStorage.setItem("username", userData.username || "");
 
-        if (currentUser.role === "admin") {
+        setMessage("تم تسجيل الدخول بنجاح.", false);
+
+        if (userData.role === "admin") {
           window.location.href = "dashboard.html";
         } else {
           window.location.href = "clients.html";
         }
+
       } catch (error) {
         setMessage("بيانات الدخول غير صحيحة.");
       }
@@ -191,26 +292,39 @@
     onAuthStateChanged(auth, async (user) => {
       if (!user) return;
 
-      const userRef = doc(db, "users", user.uid);
-      const userSnap = await getDoc(userRef);
-      if (!userSnap.exists()) return;
+      try {
+        let userSnap = await getDoc(doc(db, "users", user.uid));
 
-      const userData = userSnap.data();
+        if (!userSnap.exists()) {
+          userSnap = await ensureAdminDocIfMissing(user);
+        }
 
-      localStorage.setItem("userUid", user.uid);
-      localStorage.setItem("userName", userData.name || "");
-      localStorage.setItem("userEmail", userData.email || "");
-      localStorage.setItem("userRole", userData.role || "employee");
-      localStorage.setItem("username", userData.username || "");
+        if (!userSnap.exists()) return;
 
-      if (userData.role === "admin") {
-        window.location.href = "dashboard.html";
-      } else {
-        window.location.href = "clients.html";
+        const userData = userSnap.data();
+
+        if (!userData.active) {
+          await signOut(auth);
+          return;
+        }
+
+        localStorage.setItem("userUid", user.uid);
+        localStorage.setItem("userName", userData.name || "");
+        localStorage.setItem("userEmail", userData.email || user.email || "");
+        localStorage.setItem("userRole", userData.role || "employee");
+        localStorage.setItem("username", userData.username || "");
+
+        if (userData.role === "admin") {
+          window.location.href = "dashboard.html";
+        } else {
+          window.location.href = "clients.html";
+        }
+      } catch (error) {
+        console.error(error);
       }
     });
 
-    document.getElementById("username").addEventListener("keydown", function (event) {
+    document.getElementById("loginValue").addEventListener("keydown", function (event) {
       if (event.key === "Enter") login();
     });
 
