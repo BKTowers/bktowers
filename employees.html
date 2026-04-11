@@ -1,0 +1,1116 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>الموظفين - BkTowers</title>
+  <style>
+    :root {
+      --primary: #0b1f4d;
+      --primary-dark: #08173a;
+      --primary-light: #eef4ff;
+      --bg: #eef3f9;
+      --card: #ffffff;
+      --text: #111827;
+      --muted: #4b5563;
+      --border: #d7deea;
+      --danger: #c62828;
+      --danger-dark: #a61f1f;
+      --success: #166534;
+      --success-bg: #dcfce7;
+      --warning-bg: #fef3c7;
+      --warning-text: #92400e;
+      --danger-bg: #fee2e2;
+      --danger-text: #991b1b;
+      --info-bg: #dbeafe;
+      --info-text: #1d4ed8;
+      --shadow: 0 12px 30px rgba(15, 23, 42, 0.10);
+      --radius: 18px;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      font-family: Arial, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+    }
+
+    .app-shell {
+      display: flex;
+      min-height: 100vh;
+    }
+
+    .sidebar {
+      width: 290px;
+      background: linear-gradient(180deg, var(--primary), var(--primary-dark));
+      color: #fff;
+      padding: 24px 18px;
+      position: sticky;
+      top: 0;
+      height: 100vh;
+      overflow-y: auto;
+      flex-shrink: 0;
+    }
+
+    .brand {
+      font-size: 34px;
+      font-weight: 800;
+      margin-bottom: 6px;
+      color: #ffffff;
+    }
+
+    .brand-sub {
+      font-size: 14px;
+      color: #dbe6ff;
+      margin-bottom: 24px;
+      font-weight: 700;
+    }
+
+    .user-card {
+      background: rgba(255, 255, 255, 0.10);
+      border: 1px solid rgba(255, 255, 255, 0.14);
+      border-radius: 16px;
+      padding: 14px;
+      margin-bottom: 20px;
+    }
+
+    .user-card .row {
+      margin-bottom: 10px;
+      font-size: 14px;
+      line-height: 1.8;
+      word-break: break-word;
+      color: #ffffff;
+    }
+
+    .user-card .row:last-child {
+      margin-bottom: 0;
+    }
+
+    .menu-title {
+      font-size: 12px;
+      color: #dbe6ff;
+      margin: 18px 6px 10px;
+      font-weight: 700;
+    }
+
+    .nav-links {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .nav-links a,
+    .nav-links button {
+      width: 100%;
+      border: none;
+      border-radius: 14px;
+      padding: 13px 14px;
+      font-size: 14px;
+      background: rgba(255, 255, 255, 0.10);
+      color: #ffffff;
+      text-decoration: none;
+      text-align: right;
+      cursor: pointer;
+      transition: 0.2s ease;
+      font-family: inherit;
+      font-weight: 700;
+    }
+
+    .nav-links a:hover,
+    .nav-links button:hover {
+      background: rgba(255, 255, 255, 0.18);
+    }
+
+    .nav-links a.active {
+      background: #ffffff;
+      color: var(--primary);
+    }
+
+    .sidebar-note {
+      margin-top: 22px;
+      font-size: 12px;
+      color: #e5edff;
+      line-height: 1.9;
+      font-weight: 700;
+    }
+
+    .main {
+      flex: 1;
+      min-width: 0;
+      padding: 24px;
+    }
+
+    .topbar {
+      background: var(--card);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      padding: 18px 20px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+      margin-bottom: 22px;
+      flex-wrap: wrap;
+      border: 1px solid #e4eaf3;
+    }
+
+    .topbar-title h1 {
+      margin: 0 0 6px;
+      font-size: 30px;
+      color: var(--primary);
+      font-weight: 800;
+    }
+
+    .topbar-title p {
+      margin: 0;
+      color: var(--muted);
+      font-size: 14px;
+      font-weight: 700;
+    }
+
+    .topbar-actions {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+
+    .logout-btn,
+    .action-btn {
+      border: none;
+      border-radius: 12px;
+      padding: 12px 16px;
+      cursor: pointer;
+      font-size: 14px;
+      font-weight: 800;
+      font-family: inherit;
+    }
+
+    .action-btn {
+      background: var(--primary);
+      color: #fff;
+    }
+
+    .action-btn:hover {
+      background: #163b86;
+    }
+
+    .logout-btn {
+      background: var(--danger);
+      color: #fff;
+    }
+
+    .logout-btn:hover {
+      background: var(--danger-dark);
+    }
+
+    .stats-grid {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 18px;
+      margin-bottom: 22px;
+    }
+
+    .stat-card {
+      background: var(--card);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      padding: 20px;
+      min-height: 120px;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      border: 1px solid #e4eaf3;
+    }
+
+    .stat-card h3 {
+      margin: 0;
+      font-size: 14px;
+      color: var(--muted);
+      font-weight: 800;
+    }
+
+    .stat-card .value {
+      font-size: 36px;
+      font-weight: 800;
+      color: var(--primary);
+      margin-top: 16px;
+    }
+
+    .page-grid {
+      display: grid;
+      grid-template-columns: 430px minmax(0, 1fr);
+      gap: 22px;
+      align-items: start;
+    }
+
+    .panel {
+      background: var(--card);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      padding: 22px;
+      min-width: 0;
+      border: 1px solid #e4eaf3;
+    }
+
+    .panel-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      margin-bottom: 18px;
+      flex-wrap: wrap;
+    }
+
+    .panel-header h2 {
+      margin: 0;
+      font-size: 24px;
+      color: var(--primary);
+      font-weight: 800;
+    }
+
+    .panel-header p {
+      margin: 0;
+      color: var(--muted);
+      font-size: 13px;
+      font-weight: 700;
+    }
+
+    .form-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 14px;
+    }
+
+    .form-group {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .form-group.full {
+      grid-column: 1 / -1;
+    }
+
+    label {
+      font-size: 14px;
+      font-weight: 800;
+      color: #1f2937;
+    }
+
+    input,
+    select {
+      width: 100%;
+      padding: 12px 13px;
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      font-size: 14px;
+      background: #fff;
+      outline: none;
+      font-family: inherit;
+      transition: 0.2s ease;
+      color: #111827;
+      font-weight: 700;
+    }
+
+    input::placeholder {
+      color: #6b7280;
+      font-weight: 600;
+    }
+
+    input:focus,
+    select:focus {
+      border-color: var(--primary);
+      box-shadow: 0 0 0 3px rgba(10, 31, 68, 0.08);
+    }
+
+    .hint-box {
+      background: #f8fbff;
+      border: 1px dashed var(--border);
+      border-radius: 14px;
+      padding: 12px 14px;
+      font-size: 13px;
+      color: var(--muted);
+      line-height: 1.8;
+      font-weight: 700;
+    }
+
+    .form-actions {
+      display: flex;
+      gap: 10px;
+      margin-top: 18px;
+      flex-wrap: wrap;
+    }
+
+    .primary-btn,
+    .secondary-btn,
+    .danger-btn,
+    .edit-btn,
+    .toggle-btn {
+      border: none;
+      border-radius: 12px;
+      padding: 12px 16px;
+      cursor: pointer;
+      font-size: 14px;
+      font-weight: 800;
+      font-family: inherit;
+      transition: 0.2s ease;
+    }
+
+    .primary-btn {
+      background: var(--primary);
+      color: #fff;
+    }
+
+    .primary-btn:hover {
+      background: #163b86;
+    }
+
+    .secondary-btn {
+      background: #edf2f7;
+      color: #111827;
+    }
+
+    .secondary-btn:hover {
+      background: #e1e8f0;
+    }
+
+    .edit-btn {
+      background: #dbeafe;
+      color: #1d4ed8;
+      padding: 9px 14px;
+      font-size: 13px;
+    }
+
+    .edit-btn:hover {
+      background: #bfdbfe;
+    }
+
+    .danger-btn {
+      background: var(--danger);
+      color: #fff;
+      padding: 9px 14px;
+      font-size: 13px;
+    }
+
+    .danger-btn:hover {
+      background: var(--danger-dark);
+    }
+
+    .toggle-btn {
+      background: #f3f4f6;
+      color: #111827;
+      padding: 9px 14px;
+      font-size: 13px;
+    }
+
+    .toggle-btn:hover {
+      background: #e5e7eb;
+    }
+
+    .message {
+      margin-top: 14px;
+      min-height: 20px;
+      font-size: 14px;
+      font-weight: 800;
+    }
+
+    .message.success {
+      color: var(--success);
+    }
+
+    .message.error {
+      color: #b91c1c;
+    }
+
+    .table-tools {
+      display: flex;
+      justify-content: space-between;
+      gap: 12px;
+      flex-wrap: wrap;
+      margin-bottom: 14px;
+    }
+
+    .search-box {
+      max-width: 320px;
+      width: 100%;
+    }
+
+    .table-wrap {
+      overflow-x: auto;
+      border: 1px solid var(--border);
+      border-radius: 16px;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      min-width: 1120px;
+      background: #fff;
+    }
+
+    th,
+    td {
+      padding: 14px 12px;
+      border-bottom: 1px solid var(--border);
+      text-align: right;
+      vertical-align: top;
+      font-size: 14px;
+      color: #111827;
+      font-weight: 700;
+    }
+
+    th {
+      background: #f7faff;
+      color: #1f2937;
+      font-weight: 800;
+      position: sticky;
+      top: 0;
+      z-index: 1;
+    }
+
+    tbody tr:hover {
+      background: #fbfdff;
+    }
+
+    .status-badge {
+      display: inline-block;
+      padding: 6px 10px;
+      border-radius: 999px;
+      font-size: 12px;
+      font-weight: 800;
+      white-space: nowrap;
+    }
+
+    .status-active {
+      background: var(--success-bg);
+      color: var(--success-text);
+    }
+
+    .status-inactive {
+      background: var(--danger-bg);
+      color: var(--danger-text);
+    }
+
+    .role-badge {
+      display: inline-block;
+      padding: 6px 10px;
+      border-radius: 999px;
+      font-size: 12px;
+      font-weight: 800;
+      background: var(--info-bg);
+      color: var(--info-text);
+    }
+
+    .empty {
+      text-align: center;
+      color: var(--muted);
+      padding: 26px 0;
+      font-weight: 800;
+    }
+
+    .actions-inline {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+
+    @media (max-width: 1450px) {
+      .stats-grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+      }
+
+      .page-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    @media (max-width: 900px) {
+      .app-shell {
+        flex-direction: column;
+      }
+
+      .sidebar {
+        width: 100%;
+        height: auto;
+        position: relative;
+        border-radius: 0 0 22px 22px;
+      }
+
+      .main {
+        padding: 16px;
+      }
+
+      .stats-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .form-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="app-shell">
+    <aside class="sidebar">
+      <div class="brand">BkTowers</div>
+      <div class="brand-sub">نظام إدارة العقارات</div>
+
+      <div class="user-card">
+        <div class="row"><strong>الاسم:</strong> <span id="sidebarUserName">-</span></div>
+        <div class="row"><strong>البريد:</strong> <span id="sidebarUserEmail">-</span></div>
+        <div class="row"><strong>الصلاحية:</strong> <span id="sidebarUserRole">-</span></div>
+      </div>
+
+      <div class="menu-title">القائمة الرئيسية</div>
+      <div class="nav-links">
+        <a href="dashboard.html">لوحة التحكم</a>
+        <a href="clients.html">العملاء</a>
+        <a href="stays.html">السكن والحجوزات</a>
+        <a href="revenues.html">الإيرادات</a>
+        <a href="expenses.html">المصروفات</a>
+        <a href="maintenance.html">الصيانة</a>
+        <a href="reports.html">التقارير</a>
+        <a href="employees.html" class="active">الموظفين</a>
+        <button onclick="logout()">تسجيل الخروج</button>
+      </div>
+
+      <div class="sidebar-note">
+        من هذه الصفحة يمكنك إضافة الموظفين وتعديل بياناتهم وإيقافهم أو حذفهم من النظام.
+      </div>
+    </aside>
+
+    <main class="main">
+      <section class="topbar">
+        <div class="topbar-title">
+          <h1>إدارة الموظفين</h1>
+          <p>إضافة وتعديل وحذف الموظفين وتحديد صلاحية الدخول للنظام.</p>
+        </div>
+
+        <div class="topbar-actions">
+          <button class="action-btn" onclick="focusAddForm()">إضافة موظف جديد</button>
+          <button class="logout-btn" onclick="logout()">تسجيل الخروج</button>
+        </div>
+      </section>
+
+      <section class="stats-grid">
+        <div class="stat-card">
+          <h3>إجمالي الموظفين</h3>
+          <div class="value" id="totalEmployees">0</div>
+        </div>
+
+        <div class="stat-card">
+          <h3>الحسابات النشطة</h3>
+          <div class="value" id="activeEmployees">0</div>
+        </div>
+
+        <div class="stat-card">
+          <h3>الحسابات غير النشطة</h3>
+          <div class="value" id="inactiveEmployees">0</div>
+        </div>
+
+        <div class="stat-card">
+          <h3>عدد المدراء</h3>
+          <div class="value" id="adminsCount">0</div>
+        </div>
+      </section>
+
+      <section class="page-grid">
+        <div class="panel">
+          <div class="panel-header">
+            <div>
+              <h2 id="formTitle">إضافة موظف جديد</h2>
+              <p>أدخل بيانات الموظف واسم المستخدم وكلمة المرور.</p>
+            </div>
+          </div>
+
+          <div class="form-grid">
+            <div class="form-group">
+              <label for="employeeName">اسم الموظف</label>
+              <input type="text" id="employeeName" placeholder="اكتب اسم الموظف">
+            </div>
+
+            <div class="form-group">
+              <label for="nationalId">رقم الهوية</label>
+              <input type="text" id="nationalId" placeholder="اكتب رقم الهوية">
+            </div>
+
+            <div class="form-group">
+              <label for="username">اسم المستخدم</label>
+              <input type="text" id="username" placeholder="مثال: ahmed">
+            </div>
+
+            <div class="form-group">
+              <label for="password">كلمة المرور</label>
+              <input type="password" id="password" placeholder="اكتب كلمة المرور">
+            </div>
+
+            <div class="form-group">
+              <label for="role">الصلاحية</label>
+              <select id="role">
+                <option value="employee">موظف</option>
+                <option value="admin">مدير</option>
+              </select>
+            </div>
+
+            <div class="form-group">
+              <label for="active">الحالة</label>
+              <select id="active">
+                <option value="true">نشط</option>
+                <option value="false">غير نشط</option>
+              </select>
+            </div>
+
+            <div class="form-group full">
+              <label>البريد الداخلي التلقائي</label>
+              <div class="hint-box" id="generatedEmailBox">سيتم توليد البريد تلقائيًا من اسم المستخدم بعد كتابته.</div>
+            </div>
+          </div>
+
+          <div class="form-actions">
+            <button class="primary-btn" onclick="saveEmployee()" id="saveBtn">حفظ الموظف</button>
+            <button class="secondary-btn" onclick="clearForm()">تفريغ الحقول</button>
+          </div>
+
+          <div id="formMessage" class="message"></div>
+        </div>
+
+        <div class="panel">
+          <div class="panel-header">
+            <div>
+              <h2>قائمة الموظفين</h2>
+              <p>جميع الموظفين المسجلين في النظام مع حالة كل حساب.</p>
+            </div>
+          </div>
+
+          <div class="table-tools">
+            <input type="text" id="searchInput" class="search-box" placeholder="ابحث بالاسم أو اسم المستخدم أو الهوية">
+          </div>
+
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr>
+                  <th>الاسم</th>
+                  <th>رقم الهوية</th>
+                  <th>اسم المستخدم</th>
+                  <th>البريد الداخلي</th>
+                  <th>الصلاحية</th>
+                  <th>الحالة</th>
+                  <th>الإجراءات</th>
+                </tr>
+              </thead>
+              <tbody id="employeesTableBody">
+                <tr>
+                  <td colspan="7" class="empty">جاري تحميل الموظفين...</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+    </main>
+  </div>
+
+  <script type="module">
+    import { initializeApp, getApps, getApp, deleteApp } from "https://www.gstatic.com/firebasejs/12.11.0/firebase-app.js";
+    import {
+      getAuth,
+      onAuthStateChanged,
+      signOut,
+      createUserWithEmailAndPassword
+    } from "https://www.gstatic.com/firebasejs/12.11.0/firebase-auth.js";
+    import {
+      getFirestore,
+      collection,
+      addDoc,
+      getDocs,
+      deleteDoc,
+      doc,
+      serverTimestamp,
+      orderBy,
+      query,
+      updateDoc,
+      getDoc,
+      where,
+      setDoc
+    } from "https://www.gstatic.com/firebasejs/12.11.0/firebase-firestore.js";
+
+    const firebaseConfig = {
+      apiKey: "AIzaSyDey3KL3qZUvZBVtFcB38xzBGx6qrG2WYY",
+      authDomain: "bktowers-4b822.firebaseapp.com",
+      projectId: "bktowers-4b822",
+      storageBucket: "bktowers-4b822.firebasestorage.app",
+      messagingSenderId: "336608827796",
+      appId: "1:336608827796:web:4957fe0d411220f6a69781"
+    };
+
+    const app = getApps().length ? getApp() : initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+    const db = getFirestore(app);
+
+    const employeesTableBody = document.getElementById("employeesTableBody");
+    const formMessage = document.getElementById("formMessage");
+    const formTitle = document.getElementById("formTitle");
+    const saveBtn = document.getElementById("saveBtn");
+    const searchInput = document.getElementById("searchInput");
+    const generatedEmailBox = document.getElementById("generatedEmailBox");
+
+    const totalEmployeesEl = document.getElementById("totalEmployees");
+    const activeEmployeesEl = document.getElementById("activeEmployees");
+    const inactiveEmployeesEl = document.getElementById("inactiveEmployees");
+    const adminsCountEl = document.getElementById("adminsCount");
+
+    const userNameEl = document.getElementById("sidebarUserName");
+    const userEmailEl = document.getElementById("sidebarUserEmail");
+    const userRoleEl = document.getElementById("sidebarUserRole");
+
+    let allEmployees = [];
+    let editingEmployeeId = null;
+
+    function setMessage(text, type = "") {
+      formMessage.textContent = text;
+      formMessage.className = "message";
+      if (type) formMessage.classList.add(type);
+    }
+
+    function focusAddForm() {
+      document.getElementById("employeeName").focus();
+      window.scrollTo({ top: 0, behavior: "smooth" });
+    }
+
+    function normalizeUsername(value) {
+      return value.trim().toLowerCase().replace(/\s+/g, "");
+    }
+
+    function buildInternalEmail(username) {
+      return `${normalizeUsername(username)}@bktowers.local`;
+    }
+
+    function updateGeneratedEmailPreview() {
+      const username = document.getElementById("username").value.trim();
+      if (!username) {
+        generatedEmailBox.textContent = "سيتم توليد البريد تلقائيًا من اسم المستخدم بعد كتابته.";
+        return;
+      }
+      generatedEmailBox.textContent = `البريد الداخلي الناتج: ${buildInternalEmail(username)}`;
+    }
+
+    function clearForm() {
+      editingEmployeeId = null;
+      document.getElementById("employeeName").value = "";
+      document.getElementById("nationalId").value = "";
+      document.getElementById("username").value = "";
+      document.getElementById("password").value = "";
+      document.getElementById("role").value = "employee";
+      document.getElementById("active").value = "true";
+      formTitle.textContent = "إضافة موظف جديد";
+      saveBtn.textContent = "حفظ الموظف";
+      generatedEmailBox.textContent = "سيتم توليد البريد تلقائيًا من اسم المستخدم بعد كتابته.";
+      setMessage("");
+    }
+
+    function getRoleLabel(role) {
+      return role === "admin" ? "مدير" : "موظف";
+    }
+
+    function getStatusBadge(active) {
+      return active
+        ? `<span class="status-badge status-active">نشط</span>`
+        : `<span class="status-badge status-inactive">غير نشط</span>`;
+    }
+
+    function renderEmployees(rows) {
+      let html = "";
+      let total = rows.length;
+      let activeCount = 0;
+      let inactiveCount = 0;
+      let adminsCount = 0;
+
+      rows.forEach((item) => {
+        const emp = item.data;
+        if (emp.active) activeCount++;
+        else inactiveCount++;
+        if (emp.role === "admin") adminsCount++;
+
+        html += `
+          <tr>
+            <td>${emp.name || "-"}</td>
+            <td>${emp.nationalId || "-"}</td>
+            <td>${emp.username || "-"}</td>
+            <td>${emp.email || "-"}</td>
+            <td><span class="role-badge">${getRoleLabel(emp.role)}</span></td>
+            <td>${getStatusBadge(!!emp.active)}</td>
+            <td>
+              <div class="actions-inline">
+                <button class="edit-btn" onclick="editEmployee('${item.id}')">تعديل</button>
+                <button class="toggle-btn" onclick="toggleEmployeeStatus('${item.id}')">${emp.active ? "إيقاف" : "تفعيل"}</button>
+                <button class="danger-btn" onclick="deleteEmployee('${item.id}')">حذف</button>
+              </div>
+            </td>
+          </tr>
+        `;
+      });
+
+      if (!html) {
+        html = `<tr><td colspan="7" class="empty">لا توجد نتائج مطابقة.</td></tr>`;
+      }
+
+      employeesTableBody.innerHTML = html;
+      totalEmployeesEl.textContent = total;
+      activeEmployeesEl.textContent = activeCount;
+      inactiveEmployeesEl.textContent = inactiveCount;
+      adminsCountEl.textContent = adminsCount;
+    }
+
+    async function loadEmployees() {
+      employeesTableBody.innerHTML = `<tr><td colspan="7" class="empty">جاري تحميل الموظفين...</td></tr>`;
+
+      const q = query(collection(db, "users"), orderBy("createdAt", "desc"));
+      const snapshot = await getDocs(q);
+
+      allEmployees = [];
+      snapshot.forEach((docSnap) => {
+        const data = docSnap.data();
+        allEmployees.push({
+          id: docSnap.id,
+          data
+        });
+      });
+
+      renderEmployees(allEmployees);
+    }
+
+    async function checkUsernameExists(username, excludeId = null) {
+      const q = query(collection(db, "users"), where("username", "==", username));
+      const snapshot = await getDocs(q);
+
+      if (snapshot.empty) return false;
+
+      let exists = false;
+      snapshot.forEach((docSnap) => {
+        if (docSnap.id !== excludeId) exists = true;
+      });
+
+      return exists;
+    }
+
+    async function createAuthUserForEmployee(email, password) {
+      const secondaryName = `secondary-${Date.now()}`;
+      const secondaryApp = initializeApp(firebaseConfig, secondaryName);
+      const secondaryAuth = getAuth(secondaryApp);
+
+      try {
+        const cred = await createUserWithEmailAndPassword(secondaryAuth, email, password);
+        return cred.user.uid;
+      } finally {
+        await signOut(secondaryAuth).catch(() => {});
+        await deleteApp(secondaryApp).catch(() => {});
+      }
+    }
+
+    async function saveEmployee() {
+      try {
+        const name = document.getElementById("employeeName").value.trim();
+        const nationalId = document.getElementById("nationalId").value.trim();
+        const username = normalizeUsername(document.getElementById("username").value);
+        const password = document.getElementById("password").value.trim();
+        const role = document.getElementById("role").value;
+        const active = document.getElementById("active").value === "true";
+
+        if (!name) throw new Error("اسم الموظف مطلوب.");
+        if (!nationalId) throw new Error("رقم الهوية مطلوب.");
+        if (!username) throw new Error("اسم المستخدم مطلوب.");
+        if (!editingEmployeeId && !password) throw new Error("كلمة المرور مطلوبة عند إنشاء موظف جديد.");
+
+        const email = buildInternalEmail(username);
+        const usernameExists = await checkUsernameExists(username, editingEmployeeId);
+
+        if (usernameExists) {
+          throw new Error("اسم المستخدم مستخدم بالفعل.");
+        }
+
+        if (editingEmployeeId) {
+          const payload = {
+            name,
+            nationalId,
+            username,
+            email,
+            role,
+            active,
+            updatedAt: serverTimestamp()
+          };
+
+          if (password) {
+            payload.plainPassword = password;
+          }
+
+          await updateDoc(doc(db, "users", editingEmployeeId), payload);
+          setMessage("تم تعديل الموظف بنجاح.", "success");
+        } else {
+          const newUid = await createAuthUserForEmployee(email, password);
+
+          await setDoc(doc(db, "users", newUid), {
+            name,
+            nationalId,
+            username,
+            email,
+            role,
+            active,
+            plainPassword: password,
+            createdAt: serverTimestamp()
+          });
+
+          setMessage("تمت إضافة الموظف بنجاح.", "success");
+        }
+
+        clearForm();
+        await loadEmployees();
+      } catch (error) {
+        setMessage(error.message, "error");
+      }
+    }
+
+    function fillFormForEdit(item) {
+      const emp = item.data;
+      editingEmployeeId = item.id;
+
+      document.getElementById("employeeName").value = emp.name || "";
+      document.getElementById("nationalId").value = emp.nationalId || "";
+      document.getElementById("username").value = emp.username || "";
+      document.getElementById("password").value = emp.plainPassword || "";
+      document.getElementById("role").value = emp.role || "employee";
+      document.getElementById("active").value = String(!!emp.active);
+
+      formTitle.textContent = "تعديل الموظف";
+      saveBtn.textContent = "حفظ التعديلات";
+      updateGeneratedEmailPreview();
+      setMessage("");
+      focusAddForm();
+    }
+
+    function editEmployee(id) {
+      const item = allEmployees.find(emp => emp.id === id);
+      if (!item) return;
+      fillFormForEdit(item);
+    }
+
+    async function toggleEmployeeStatus(id) {
+      const item = allEmployees.find(emp => emp.id === id);
+      if (!item) return;
+
+      const newStatus = !item.data.active;
+
+      try {
+        await updateDoc(doc(db, "users", id), {
+          active: newStatus,
+          updatedAt: serverTimestamp()
+        });
+        await loadEmployees();
+      } catch (error) {
+        alert(error.message);
+      }
+    }
+
+    async function deleteEmployee(id) {
+      const item = allEmployees.find(emp => emp.id === id);
+      if (!item) return;
+
+      const confirmed = window.confirm("هل أنت متأكد من حذف هذا الموظف من النظام؟");
+      if (!confirmed) return;
+
+      try {
+        await deleteDoc(doc(db, "users", id));
+        if (editingEmployeeId === id) {
+          clearForm();
+        }
+        await loadEmployees();
+      } catch (error) {
+        alert(error.message);
+      }
+    }
+
+    function filterEmployees() {
+      const keyword = searchInput.value.trim().toLowerCase();
+
+      if (!keyword) {
+        renderEmployees(allEmployees);
+        return;
+      }
+
+      const filtered = allEmployees.filter((item) => {
+        const emp = item.data;
+        return (
+          String(emp.name || "").toLowerCase().includes(keyword) ||
+          String(emp.username || "").toLowerCase().includes(keyword) ||
+          String(emp.nationalId || "").toLowerCase().includes(keyword) ||
+          String(emp.email || "").toLowerCase().includes(keyword)
+        );
+      });
+
+      renderEmployees(filtered);
+    }
+
+    async function logout() {
+      try {
+        await signOut(auth);
+        localStorage.clear();
+        window.location.href = "index.html";
+      } catch (error) {
+        alert(error.message);
+      }
+    }
+
+    document.getElementById("username").addEventListener("input", updateGeneratedEmailPreview);
+    searchInput.addEventListener("input", filterEmployees);
+
+    window.saveEmployee = saveEmployee;
+    window.editEmployee = editEmployee;
+    window.deleteEmployee = deleteEmployee;
+    window.toggleEmployeeStatus = toggleEmployeeStatus;
+    window.logout = logout;
+    window.clearForm = clearForm;
+    window.focusAddForm = focusAddForm;
+
+    onAuthStateChanged(auth, async (user) => {
+      if (!user) {
+        window.location.href = "index.html";
+        return;
+      }
+
+      try {
+        const currentUserRef = doc(db, "users", user.uid);
+        const currentUserSnap = await getDoc(currentUserRef);
+
+        if (!currentUserSnap.exists()) {
+          window.location.href = "index.html";
+          return;
+        }
+
+        const currentUser = currentUserSnap.data();
+
+        if (currentUser.role !== "admin") {
+          window.location.href = "clients.html";
+          return;
+        }
+
+        userNameEl.textContent = currentUser.name || "المدير الرئيسي";
+        userEmailEl.textContent = currentUser.email || user.email || "-";
+        userRoleEl.textContent = currentUser.role === "admin" ? "مدير" : "موظف";
+
+        localStorage.setItem("userName", currentUser.name || "");
+        localStorage.setItem("userEmail", currentUser.email || "");
+        localStorage.setItem("userRole", currentUser.role || "admin");
+
+        await loadEmployees();
+      } catch (error) {
+        window.location.href = "index.html";
+      }
+    });
+  </script>
+</body>
+</html>
