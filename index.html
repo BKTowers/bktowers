@@ -279,10 +279,10 @@
         setMessage("تم تسجيل الدخول بنجاح.", false);
 
         if (userData.role === "admin") {
-          window.location.href = "dashboard.html";
-        } else {
-          window.location.href = "clients.html";
-        }
+  window.location.href = "dashboard.html";
+} else {
+  window.location.href = "employee-dashboard.html";
+}
 
       } catch (error) {
         setMessage("بيانات الدخول غير صحيحة.");
