@@ -8,31 +8,36 @@
 <style>
 body {
   margin: 0;
-  font-family: Arial;
+  font-family: Arial, sans-serif;
   background: #f0fdf4;
 }
 
 .sidebar {
-  width: 260px;
+  width: 270px;
   height: 100vh;
   position: fixed;
+  top: 0;
+  right: 0;
   background: linear-gradient(180deg, #065f46, #064e3b);
   color: white;
-  padding: 20px;
+  padding: 22px;
+  box-sizing: border-box;
 }
 
 .sidebar h2 {
-  margin-bottom: 20px;
+  margin: 0 0 20px;
+  font-size: 24px;
 }
 
 .sidebar a {
   display: block;
-  padding: 12px;
-  margin: 8px 0;
-  background: rgba(255,255,255,0.1);
-  border-radius: 10px;
+  padding: 13px;
+  margin: 10px 0;
+  background: rgba(255,255,255,0.12);
+  border-radius: 12px;
   color: white;
   text-decoration: none;
+  font-weight: bold;
 }
 
 .sidebar a:hover {
@@ -40,15 +45,15 @@ body {
 }
 
 .main {
-  margin-right: 260px;
+  margin-right: 270px;
   padding: 25px;
 }
 
 .card {
   background: white;
-  padding: 20px;
-  border-radius: 15px;
-  margin-bottom: 15px;
+  padding: 22px;
+  border-radius: 16px;
+  margin-bottom: 18px;
   box-shadow: 0 10px 25px rgba(0,0,0,0.08);
 }
 
@@ -56,19 +61,74 @@ body {
   display: flex;
   justify-content: space-between;
   align-items: center;
+  gap: 12px;
+  margin-bottom: 18px;
+}
+
+.header h2 {
+  margin: 0;
+  color: #065f46;
 }
 
 .logout {
-  background: red;
+  background: #dc2626;
   color: white;
-  padding: 10px;
+  padding: 10px 14px;
   border: none;
   border-radius: 10px;
   cursor: pointer;
+  font-weight: bold;
 }
 
 .logout:hover {
-  background: darkred;
+  background: #b91c1c;
+}
+
+.info-row {
+  margin: 10px 0;
+  font-size: 16px;
+  line-height: 1.8;
+}
+
+.quick-links {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 16px;
+}
+
+.quick-link {
+  display: block;
+  background: #ecfdf5;
+  border: 1px solid #bbf7d0;
+  color: #065f46;
+  text-decoration: none;
+  padding: 18px;
+  border-radius: 14px;
+  font-weight: bold;
+  text-align: center;
+  transition: 0.2s;
+}
+
+.quick-link:hover {
+  background: #d1fae5;
+}
+
+.note {
+  color: #374151;
+  font-size: 14px;
+  line-height: 1.9;
+}
+
+@media (max-width: 900px) {
+  .sidebar {
+    width: 100%;
+    height: auto;
+    position: relative;
+  }
+
+  .main {
+    margin-right: 0;
+  }
 }
 </style>
 </head>
@@ -80,29 +140,37 @@ body {
 
   <a href="clients.html">العملاء</a>
   <a href="stays.html">السكن والحجوزات</a>
-  <a href="revenues.html">الإيرادات</a>
-  <a href="expenses.html">المصروفات</a>
-  <a href="maintenance.html">الصيانة</a>
-  <a href="reports.html">التقارير</a>
 </div>
 
 <div class="main">
 
   <div class="header">
-    <h2>لوحة الموظف</h2>
+    <h2>صفحة الموظف</h2>
     <button class="logout" onclick="logout()">تسجيل خروج</button>
   </div>
 
   <div class="card">
     <h3>بيانات المستخدم</h3>
-    <p><strong>الاسم:</strong> <span id="name"></span></p>
-    <p><strong>البريد:</strong> <span id="email"></span></p>
-    <p><strong>الصلاحية:</strong> <span id="role"></span></p>
+    <div class="info-row"><strong>الاسم:</strong> <span id="name"></span></div>
+    <div class="info-row"><strong>البريد:</strong> <span id="email"></span></div>
+    <div class="info-row"><strong>الصلاحية:</strong> <span id="role"></span></div>
+    <div class="info-row"><strong>رقم الهوية:</strong> <span id="nationalId"></span></div>
   </div>
 
   <div class="card">
-    <h3>الوصول السريع</h3>
-    <p>اختر من القائمة الجانبية للوصول للوظائف.</p>
+    <h3>المهام المسموح بها</h3>
+    <div class="quick-links">
+      <a class="quick-link" href="clients.html">إضافة وعرض العملاء</a>
+      <a class="quick-link" href="stays.html">تسجيل السكن والحجوزات</a>
+    </div>
+  </div>
+
+  <div class="card">
+    <h3>تنبيه</h3>
+    <div class="note">
+      هذه الصفحة مخصصة للموظف فقط، وصلاحيته الحالية تقتصر على تسجيل العملاء والحجوزات فقط.
+      لا يمكنه الوصول إلى لوحة التحكم أو الإيرادات أو المصروفات أو الصيانة أو التقارير أو إدارة الموظفين.
+    </div>
   </div>
 
 </div>
@@ -141,15 +209,15 @@ onAuthStateChanged(auth, async (user) => {
 
   const data = snap.data();
 
-  // 🔴 منع الأدمن من دخول لوحة الموظف
   if (data.role === "admin") {
     window.location.href = "dashboard.html";
     return;
   }
 
-  document.getElementById("name").innerText = data.name;
-  document.getElementById("email").innerText = data.email;
+  document.getElementById("name").innerText = data.name || "-";
+  document.getElementById("email").innerText = data.email || "-";
   document.getElementById("role").innerText = "موظف";
+  document.getElementById("nationalId").innerText = data.nationalId || "-";
 });
 
 window.logout = async function () {
