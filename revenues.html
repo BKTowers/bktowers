@@ -1,0 +1,1016 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>الإيرادات - BkTowers</title>
+  <style>
+    :root {
+      --primary: #0b1f4d;
+      --primary-dark: #08173a;
+      --bg: #eef3f9;
+      --card: #ffffff;
+      --text: #111827;
+      --muted: #4b5563;
+      --border: #d7deea;
+      --danger: #c62828;
+      --danger-dark: #a61f1f;
+      --success-bg: #dcfce7;
+      --success-text: #166534;
+      --info-bg: #dbeafe;
+      --info-text: #1d4ed8;
+      --manual-bg: #ede9fe;
+      --manual-text: #6d28d9;
+      --shadow: 0 12px 30px rgba(15, 23, 42, 0.10);
+      --radius: 18px;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      font-family: Arial, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+    }
+
+    .app-shell {
+      display: flex;
+      min-height: 100vh;
+    }
+
+    .sidebar {
+      width: 290px;
+      background: linear-gradient(180deg, var(--primary), var(--primary-dark));
+      color: #fff;
+      padding: 24px 18px;
+      position: sticky;
+      top: 0;
+      height: 100vh;
+      overflow-y: auto;
+      flex-shrink: 0;
+    }
+
+    .brand {
+      font-size: 34px;
+      font-weight: 800;
+      margin-bottom: 6px;
+      color: #ffffff;
+    }
+
+    .brand-sub {
+      font-size: 14px;
+      color: #dbe6ff;
+      margin-bottom: 24px;
+      font-weight: 700;
+    }
+
+    .user-card {
+      background: rgba(255, 255, 255, 0.10);
+      border: 1px solid rgba(255, 255, 255, 0.14);
+      border-radius: 16px;
+      padding: 14px;
+      margin-bottom: 20px;
+    }
+
+    .user-card .row {
+      margin-bottom: 10px;
+      font-size: 14px;
+      line-height: 1.8;
+      color: #ffffff;
+      word-break: break-word;
+    }
+
+    .user-card .row:last-child {
+      margin-bottom: 0;
+    }
+
+    .menu-title {
+      font-size: 12px;
+      color: #dbe6ff;
+      margin: 18px 6px 10px;
+      font-weight: 700;
+    }
+
+    .nav-links {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .nav-links a,
+    .nav-links button {
+      width: 100%;
+      border: none;
+      border-radius: 14px;
+      padding: 13px 14px;
+      font-size: 14px;
+      background: rgba(255, 255, 255, 0.10);
+      color: #ffffff;
+      text-decoration: none;
+      text-align: right;
+      cursor: pointer;
+      transition: 0.2s ease;
+      font-family: inherit;
+      font-weight: 700;
+    }
+
+    .nav-links a:hover,
+    .nav-links button:hover {
+      background: rgba(255, 255, 255, 0.18);
+    }
+
+    .nav-links a.active {
+      background: #ffffff;
+      color: #111827;
+    }
+
+    .main {
+      flex: 1;
+      min-width: 0;
+      padding: 24px;
+    }
+
+    .topbar {
+      background: var(--card);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      padding: 18px 20px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+      margin-bottom: 22px;
+      flex-wrap: wrap;
+      border: 1px solid #e4eaf3;
+    }
+
+    .topbar-title h1 {
+      margin: 0 0 6px;
+      font-size: 30px;
+      color: var(--primary);
+      font-weight: 800;
+    }
+
+    .topbar-title p {
+      margin: 0;
+      color: var(--muted);
+      font-size: 14px;
+      font-weight: 700;
+    }
+
+    .topbar-actions {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+
+    .action-btn,
+    .logout-btn {
+      border: none;
+      border-radius: 12px;
+      padding: 12px 16px;
+      cursor: pointer;
+      font-size: 14px;
+      font-weight: 800;
+      font-family: inherit;
+    }
+
+    .action-btn {
+      background: var(--primary);
+      color: #fff;
+    }
+
+    .logout-btn {
+      background: var(--danger);
+      color: #fff;
+    }
+
+    .summary-grid {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 16px;
+      margin-bottom: 22px;
+    }
+
+    .summary-card {
+      background: var(--card);
+      border-radius: 16px;
+      box-shadow: var(--shadow);
+      padding: 18px;
+      border: 1px solid #e4eaf3;
+    }
+
+    .summary-card h3 {
+      margin: 0 0 10px;
+      font-size: 14px;
+      color: var(--muted);
+      font-weight: 800;
+    }
+
+    .summary-card .value {
+      font-size: 30px;
+      font-weight: 800;
+      color: var(--primary);
+    }
+
+    .content-grid {
+      display: grid;
+      grid-template-columns: 430px minmax(0, 1fr);
+      gap: 22px;
+      align-items: start;
+    }
+
+    .panel {
+      background: var(--card);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      padding: 22px;
+      border: 1px solid #e4eaf3;
+      min-width: 0;
+    }
+
+    .panel-header h2 {
+      margin: 0 0 6px;
+      font-size: 24px;
+      color: var(--primary);
+      font-weight: 800;
+    }
+
+    .panel-header p {
+      margin: 0 0 18px;
+      color: var(--muted);
+      font-size: 13px;
+      font-weight: 700;
+    }
+
+    .form-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 14px;
+    }
+
+    .form-group {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .form-group.full {
+      grid-column: 1 / -1;
+    }
+
+    label {
+      font-size: 14px;
+      font-weight: 800;
+      color: #1f2937;
+    }
+
+    input,
+    select,
+    textarea {
+      width: 100%;
+      padding: 12px 13px;
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      font-size: 14px;
+      background: #fff;
+      outline: none;
+      font-family: inherit;
+      color: #111827;
+      font-weight: 700;
+    }
+
+    textarea {
+      min-height: 90px;
+      resize: vertical;
+    }
+
+    .money-box {
+      display: flex;
+      align-items: stretch;
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      overflow: hidden;
+      background: #fff;
+    }
+
+    .money-box input {
+      border: none;
+      border-radius: 0;
+    }
+
+    .money-label {
+      min-width: 60px;
+      background: #f3f6fb;
+      border-right: 1px solid var(--border);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 13px;
+      font-weight: 800;
+      color: #374151;
+    }
+
+    .hint-box {
+      background: #f8fbff;
+      border: 1px dashed var(--border);
+      border-radius: 14px;
+      padding: 12px;
+      font-size: 13px;
+      color: var(--muted);
+      line-height: 1.8;
+      font-weight: 700;
+    }
+
+    .form-actions {
+      display: flex;
+      gap: 10px;
+      margin-top: 18px;
+      flex-wrap: wrap;
+    }
+
+    .primary-btn,
+    .secondary-btn,
+    .edit-btn,
+    .danger-btn {
+      border: none;
+      border-radius: 12px;
+      padding: 12px 16px;
+      cursor: pointer;
+      font-size: 14px;
+      font-weight: 800;
+      font-family: inherit;
+    }
+
+    .primary-btn {
+      background: var(--primary);
+      color: #fff;
+    }
+
+    .secondary-btn {
+      background: #edf2f7;
+      color: #111827;
+    }
+
+    .edit-btn {
+      background: var(--info-bg);
+      color: var(--info-text);
+      padding: 9px 14px;
+      font-size: 13px;
+    }
+
+    .danger-btn {
+      background: var(--danger);
+      color: #fff;
+      padding: 9px 14px;
+      font-size: 13px;
+    }
+
+    .message {
+      margin-top: 14px;
+      min-height: 20px;
+      font-size: 14px;
+      font-weight: 800;
+    }
+
+    .message.success {
+      color: #166534;
+    }
+
+    .message.error {
+      color: #b91c1c;
+    }
+
+    .table-tools {
+      display: flex;
+      justify-content: space-between;
+      gap: 12px;
+      flex-wrap: wrap;
+      margin-bottom: 14px;
+    }
+
+    .search-box {
+      max-width: 320px;
+      width: 100%;
+    }
+
+    .table-wrap {
+      overflow-x: auto;
+      border: 1px solid var(--border);
+      border-radius: 16px;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      min-width: 1200px;
+      background: #fff;
+    }
+
+    th,
+    td {
+      padding: 14px 12px;
+      border-bottom: 1px solid var(--border);
+      text-align: right;
+      vertical-align: top;
+      font-size: 14px;
+      color: #111827;
+      font-weight: 700;
+    }
+
+    th {
+      background: #f7faff;
+      color: #1f2937;
+      font-weight: 800;
+    }
+
+    tbody tr:hover {
+      background: #fbfdff;
+    }
+
+    .source-badge {
+      display: inline-block;
+      padding: 6px 10px;
+      border-radius: 999px;
+      font-size: 12px;
+      font-weight: 800;
+      white-space: nowrap;
+    }
+
+    .source-stay {
+      background: var(--info-bg);
+      color: var(--info-text);
+    }
+
+    .source-manual {
+      background: var(--manual-bg);
+      color: var(--manual-text);
+    }
+
+    .empty {
+      text-align: center;
+      color: var(--muted);
+      padding: 26px 0;
+      font-weight: 800;
+    }
+
+    .actions-inline {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+
+    @media (max-width: 1350px) {
+      .summary-grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+      }
+
+      .content-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    @media (max-width: 900px) {
+      .app-shell {
+        flex-direction: column;
+      }
+
+      .sidebar {
+        width: 100%;
+        height: auto;
+        position: relative;
+      }
+
+      .main {
+        padding: 16px;
+      }
+
+      .form-grid,
+      .summary-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="app-shell">
+    <aside class="sidebar">
+      <div class="brand">BkTowers</div>
+      <div class="brand-sub">نظام إدارة العقارات</div>
+
+      <div class="user-card">
+        <div class="row"><strong>الاسم:</strong> <span id="sidebarUserName">-</span></div>
+        <div class="row"><strong>البريد:</strong> <span id="sidebarUserEmail">-</span></div>
+        <div class="row"><strong>الصلاحية:</strong> <span id="sidebarUserRole">-</span></div>
+      </div>
+
+      <div class="menu-title">القائمة الرئيسية</div>
+      <div class="nav-links">
+        <a href="dashboard.html">لوحة التحكم</a>
+        <a href="clients.html">العملاء</a>
+        <a href="stays.html">السكن والحجوزات</a>
+        <a href="revenues.html" class="active">الإيرادات</a>
+        <a href="expenses.html">المصروفات</a>
+        <a href="maintenance.html">الصيانة</a>
+        <a href="reports.html">التقارير</a>
+        <a href="employees.html">الموظفين</a>
+        <button onclick="logout()">تسجيل الخروج</button>
+      </div>
+    </aside>
+
+    <main class="main">
+      <section class="topbar">
+        <div class="topbar-title">
+          <h1>الإيرادات</h1>
+          <p>الإيرادات التلقائية من الحجوزات + الإيرادات الإضافية اليدوية.</p>
+        </div>
+
+        <div class="topbar-actions">
+          <button class="action-btn" onclick="focusAddForm()">إضافة إيراد يدوي</button>
+          <button class="logout-btn" onclick="logout()">تسجيل الخروج</button>
+        </div>
+      </section>
+
+      <section class="summary-grid">
+        <div class="summary-card">
+          <h3>إجمالي الإيرادات</h3>
+          <div class="value" id="totalRevenue">0</div>
+        </div>
+        <div class="summary-card">
+          <h3>إيرادات الحجوزات</h3>
+          <div class="value" id="staysRevenue">0</div>
+        </div>
+        <div class="summary-card">
+          <h3>الإيرادات اليدوية</h3>
+          <div class="value" id="manualRevenue">0</div>
+        </div>
+        <div class="summary-card">
+          <h3>عدد العمليات</h3>
+          <div class="value" id="totalEntries">0</div>
+        </div>
+      </section>
+
+      <section class="content-grid">
+        <div class="panel">
+          <div class="panel-header">
+            <h2 id="formTitle">إضافة إيراد يدوي</h2>
+            <p>هذه الإضافة مخصصة للدخل الإضافي غير الناتج من الحجز.</p>
+          </div>
+
+          <div class="form-grid">
+            <div class="form-group">
+              <label for="periodType">نوع الفترة</label>
+              <select id="periodType">
+                <option value="يومي">يومي</option>
+                <option value="شهري">شهري</option>
+                <option value="سنوي">سنوي</option>
+              </select>
+            </div>
+
+            <div class="form-group">
+              <label for="category">تصنيف الإيراد</label>
+              <select id="category">
+                <option value="إيجار إضافي">إيجار إضافي</option>
+                <option value="رسوم">رسوم</option>
+                <option value="خدمات">خدمات</option>
+                <option value="تأمين">تأمين</option>
+                <option value="أخرى">أخرى</option>
+              </select>
+            </div>
+
+            <div class="form-group">
+              <label for="clientName">اسم العميل</label>
+              <input type="text" id="clientName" placeholder="اختياري">
+            </div>
+
+            <div class="form-group">
+              <label for="unitLabel">الوحدة</label>
+              <input type="text" id="unitLabel" placeholder="اختياري">
+            </div>
+
+            <div class="form-group">
+              <label for="date">التاريخ</label>
+              <input type="date" id="date">
+            </div>
+
+            <div class="form-group">
+              <label for="amount">المبلغ</label>
+              <div class="money-box">
+                <input type="number" id="amount" min="0" step="0.01" placeholder="اكتب المبلغ">
+                <div class="money-label">ر.س</div>
+              </div>
+            </div>
+
+            <div class="form-group full">
+              <label for="description">البيان</label>
+              <textarea id="description" placeholder="اكتب وصف الإيراد اليدوي"></textarea>
+            </div>
+
+            <div class="form-group full">
+              <label>ملاحظة</label>
+              <div class="hint-box">
+                الإيرادات الناتجة من الحجوزات تظهر تلقائيًا في الجدول بالأسفل ولا تحتاج إضافتها يدويًا.
+              </div>
+            </div>
+          </div>
+
+          <div class="form-actions">
+            <button class="primary-btn" onclick="saveManualRevenue()" id="saveBtn">حفظ الإيراد</button>
+            <button class="secondary-btn" onclick="clearForm()">تفريغ الحقول</button>
+          </div>
+
+          <div id="formMessage" class="message"></div>
+        </div>
+
+        <div class="panel">
+          <div class="panel-header">
+            <h2>قائمة الإيرادات</h2>
+            <p>تعرض الإيرادات التلقائية من السكن والحجوزات مع الإيرادات اليدوية.</p>
+          </div>
+
+          <div class="table-tools">
+            <input type="text" id="searchInput" class="search-box" placeholder="ابحث بالعميل أو الوحدة أو المصدر أو التصنيف">
+          </div>
+
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr>
+                  <th>المصدر</th>
+                  <th>نوع الفترة</th>
+                  <th>التصنيف</th>
+                  <th>العميل</th>
+                  <th>الوحدة</th>
+                  <th>التاريخ</th>
+                  <th>المبلغ</th>
+                  <th>البيان</th>
+                  <th>الإجراءات</th>
+                </tr>
+              </thead>
+              <tbody id="revenuesTableBody">
+                <tr>
+                  <td colspan="9" class="empty">جاري تحميل الإيرادات...</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+    </main>
+  </div>
+
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/12.11.0/firebase-app.js";
+    import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/12.11.0/firebase-auth.js";
+    import {
+      getFirestore,
+      collection,
+      addDoc,
+      getDocs,
+      deleteDoc,
+      doc,
+      getDoc,
+      updateDoc,
+      orderBy,
+      query,
+      serverTimestamp
+    } from "https://www.gstatic.com/firebasejs/12.11.0/firebase-firestore.js";
+
+    const firebaseConfig = {
+      apiKey: "AIzaSyDey3KL3qZUvZBVtFcB38xzBGx6qrG2WYY",
+      authDomain: "bktowers-4b822.firebaseapp.com",
+      projectId: "bktowers-4b822",
+      storageBucket: "bktowers-4b822.firebasestorage.app",
+      messagingSenderId: "336608827796",
+      appId: "1:336608827796:web:4957fe0d411220f6a69781"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+    const db = getFirestore(app);
+
+    const userNameEl = document.getElementById("sidebarUserName");
+    const userEmailEl = document.getElementById("sidebarUserEmail");
+    const userRoleEl = document.getElementById("sidebarUserRole");
+
+    const periodType = document.getElementById("periodType");
+    const category = document.getElementById("category");
+    const clientName = document.getElementById("clientName");
+    const unitLabel = document.getElementById("unitLabel");
+    const dateInput = document.getElementById("date");
+    const amountInput = document.getElementById("amount");
+    const descriptionInput = document.getElementById("description");
+    const formTitle = document.getElementById("formTitle");
+    const saveBtn = document.getElementById("saveBtn");
+    const formMessage = document.getElementById("formMessage");
+    const searchInput = document.getElementById("searchInput");
+    const revenuesTableBody = document.getElementById("revenuesTableBody");
+
+    const totalRevenueEl = document.getElementById("totalRevenue");
+    const staysRevenueEl = document.getElementById("staysRevenue");
+    const manualRevenueEl = document.getElementById("manualRevenue");
+    const totalEntriesEl = document.getElementById("totalEntries");
+
+    let allRows = [];
+    let manualRows = [];
+    let editingManualId = null;
+
+    function setMessage(text, type = "") {
+      formMessage.textContent = text;
+      formMessage.className = "message";
+      if (type) formMessage.classList.add(type);
+    }
+
+    function focusAddForm() {
+      document.getElementById("amount").focus();
+      window.scrollTo({ top: 0, behavior: "smooth" });
+    }
+
+    function formatMoney(value) {
+      return Number(value || 0).toFixed(2);
+    }
+
+    function clearForm() {
+      editingManualId = null;
+      periodType.value = "يومي";
+      category.value = "إيجار إضافي";
+      clientName.value = "";
+      unitLabel.value = "";
+      dateInput.value = "";
+      amountInput.value = "";
+      descriptionInput.value = "";
+      formTitle.textContent = "إضافة إيراد يدوي";
+      saveBtn.textContent = "حفظ الإيراد";
+      setMessage("");
+    }
+
+    function mapStayToRevenue(stayItem) {
+      const stay = stayItem.data;
+      return {
+        id: `stay_${stayItem.id}`,
+        sourceType: "stay",
+        sourceLabel: "من الحجز",
+        periodType: stay.rentalType || "-",
+        category: "حجز / سكن",
+        clientName: stay.clientName || "-",
+        unitLabel: stay.unitLabel || "-",
+        date: stay.checkIn || "-",
+        amount: Number(stay.paid || stay.amount || 0),
+        description: stay.notes || "إيراد تلقائي من الحجز",
+        raw: stay
+      };
+    }
+
+    function mapManualRevenue(item) {
+      const row = item.data;
+      return {
+        id: item.id,
+        sourceType: "manual",
+        sourceLabel: "إضافة يدوية",
+        periodType: row.periodType || "-",
+        category: row.category || "-",
+        clientName: row.clientName || "-",
+        unitLabel: row.unitLabel || "-",
+        date: row.date || "-",
+        amount: Number(row.amount || 0),
+        description: row.description || "-",
+        raw: row
+      };
+    }
+
+    function renderRows(rows) {
+      let html = "";
+      let totalRevenue = 0;
+      let staysRevenue = 0;
+      let manualRevenue = 0;
+
+      rows.forEach((row) => {
+        totalRevenue += row.amount;
+        if (row.sourceType === "stay") staysRevenue += row.amount;
+        if (row.sourceType === "manual") manualRevenue += row.amount;
+
+        html += `
+          <tr>
+            <td>
+              ${
+                row.sourceType === "stay"
+                  ? `<span class="source-badge source-stay">${row.sourceLabel}</span>`
+                  : `<span class="source-badge source-manual">${row.sourceLabel}</span>`
+              }
+            </td>
+            <td>${row.periodType || "-"}</td>
+            <td>${row.category || "-"}</td>
+            <td>${row.clientName || "-"}</td>
+            <td>${row.unitLabel || "-"}</td>
+            <td>${row.date || "-"}</td>
+            <td>${formatMoney(row.amount)} ر.س</td>
+            <td>${row.description || "-"}</td>
+            <td>
+              ${
+                row.sourceType === "manual"
+                  ? `
+                    <div class="actions-inline">
+                      <button class="edit-btn" onclick="editManualRevenue('${row.id}')">تعديل</button>
+                      <button class="danger-btn" onclick="deleteManualRevenue('${row.id}')">حذف</button>
+                    </div>
+                  `
+                  : `-`
+              }
+            </td>
+          </tr>
+        `;
+      });
+
+      if (!html) {
+        html = `<tr><td colspan="9" class="empty">لا توجد نتائج مطابقة.</td></tr>`;
+      }
+
+      revenuesTableBody.innerHTML = html;
+      totalRevenueEl.textContent = formatMoney(totalRevenue);
+      staysRevenueEl.textContent = formatMoney(staysRevenue);
+      manualRevenueEl.textContent = formatMoney(manualRevenue);
+      totalEntriesEl.textContent = rows.length;
+    }
+
+    async function loadAllRevenues() {
+      revenuesTableBody.innerHTML = `<tr><td colspan="9" class="empty">جاري تحميل الإيرادات...</td></tr>`;
+
+      const staysSnapshot = await getDocs(query(collection(db, "stays"), orderBy("createdAt", "desc")));
+      const manualSnapshot = await getDocs(query(collection(db, "revenues"), orderBy("createdAt", "desc")));
+
+      const stayRows = [];
+      manualRows = [];
+
+      staysSnapshot.forEach((docSnap) => {
+        stayRows.push({
+          id: docSnap.id,
+          data: docSnap.data()
+        });
+      });
+
+      manualSnapshot.forEach((docSnap) => {
+        manualRows.push({
+          id: docSnap.id,
+          data: docSnap.data()
+        });
+      });
+
+      allRows = [
+        ...stayRows.map(mapStayToRevenue),
+        ...manualRows.map(mapManualRevenue)
+      ].sort((a, b) => String(b.date || "").localeCompare(String(a.date || "")));
+
+      renderRows(allRows);
+    }
+
+    async function saveManualRevenue() {
+      try {
+        const payload = {
+          periodType: periodType.value,
+          category: category.value,
+          clientName: clientName.value.trim(),
+          unitLabel: unitLabel.value.trim(),
+          date: dateInput.value,
+          amount: Number(amountInput.value || 0),
+          description: descriptionInput.value.trim(),
+          sourceType: "manual"
+        };
+
+        if (!payload.date) throw new Error("التاريخ مطلوب.");
+        if (payload.amount <= 0) throw new Error("المبلغ يجب أن يكون أكبر من صفر.");
+        if (!payload.description) throw new Error("البيان مطلوب.");
+
+        if (editingManualId) {
+          await updateDoc(doc(db, "revenues", editingManualId), payload);
+          setMessage("تم تعديل الإيراد اليدوي بنجاح.", "success");
+        } else {
+          await addDoc(collection(db, "revenues"), {
+            ...payload,
+            createdAt: serverTimestamp()
+          });
+          setMessage("تمت إضافة الإيراد اليدوي بنجاح.", "success");
+        }
+
+        clearForm();
+        await loadAllRevenues();
+      } catch (error) {
+        setMessage(error.message, "error");
+      }
+    }
+
+    function fillFormForEdit(item) {
+      const row = item.data;
+      editingManualId = item.id;
+
+      periodType.value = row.periodType || "يومي";
+      category.value = row.category || "إيجار إضافي";
+      clientName.value = row.clientName || "";
+      unitLabel.value = row.unitLabel || "";
+      dateInput.value = row.date || "";
+      amountInput.value = row.amount ?? "";
+      descriptionInput.value = row.description || "";
+
+      formTitle.textContent = "تعديل الإيراد اليدوي";
+      saveBtn.textContent = "حفظ التعديلات";
+      focusAddForm();
+    }
+
+    function editManualRevenue(id) {
+      const item = manualRows.find(row => row.id === id);
+      if (!item) return;
+      fillFormForEdit(item);
+    }
+
+    async function deleteManualRevenue(id) {
+      const confirmed = window.confirm("هل أنت متأكد من حذف هذا الإيراد اليدوي؟");
+      if (!confirmed) return;
+
+      try {
+        await deleteDoc(doc(db, "revenues", id));
+        if (editingManualId === id) {
+          clearForm();
+        }
+        await loadAllRevenues();
+      } catch (error) {
+        alert(error.message);
+      }
+    }
+
+    function filterRows() {
+      const keyword = searchInput.value.trim().toLowerCase();
+
+      if (!keyword) {
+        renderRows(allRows);
+        return;
+      }
+
+      const filtered = allRows.filter((row) => {
+        return (
+          String(row.sourceLabel || "").toLowerCase().includes(keyword) ||
+          String(row.category || "").toLowerCase().includes(keyword) ||
+          String(row.clientName || "").toLowerCase().includes(keyword) ||
+          String(row.unitLabel || "").toLowerCase().includes(keyword) ||
+          String(row.periodType || "").toLowerCase().includes(keyword) ||
+          String(row.description || "").toLowerCase().includes(keyword)
+        );
+      });
+
+      renderRows(filtered);
+    }
+
+    async function logout() {
+      try {
+        await signOut(auth);
+        localStorage.clear();
+        window.location.href = "index.html";
+      } catch (error) {
+        alert(error.message);
+      }
+    }
+
+    searchInput.addEventListener("input", filterRows);
+
+    window.saveManualRevenue = saveManualRevenue;
+    window.editManualRevenue = editManualRevenue;
+    window.deleteManualRevenue = deleteManualRevenue;
+    window.logout = logout;
+    window.clearForm = clearForm;
+    window.focusAddForm = focusAddForm;
+
+    onAuthStateChanged(auth, async (user) => {
+      if (!user) {
+        window.location.href = "index.html";
+        return;
+      }
+
+      try {
+        const userRef = doc(db, "users", user.uid);
+        const userSnap = await getDoc(userRef);
+
+        if (!userSnap.exists()) {
+          window.location.href = "index.html";
+          return;
+        }
+
+        const userData = userSnap.data();
+
+        if (userData.role !== "admin") {
+          window.location.href = "employee-dashboard.html";
+          return;
+        }
+
+        userNameEl.textContent = userData.name || "-";
+        userEmailEl.textContent = userData.email || user.email || "-";
+        userRoleEl.textContent = "مدير";
+
+        await loadAllRevenues();
+      } catch (error) {
+        window.location.href = "index.html";
+      }
+    });
+  </script>
+</body>
+</html>
