@@ -56,6 +56,7 @@ button{
 .msg{
   margin-top:10px;
   color:red;
+  min-height:24px;
 }
 </style>
 </head>
@@ -91,50 +92,88 @@ const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
 const db = getFirestore(app);
 
-// find user by username
 async function findUser(username){
-  const q = query(collection(db,"users"), where("username","==",username.toLowerCase()));
-  const snap = await getDocs(q);
-  if(snap.empty) return null;
+  const usersRef = collection(db, "users");
 
-  return snap.docs[0].data();
+  // Try exact username first
+  let q = query(usersRef, where("username", "==", username));
+  let snap = await getDocs(q);
+
+  if (!snap.empty) {
+    return { id: snap.docs[0].id, ...snap.docs[0].data() };
+  }
+
+  // Try lowercase as fallback
+  q = query(usersRef, where("username", "==", username.toLowerCase()));
+  snap = await getDocs(q);
+
+  if (!snap.empty) {
+    return { id: snap.docs[0].id, ...snap.docs[0].data() };
+  }
+
+  return null;
 }
 
 window.login = async function(){
-  const username = document.getElementById("username").value.trim().toLowerCase();
-  const password = document.getElementById("password").value.trim();
+  const username = document.getElementById("username").value.trim();
+  const password = document.getElementById("password").value;
   const msg = document.getElementById("msg");
 
   msg.innerText = "";
 
   if(!username || !password){
-    msg.innerText = "اكتب البيانات كاملة";
+    msg.innerText = "اكتب اسم المستخدم وكلمة المرور";
     return;
   }
 
   try{
-    // 1. get user from firestore
     const user = await findUser(username);
 
     if(!user){
-      msg.innerText = "اسم المستخدم غير موجود";
+      msg.innerText = "اسم المستخدم غير موجود داخل users";
       return;
     }
 
-    // 2. login using firebase auth email
+    if(!user.email){
+      msg.innerText = "هذا المستخدم لا يحتوي على email داخل users";
+      return;
+    }
+
     await signInWithEmailAndPassword(auth, user.email, password);
 
-    // 3. redirect based on role
+    localStorage.setItem("userId", user.id || "");
+    localStorage.setItem("username", user.username || "");
+    localStorage.setItem("role", user.role || "");
+    localStorage.setItem("name", user.name || "");
+
     if(user.role === "admin"){
       window.location.href = "dashboard.html";
-    } else {
+    }else{
       window.location.href = "employee-dashboard.html";
     }
 
   }catch(e){
-    msg.innerText = "كلمة المرور غير صحيحة";
+    console.log("Login error:", e);
+
+    if (e.code === "auth/user-not-found") {
+      msg.innerText = "الإيميل المرتبط بهذا المستخدم غير موجود في Firebase Auth";
+    } else if (e.code === "auth/wrong-password" || e.code === "auth/invalid-credential") {
+      msg.innerText = "كلمة المرور غير صحيحة";
+    } else if (e.code === "auth/invalid-email") {
+      msg.innerText = "الإيميل المخزن لهذا المستخدم غير صالح";
+    } else {
+      msg.innerText = "فشل تسجيل الدخول";
+    }
   }
 };
+
+document.getElementById("password").addEventListener("keydown", function(e){
+  if(e.key === "Enter") login();
+});
+
+document.getElementById("username").addEventListener("keydown", function(e){
+  if(e.key === "Enter") login();
+});
 </script>
 
 </body>
