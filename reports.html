@@ -1,0 +1,1020 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>التقارير - BkTowers</title>
+  <style>
+    :root {
+      --primary: #0b1f4d;
+      --primary-dark: #08173a;
+      --bg: #eef3f9;
+      --card: #ffffff;
+      --text: #111827;
+      --muted: #4b5563;
+      --border: #d7deea;
+      --danger: #c62828;
+      --success: #166534;
+      --warning: #92400e;
+      --info: #1d4ed8;
+      --success-bg: #dcfce7;
+      --warning-bg: #fef3c7;
+      --danger-bg: #fee2e2;
+      --info-bg: #dbeafe;
+      --shadow: 0 12px 30px rgba(15, 23, 42, 0.10);
+      --radius: 18px;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      font-family: Arial, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+    }
+
+    .app-shell {
+      display: flex;
+      min-height: 100vh;
+    }
+
+    .sidebar {
+      width: 290px;
+      background: linear-gradient(180deg, var(--primary), var(--primary-dark));
+      color: #fff;
+      padding: 24px 18px;
+      position: sticky;
+      top: 0;
+      height: 100vh;
+      overflow-y: auto;
+      flex-shrink: 0;
+    }
+
+    .brand {
+      font-size: 34px;
+      font-weight: 800;
+      margin-bottom: 6px;
+      color: #ffffff;
+    }
+
+    .brand-sub {
+      font-size: 14px;
+      color: #dbe6ff;
+      margin-bottom: 24px;
+      font-weight: 700;
+    }
+
+    .user-card {
+      background: rgba(255, 255, 255, 0.10);
+      border: 1px solid rgba(255, 255, 255, 0.14);
+      border-radius: 16px;
+      padding: 14px;
+      margin-bottom: 20px;
+    }
+
+    .user-card .row {
+      margin-bottom: 10px;
+      font-size: 14px;
+      line-height: 1.8;
+      color: #ffffff;
+      word-break: break-word;
+    }
+
+    .user-card .row:last-child {
+      margin-bottom: 0;
+    }
+
+    .menu-title {
+      font-size: 12px;
+      color: #dbe6ff;
+      margin: 18px 6px 10px;
+      font-weight: 700;
+    }
+
+    .nav-links {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .nav-links a,
+    .nav-links button {
+      width: 100%;
+      border: none;
+      border-radius: 14px;
+      padding: 13px 14px;
+      font-size: 14px;
+      background: rgba(255, 255, 255, 0.10);
+      color: #ffffff;
+      text-decoration: none;
+      text-align: right;
+      cursor: pointer;
+      transition: 0.2s ease;
+      font-family: inherit;
+      font-weight: 700;
+    }
+
+    .nav-links a:hover,
+    .nav-links button:hover {
+      background: rgba(255, 255, 255, 0.18);
+    }
+
+    .nav-links a.active {
+      background: #ffffff;
+      color: #111827;
+    }
+
+    .main {
+      flex: 1;
+      min-width: 0;
+      padding: 24px;
+    }
+
+    .topbar {
+      background: var(--card);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      padding: 18px 20px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+      margin-bottom: 22px;
+      flex-wrap: wrap;
+      border: 1px solid #e4eaf3;
+    }
+
+    .topbar-title h1 {
+      margin: 0 0 6px;
+      font-size: 30px;
+      color: var(--primary);
+      font-weight: 800;
+    }
+
+    .topbar-title p {
+      margin: 0;
+      color: var(--muted);
+      font-size: 14px;
+      font-weight: 700;
+    }
+
+    .topbar-actions {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+
+    .action-btn,
+    .logout-btn,
+    .print-btn {
+      border: none;
+      border-radius: 12px;
+      padding: 12px 16px;
+      cursor: pointer;
+      font-size: 14px;
+      font-weight: 800;
+      font-family: inherit;
+    }
+
+    .action-btn,
+    .print-btn {
+      background: var(--primary);
+      color: #fff;
+    }
+
+    .logout-btn {
+      background: var(--danger);
+      color: #fff;
+    }
+
+    .filter-panel,
+    .stats-panel,
+    .table-panel {
+      background: var(--card);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      padding: 22px;
+      border: 1px solid #e4eaf3;
+      margin-bottom: 22px;
+    }
+
+    .filter-panel h2,
+    .stats-panel h2,
+    .table-panel h2 {
+      margin: 0 0 14px;
+      font-size: 24px;
+      color: var(--primary);
+      font-weight: 800;
+    }
+
+    .filter-grid {
+      display: grid;
+      grid-template-columns: repeat(5, minmax(0, 1fr));
+      gap: 14px;
+      align-items: end;
+    }
+
+    .form-group {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    label {
+      font-size: 14px;
+      font-weight: 800;
+      color: #1f2937;
+    }
+
+    input,
+    select {
+      width: 100%;
+      padding: 12px 13px;
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      font-size: 14px;
+      background: #fff;
+      outline: none;
+      font-family: inherit;
+      color: #111827;
+      font-weight: 700;
+    }
+
+    .filter-actions {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+
+    .primary-btn,
+    .secondary-btn {
+      border: none;
+      border-radius: 12px;
+      padding: 12px 16px;
+      cursor: pointer;
+      font-size: 14px;
+      font-weight: 800;
+      font-family: inherit;
+    }
+
+    .primary-btn {
+      background: var(--primary);
+      color: #fff;
+    }
+
+    .secondary-btn {
+      background: #edf2f7;
+      color: #111827;
+    }
+
+    .stats-grid {
+      display: grid;
+      grid-template-columns: repeat(5, minmax(0, 1fr));
+      gap: 16px;
+    }
+
+    .stat-card {
+      background: #fff;
+      border-radius: 16px;
+      padding: 18px;
+      border: 1px solid #e4eaf3;
+    }
+
+    .stat-card h3 {
+      margin: 0 0 10px;
+      font-size: 14px;
+      color: var(--muted);
+      font-weight: 800;
+    }
+
+    .stat-card .value {
+      font-size: 28px;
+      font-weight: 800;
+      color: var(--primary);
+    }
+
+    .stat-card.profit .value {
+      color: var(--success);
+    }
+
+    .stat-card.cost .value {
+      color: var(--danger);
+    }
+
+    .table-wrap {
+      overflow-x: auto;
+      border: 1px solid var(--border);
+      border-radius: 16px;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      min-width: 1200px;
+      background: #fff;
+    }
+
+    th,
+    td {
+      padding: 14px 12px;
+      border-bottom: 1px solid var(--border);
+      text-align: right;
+      vertical-align: top;
+      font-size: 14px;
+      color: #111827;
+      font-weight: 700;
+    }
+
+    th {
+      background: #f7faff;
+      color: #1f2937;
+      font-weight: 800;
+    }
+
+    .empty {
+      text-align: center;
+      color: var(--muted);
+      padding: 26px 0;
+      font-weight: 800;
+    }
+
+    .section-badge {
+      display: inline-block;
+      padding: 6px 10px;
+      border-radius: 999px;
+      font-size: 12px;
+      font-weight: 800;
+      white-space: nowrap;
+    }
+
+    .badge-revenue {
+      background: var(--success-bg);
+      color: var(--success);
+    }
+
+    .badge-expense {
+      background: var(--danger-bg);
+      color: var(--danger);
+    }
+
+    .badge-maintenance {
+      background: var(--warning-bg);
+      color: var(--warning);
+    }
+
+    .subtables {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 22px;
+    }
+
+    .print-header {
+      display: none;
+    }
+
+    @media (max-width: 1450px) {
+      .stats-grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+      }
+
+      .filter-grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+      }
+    }
+
+    @media (max-width: 900px) {
+      .app-shell {
+        flex-direction: column;
+      }
+
+      .sidebar {
+        width: 100%;
+        height: auto;
+        position: relative;
+      }
+
+      .main {
+        padding: 16px;
+      }
+
+      .stats-grid,
+      .filter-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    @media print {
+      body {
+        background: #fff;
+      }
+
+      .sidebar,
+      .topbar-actions,
+      .filter-actions,
+      .nav-links,
+      .menu-title {
+        display: none !important;
+      }
+
+      .app-shell {
+        display: block;
+      }
+
+      .main {
+        padding: 0;
+      }
+
+      .topbar,
+      .filter-panel,
+      .stats-panel,
+      .table-panel {
+        box-shadow: none;
+        border: 1px solid #ddd;
+        margin-bottom: 16px;
+      }
+
+      .print-header {
+        display: block;
+        margin-bottom: 16px;
+        padding: 10px 0;
+      }
+
+      .print-header h1 {
+        margin: 0 0 6px;
+        font-size: 26px;
+      }
+
+      .print-header p {
+        margin: 0;
+        font-size: 14px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="app-shell">
+    <aside class="sidebar">
+      <div class="brand">BkTowers</div>
+      <div class="brand-sub">نظام إدارة العقارات</div>
+
+      <div class="user-card">
+        <div class="row"><strong>الاسم:</strong> <span id="sidebarUserName">-</span></div>
+        <div class="row"><strong>البريد:</strong> <span id="sidebarUserEmail">-</span></div>
+        <div class="row"><strong>الصلاحية:</strong> <span id="sidebarUserRole">-</span></div>
+      </div>
+
+      <div class="menu-title">القائمة الرئيسية</div>
+      <div class="nav-links">
+        <a href="dashboard.html">لوحة التحكم</a>
+        <a href="clients.html">العملاء</a>
+        <a href="stays.html">السكن والحجوزات</a>
+        <a href="revenues.html">الإيرادات</a>
+        <a href="expenses.html">المصروفات</a>
+        <a href="maintenance.html">الصيانة</a>
+        <a href="reports.html" class="active">التقارير</a>
+        <a href="employees.html">الموظفين</a>
+        <button onclick="logout()">تسجيل الخروج</button>
+      </div>
+    </aside>
+
+    <main class="main">
+      <div class="print-header">
+        <h1>BkTowers - تقرير مالي</h1>
+        <p id="printSummaryText">تقرير الأرباح والإيرادات والمصروفات</p>
+      </div>
+
+      <section class="topbar">
+        <div class="topbar-title">
+          <h1>التقارير</h1>
+          <p>تقارير الأرباح والإيرادات والمصروفات والصيانة مع الفلترة والطباعة.</p>
+        </div>
+
+        <div class="topbar-actions">
+          <button class="print-btn" onclick="printReport()">طباعة التقرير</button>
+          <button class="logout-btn" onclick="logout()">تسجيل الخروج</button>
+        </div>
+      </section>
+
+      <section class="filter-panel">
+        <h2>الفلاتر</h2>
+
+        <div class="filter-grid">
+          <div class="form-group">
+            <label for="reportType">نوع التقرير</label>
+            <select id="reportType">
+              <option value="daily">يومي</option>
+              <option value="monthly">شهري</option>
+              <option value="yearly">سنوي</option>
+              <option value="custom">فترة مخصصة</option>
+            </select>
+          </div>
+
+          <div class="form-group">
+            <label for="filterDate">التاريخ</label>
+            <input type="date" id="filterDate">
+          </div>
+
+          <div class="form-group">
+            <label for="filterMonth">الشهر</label>
+            <input type="month" id="filterMonth">
+          </div>
+
+          <div class="form-group">
+            <label for="filterYear">السنة</label>
+            <input type="number" id="filterYear" placeholder="مثال 2026">
+          </div>
+
+          <div class="form-group">
+            <label for="unitFilter">الوحدة</label>
+            <select id="unitFilter">
+              <option value="">كل الوحدات</option>
+            </select>
+          </div>
+
+          <div class="form-group">
+            <label for="fromDate">من تاريخ</label>
+            <input type="date" id="fromDate">
+          </div>
+
+          <div class="form-group">
+            <label for="toDate">إلى تاريخ</label>
+            <input type="date" id="toDate">
+          </div>
+
+          <div class="form-group" style="grid-column: 1 / -1;">
+            <div class="filter-actions">
+              <button class="primary-btn" onclick="applyFilters()">تطبيق الفلتر</button>
+              <button class="secondary-btn" onclick="resetFilters()">إعادة تعيين</button>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section class="stats-panel">
+        <h2>ملخص التقرير</h2>
+        <div class="stats-grid">
+          <div class="stat-card">
+            <h3>إجمالي الإيرادات</h3>
+            <div class="value" id="totalRevenue">0</div>
+          </div>
+          <div class="stat-card cost">
+            <h3>إجمالي المصروفات</h3>
+            <div class="value" id="totalExpenses">0</div>
+          </div>
+          <div class="stat-card cost">
+            <h3>إجمالي الصيانة</h3>
+            <div class="value" id="totalMaintenance">0</div>
+          </div>
+          <div class="stat-card profit">
+            <h3>صافي الربح</h3>
+            <div class="value" id="netProfit">0</div>
+          </div>
+          <div class="stat-card">
+            <h3>عدد السجلات</h3>
+            <div class="value" id="totalRecords">0</div>
+          </div>
+        </div>
+      </section>
+
+      <section class="subtables">
+        <section class="table-panel">
+          <h2>الإيرادات</h2>
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr>
+                  <th>المصدر</th>
+                  <th>النوع</th>
+                  <th>العميل</th>
+                  <th>الوحدة</th>
+                  <th>التاريخ</th>
+                  <th>المبلغ</th>
+                  <th>البيان</th>
+                </tr>
+              </thead>
+              <tbody id="revenuesBody">
+                <tr><td colspan="7" class="empty">جاري تحميل الإيرادات...</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </section>
+
+        <section class="table-panel">
+          <h2>المصروفات</h2>
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr>
+                  <th>القسم</th>
+                  <th>النوع</th>
+                  <th>الوحدة</th>
+                  <th>التاريخ</th>
+                  <th>المبلغ</th>
+                  <th>البيان</th>
+                </tr>
+              </thead>
+              <tbody id="expensesBody">
+                <tr><td colspan="6" class="empty">جاري تحميل المصروفات...</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </section>
+
+        <section class="table-panel">
+          <h2>الصيانة</h2>
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr>
+                  <th>القسم</th>
+                  <th>نوع الصيانة</th>
+                  <th>الوحدة</th>
+                  <th>التاريخ</th>
+                  <th>المبلغ</th>
+                  <th>البيان</th>
+                </tr>
+              </thead>
+              <tbody id="maintenanceBody">
+                <tr><td colspan="6" class="empty">جاري تحميل الصيانة...</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </section>
+      </section>
+    </main>
+  </div>
+
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/12.11.0/firebase-app.js";
+    import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/12.11.0/firebase-auth.js";
+    import {
+      getFirestore,
+      collection,
+      getDocs,
+      doc,
+      getDoc,
+      query,
+      orderBy
+    } from "https://www.gstatic.com/firebasejs/12.11.0/firebase-firestore.js";
+
+    const firebaseConfig = {
+      apiKey: "AIzaSyDey3KL3qZUvZBVtFcB38xzBGx6qrG2WYY",
+      authDomain: "bktowers-4b822.firebaseapp.com",
+      projectId: "bktowers-4b822",
+      storageBucket: "bktowers-4b822.firebasestorage.app",
+      messagingSenderId: "336608827796",
+      appId: "1:336608827796:web:4957fe0d411220f6a69781"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+    const db = getFirestore(app);
+
+    const userNameEl = document.getElementById("sidebarUserName");
+    const userEmailEl = document.getElementById("sidebarUserEmail");
+    const userRoleEl = document.getElementById("sidebarUserRole");
+
+    const reportTypeEl = document.getElementById("reportType");
+    const filterDateEl = document.getElementById("filterDate");
+    const filterMonthEl = document.getElementById("filterMonth");
+    const filterYearEl = document.getElementById("filterYear");
+    const fromDateEl = document.getElementById("fromDate");
+    const toDateEl = document.getElementById("toDate");
+    const unitFilterEl = document.getElementById("unitFilter");
+
+    const totalRevenueEl = document.getElementById("totalRevenue");
+    const totalExpensesEl = document.getElementById("totalExpenses");
+    const totalMaintenanceEl = document.getElementById("totalMaintenance");
+    const netProfitEl = document.getElementById("netProfit");
+    const totalRecordsEl = document.getElementById("totalRecords");
+
+    const revenuesBody = document.getElementById("revenuesBody");
+    const expensesBody = document.getElementById("expensesBody");
+    const maintenanceBody = document.getElementById("maintenanceBody");
+    const printSummaryText = document.getElementById("printSummaryText");
+
+    let staysRows = [];
+    let manualRevenueRows = [];
+    let expensesRows = [];
+    let maintenanceRows = [];
+    let unitsRows = [];
+
+    function formatMoney(value) {
+      return Number(value || 0).toFixed(2) + " ر.س";
+    }
+
+    function populateUnitsFilter() {
+      unitFilterEl.innerHTML = `<option value="">كل الوحدات</option>`;
+      unitsRows.forEach((item) => {
+        const label = `${item.data.propertyName || ""} - ${item.data.unitNumber || ""}`;
+        unitFilterEl.innerHTML += `<option value="${label}">${label}</option>`;
+      });
+    }
+
+    function getDateMode() {
+      return reportTypeEl.value;
+    }
+
+    function matchDate(dateStr) {
+      if (!dateStr) return false;
+
+      const mode = getDateMode();
+
+      if (mode === "daily") {
+        if (!filterDateEl.value) return true;
+        return dateStr === filterDateEl.value;
+      }
+
+      if (mode === "monthly") {
+        if (!filterMonthEl.value) return true;
+        return dateStr.startsWith(filterMonthEl.value);
+      }
+
+      if (mode === "yearly") {
+        if (!filterYearEl.value) return true;
+        return dateStr.startsWith(String(filterYearEl.value));
+      }
+
+      if (mode === "custom") {
+        const from = fromDateEl.value;
+        const to = toDateEl.value;
+        if (!from && !to) return true;
+        if (from && dateStr < from) return false;
+        if (to && dateStr > to) return false;
+        return true;
+      }
+
+      return true;
+    }
+
+    function matchUnit(unitLabel) {
+      if (!unitFilterEl.value) return true;
+      return String(unitLabel || "") === unitFilterEl.value;
+    }
+
+    function mapStayRevenue(item) {
+      const row = item.data;
+      return {
+        source: "من الحجز",
+        type: row.rentalType || "-",
+        client: row.clientName || "-",
+        unit: row.unitLabel || "-",
+        date: row.checkIn || "-",
+        amount: Number(row.paid || row.amount || 0),
+        description: row.notes || "إيراد تلقائي من الحجز"
+      };
+    }
+
+    function mapManualRevenue(item) {
+      const row = item.data;
+      return {
+        source: "إضافة يدوية",
+        type: row.category || "-",
+        client: row.clientName || "-",
+        unit: row.unitLabel || "-",
+        date: row.date || "-",
+        amount: Number(row.amount || 0),
+        description: row.description || "-"
+      };
+    }
+
+    function mapExpense(item) {
+      const row = item.data;
+      return {
+        section: "مصروف",
+        type: row.category || "-",
+        unit: row.unitLabel || "-",
+        date: row.date || "-",
+        amount: Number(row.amount || 0),
+        description: row.description || "-"
+      };
+    }
+
+    function mapMaintenance(item) {
+      const row = item.data;
+      return {
+        section: "صيانة",
+        type: row.typeLabel || "-",
+        unit: row.unitLabel || "-",
+        date: row.date || "-",
+        amount: Number(row.amount || 0),
+        description: row.description || "-"
+      };
+    }
+
+    function filterAllData() {
+      const revenues = [
+        ...staysRows.map(mapStayRevenue),
+        ...manualRevenueRows.map(mapManualRevenue)
+      ].filter(row => matchDate(row.date) && matchUnit(row.unit));
+
+      const expenses = expensesRows
+        .map(mapExpense)
+        .filter(row => matchDate(row.date) && matchUnit(row.unit));
+
+      const maintenance = maintenanceRows
+        .map(mapMaintenance)
+        .filter(row => matchDate(row.date) && matchUnit(row.unit));
+
+      return { revenues, expenses, maintenance };
+    }
+
+    function renderRevenueTable(rows) {
+      if (!rows.length) {
+        revenuesBody.innerHTML = `<tr><td colspan="7" class="empty">لا توجد بيانات إيرادات مطابقة.</td></tr>`;
+        return;
+      }
+
+      revenuesBody.innerHTML = rows.map(row => `
+        <tr>
+          <td><span class="section-badge badge-revenue">${row.source}</span></td>
+          <td>${row.type}</td>
+          <td>${row.client}</td>
+          <td>${row.unit}</td>
+          <td>${row.date}</td>
+          <td>${formatMoney(row.amount)}</td>
+          <td>${row.description}</td>
+        </tr>
+      `).join("");
+    }
+
+    function renderExpenseTable(rows) {
+      if (!rows.length) {
+        expensesBody.innerHTML = `<tr><td colspan="6" class="empty">لا توجد بيانات مصروفات مطابقة.</td></tr>`;
+        return;
+      }
+
+      expensesBody.innerHTML = rows.map(row => `
+        <tr>
+          <td><span class="section-badge badge-expense">${row.section}</span></td>
+          <td>${row.type}</td>
+          <td>${row.unit}</td>
+          <td>${row.date}</td>
+          <td>${formatMoney(row.amount)}</td>
+          <td>${row.description}</td>
+        </tr>
+      `).join("");
+    }
+
+    function renderMaintenanceTable(rows) {
+      if (!rows.length) {
+        maintenanceBody.innerHTML = `<tr><td colspan="6" class="empty">لا توجد بيانات صيانة مطابقة.</td></tr>`;
+        return;
+      }
+
+      maintenanceBody.innerHTML = rows.map(row => `
+        <tr>
+          <td><span class="section-badge badge-maintenance">${row.section}</span></td>
+          <td>${row.type}</td>
+          <td>${row.unit}</td>
+          <td>${row.date}</td>
+          <td>${formatMoney(row.amount)}</td>
+          <td>${row.description}</td>
+        </tr>
+      `).join("");
+    }
+
+    function renderSummary(data) {
+      const totalRevenue = data.revenues.reduce((sum, row) => sum + Number(row.amount || 0), 0);
+      const totalExpenses = data.expenses.reduce((sum, row) => sum + Number(row.amount || 0), 0);
+      const totalMaintenance = data.maintenance.reduce((sum, row) => sum + Number(row.amount || 0), 0);
+      const netProfit = totalRevenue - totalExpenses - totalMaintenance;
+      const totalRecords = data.revenues.length + data.expenses.length + data.maintenance.length;
+
+      totalRevenueEl.textContent = formatMoney(totalRevenue);
+      totalExpensesEl.textContent = formatMoney(totalExpenses);
+      totalMaintenanceEl.textContent = formatMoney(totalMaintenance);
+      netProfitEl.textContent = formatMoney(netProfit);
+      totalRecordsEl.textContent = totalRecords;
+
+      const reportTypeLabelMap = {
+        daily: "يومي",
+        monthly: "شهري",
+        yearly: "سنوي",
+        custom: "فترة مخصصة"
+      };
+
+      const unitLabel = unitFilterEl.value || "كل الوحدات";
+      printSummaryText.textContent = `نوع التقرير: ${reportTypeLabelMap[reportTypeEl.value] || "-"} | الوحدة: ${unitLabel}`;
+    }
+
+    function applyFilters() {
+      const data = filterAllData();
+      renderRevenueTable(data.revenues);
+      renderExpenseTable(data.expenses);
+      renderMaintenanceTable(data.maintenance);
+      renderSummary(data);
+    }
+
+    function resetFilters() {
+      reportTypeEl.value = "daily";
+      filterDateEl.value = "";
+      filterMonthEl.value = "";
+      filterYearEl.value = "";
+      fromDateEl.value = "";
+      toDateEl.value = "";
+      unitFilterEl.value = "";
+      applyFilters();
+    }
+
+    function printReport() {
+      window.print();
+    }
+
+    async function loadAllData() {
+      const staysSnapshot = await getDocs(query(collection(db, "stays"), orderBy("createdAt", "desc")));
+      const revenuesSnapshot = await getDocs(query(collection(db, "revenues"), orderBy("createdAt", "desc")));
+      const expensesSnapshot = await getDocs(query(collection(db, "expenses"), orderBy("createdAt", "desc")));
+      const maintenanceSnapshot = await getDocs(query(collection(db, "maintenance"), orderBy("createdAt", "desc")));
+      const unitsSnapshot = await getDocs(query(collection(db, "units"), orderBy("createdAt", "desc")));
+
+      staysRows = [];
+      manualRevenueRows = [];
+      expensesRows = [];
+      maintenanceRows = [];
+      unitsRows = [];
+
+      staysSnapshot.forEach((docSnap) => {
+        staysRows.push({ id: docSnap.id, data: docSnap.data() });
+      });
+
+      revenuesSnapshot.forEach((docSnap) => {
+        manualRevenueRows.push({ id: docSnap.id, data: docSnap.data() });
+      });
+
+      expensesSnapshot.forEach((docSnap) => {
+        expensesRows.push({ id: docSnap.id, data: docSnap.data() });
+      });
+
+      maintenanceSnapshot.forEach((docSnap) => {
+        maintenanceRows.push({ id: docSnap.id, data: docSnap.data() });
+      });
+
+      unitsSnapshot.forEach((docSnap) => {
+        unitsRows.push({ id: docSnap.id, data: docSnap.data() });
+      });
+
+      populateUnitsFilter();
+      applyFilters();
+    }
+
+    async function logout() {
+      try {
+        await signOut(auth);
+        localStorage.clear();
+        window.location.href = "index.html";
+      } catch (error) {
+        alert(error.message);
+      }
+    }
+
+    reportTypeEl.addEventListener("change", applyFilters);
+    filterDateEl.addEventListener("change", applyFilters);
+    filterMonthEl.addEventListener("change", applyFilters);
+    filterYearEl.addEventListener("input", applyFilters);
+    fromDateEl.addEventListener("change", applyFilters);
+    toDateEl.addEventListener("change", applyFilters);
+    unitFilterEl.addEventListener("change", applyFilters);
+
+    window.logout = logout;
+    window.printReport = printReport;
+    window.applyFilters = applyFilters;
+    window.resetFilters = resetFilters;
+
+    onAuthStateChanged(auth, async (user) => {
+      if (!user) {
+        window.location.href = "index.html";
+        return;
+      }
+
+      try {
+        const userRef = doc(db, "users", user.uid);
+        const userSnap = await getDoc(userRef);
+
+        if (!userSnap.exists()) {
+          window.location.href = "index.html";
+          return;
+        }
+
+        const userData = userSnap.data();
+
+        if (userData.role !== "admin") {
+          window.location.href = "employee-dashboard.html";
+          return;
+        }
+
+        userNameEl.textContent = userData.name || "-";
+        userEmailEl.textContent = userData.email || user.email || "-";
+        userRoleEl.textContent = "مدير";
+
+        await loadAllData();
+      } catch (error) {
+        window.location.href = "index.html";
+      }
+    });
+  </script>
+</body>
+</html>
