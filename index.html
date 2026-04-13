@@ -6,9 +6,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 
   <style>
-    * {
-      box-sizing: border-box;
-    }
+    * { box-sizing: border-box; }
 
     body {
       margin: 0;
@@ -23,7 +21,7 @@
 
     .login-box {
       width: 100%;
-      max-width: 420px;
+      max-width: 430px;
       background: #ffffff;
       padding: 36px 28px;
       border-radius: 18px;
@@ -76,11 +74,6 @@
       box-shadow: 0 0 0 3px rgba(11, 31, 77, 0.08);
     }
 
-    .form-group input::placeholder {
-      color: #6b7280;
-      font-weight: 600;
-    }
-
     .password-wrap {
       position: relative;
     }
@@ -96,12 +89,12 @@
       font-size: 13px;
       font-weight: 700;
       color: #0b1f4d;
-      padding: 4px 6px;
       width: auto;
+      padding: 4px 6px;
       margin: 0;
     }
 
-    button.login-btn {
+    .login-btn {
       width: 100%;
       padding: 13px;
       background: #0b1f4d;
@@ -116,16 +109,22 @@
       margin-top: 4px;
     }
 
-    button.login-btn:hover {
+    .login-btn:hover {
       background: #163b86;
     }
 
     .msg {
       margin-top: 14px;
       font-size: 14px;
-      min-height: 20px;
+      min-height: 22px;
       font-weight: 700;
       color: #b91c1c;
+      line-height: 1.7;
+      text-align: right;
+    }
+
+    .msg.success {
+      color: #166534;
     }
 
     .hint {
@@ -166,11 +165,9 @@
     <div class="msg" id="msg"></div>
 
     <div class="hint">
-      يمكنك الدخول باستخدام:
+      هذه النسخة تعرض سبب الخطأ الحقيقي.
       <br />
-      1) البريد الإلكتروني + كلمة المرور
-      <br />
-      2) اسم المستخدم + كلمة المرور
+      يمكنك الدخول بالبريد الإلكتروني أو باسم المستخدم.
     </div>
   </div>
 
@@ -202,14 +199,15 @@
     const auth = getAuth(app);
     const db = getFirestore(app);
 
-    function setMessage(text, isError = true) {
+    function setMessage(text, type = "error") {
       const msg = document.getElementById("msg");
-      msg.style.color = isError ? "#b91c1c" : "#166534";
+      msg.className = "msg";
+      if (type === "success") msg.classList.add("success");
       msg.innerText = text;
     }
 
     function isEmail(value) {
-      return value.includes("@");
+      return String(value || "").includes("@");
     }
 
     function normalizeUsername(value) {
@@ -223,9 +221,7 @@
       );
       const snapshot = await getDocs(q);
 
-      if (snapshot.empty) {
-        return null;
-      }
+      if (snapshot.empty) return null;
 
       return {
         id: snapshot.docs[0].id,
@@ -262,6 +258,32 @@
       }
     }
 
+    function explainFirebaseError(error) {
+      const code = error?.code || "";
+
+      if (code === "auth/invalid-credential") {
+        return "البريد الإلكتروني أو كلمة المرور غير صحيحة.";
+      }
+
+      if (code === "auth/wrong-password") {
+        return "كلمة المرور غير صحيحة.";
+      }
+
+      if (code === "auth/user-not-found") {
+        return "الحساب غير موجود في Firebase Authentication.";
+      }
+
+      if (code === "auth/too-many-requests") {
+        return "تمت محاولات كثيرة. حاول بعد قليل.";
+      }
+
+      if (code === "permission-denied" || code === "firestore/permission-denied") {
+        return "قراءة users مرفوضة من Firestore Rules.";
+      }
+
+      return `${code || "خطأ غير معروف"}${error?.message ? " - " + error.message : ""}`;
+    }
+
     window.login = async function () {
       const loginValue = document.getElementById("loginValue").value.trim();
       const password = document.getElementById("password").value.trim();
@@ -275,50 +297,78 @@
 
       try {
         let emailToLogin = "";
+        let lookedUpUser = null;
 
         if (isEmail(loginValue)) {
           emailToLogin = loginValue;
         } else {
-          const userRecord = await findUserByUsername(loginValue);
-
-          if (!userRecord) {
-            setMessage("اسم المستخدم غير موجود.");
+          try {
+            lookedUpUser = await findUserByUsername(loginValue);
+          } catch (lookupError) {
+            setMessage("فشل البحث باسم المستخدم داخل users: " + explainFirebaseError(lookupError));
             return;
           }
 
-          if (!userRecord.data.active) {
+          if (!lookedUpUser) {
+            setMessage("اسم المستخدم غير موجود داخل users.");
+            return;
+          }
+
+          if (!lookedUpUser.data.active) {
             setMessage("هذا الحساب غير مفعل.");
             return;
           }
 
-          emailToLogin = userRecord.data.email || "";
+          emailToLogin = lookedUpUser.data.email || "";
+
+          if (!emailToLogin) {
+            setMessage("اسم المستخدم موجود، لكن لا يوجد له بريد إلكتروني محفوظ داخل users.");
+            return;
+          }
         }
 
-        if (!emailToLogin) {
-          setMessage("لا يوجد بريد إلكتروني مرتبط بهذا الحساب.");
+        let userCredential;
+        try {
+          userCredential = await signInWithEmailAndPassword(auth, emailToLogin, password);
+        } catch (authError) {
+          setMessage("فشل تسجيل الدخول في Auth: " + explainFirebaseError(authError));
           return;
         }
 
-        const userCredential = await signInWithEmailAndPassword(auth, emailToLogin, password);
         const user = userCredential.user;
 
-        let userSnap = await getDoc(doc(db, "users", user.uid));
-
-        if (!userSnap.exists()) {
-          userSnap = await ensureAdminDocIfMissing(user);
+        let userSnap;
+        try {
+          userSnap = await getDoc(doc(db, "users", user.uid));
+        } catch (docError) {
+          setMessage("تم الدخول إلى Auth لكن فشل قراءة users/" + user.uid + ": " + explainFirebaseError(docError));
+          await signOut(auth).catch(() => {});
+          return;
         }
 
         if (!userSnap.exists()) {
-          setMessage("بيانات المستخدم غير موجودة داخل النظام.");
-          await signOut(auth);
+          if (isEmail(loginValue)) {
+            try {
+              userSnap = await ensureAdminDocIfMissing(user);
+            } catch (adminError) {
+              setMessage("تم الدخول إلى Auth لكن فشل إنشاء/قراءة مستند الأدمن: " + explainFirebaseError(adminError));
+              await signOut(auth).catch(() => {});
+              return;
+            }
+          }
+        }
+
+        if (!userSnap.exists()) {
+          setMessage("تم الدخول إلى Auth لكن لا يوجد document للمستخدم داخل users بنفس uid.");
+          await signOut(auth).catch(() => {});
           return;
         }
 
         const userData = userSnap.data();
 
         if (!userData.active) {
-          setMessage("هذا الحساب غير مفعل.");
-          await signOut(auth);
+          setMessage("هذا الحساب غير مفعل داخل users.");
+          await signOut(auth).catch(() => {});
           return;
         }
 
@@ -328,10 +378,11 @@
         localStorage.setItem("userRole", userData.role || "employee");
         localStorage.setItem("username", userData.username || "");
 
-        setMessage("تم تسجيل الدخول بنجاح.", false);
+        setMessage("تم تسجيل الدخول بنجاح.", "success");
         redirectByRole(userData.role || "employee");
+
       } catch (error) {
-        setMessage("بيانات الدخول غير صحيحة.");
+        setMessage("خطأ عام: " + explainFirebaseError(error));
       }
     };
 
@@ -349,15 +400,11 @@
     };
 
     document.getElementById("loginValue").addEventListener("keydown", function (event) {
-      if (event.key === "Enter") {
-        login();
-      }
+      if (event.key === "Enter") login();
     });
 
     document.getElementById("password").addEventListener("keydown", function (event) {
-      if (event.key === "Enter") {
-        login();
-      }
+      if (event.key === "Enter") login();
     });
   </script>
 </body>
