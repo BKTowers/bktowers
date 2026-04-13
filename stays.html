@@ -1,1 +1,1266 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>السكن والحجوزات - BkTowers</title>
+  <style>
+    :root {
+      --primary: #0b1f4d;
+      --primary-dark: #08173a;
+      --green: #065f46;
+      --green-dark: #064e3b;
+      --bg: #eef3f9;
+      --card: #ffffff;
+      --text: #111827;
+      --muted: #4b5563;
+      --border: #d7deea;
+      --danger: #c62828;
+      --danger-dark: #a61f1f;
+      --info-bg: #dbeafe;
+      --info-text: #1d4ed8;
+      --success-bg: #dcfce7;
+      --success-text: #166534;
+      --warning-bg: #fef3c7;
+      --warning-text: #92400e;
+      --danger-bg: #fee2e2;
+      --danger-text: #991b1b;
+      --shadow: 0 12px 30px rgba(15, 23, 42, 0.10);
+      --radius: 18px;
+    }
 
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      font-family: Arial, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+    }
+
+    .app-shell {
+      display: flex;
+      min-height: 100vh;
+    }
+
+    .sidebar {
+      width: 290px;
+      color: #fff;
+      padding: 24px 18px;
+      position: sticky;
+      top: 0;
+      height: 100vh;
+      overflow-y: auto;
+      flex-shrink: 0;
+    }
+
+    .sidebar.admin {
+      background: linear-gradient(180deg, var(--primary), var(--primary-dark));
+    }
+
+    .sidebar.employee {
+      background: linear-gradient(180deg, var(--green), var(--green-dark));
+    }
+
+    .brand {
+      font-size: 34px;
+      font-weight: 800;
+      margin-bottom: 6px;
+      color: #ffffff;
+    }
+
+    .brand-sub {
+      font-size: 14px;
+      color: #dbe6ff;
+      margin-bottom: 24px;
+      font-weight: 700;
+    }
+
+    .user-card {
+      background: rgba(255, 255, 255, 0.10);
+      border: 1px solid rgba(255, 255, 255, 0.14);
+      border-radius: 16px;
+      padding: 14px;
+      margin-bottom: 20px;
+    }
+
+    .user-card .row {
+      margin-bottom: 10px;
+      font-size: 14px;
+      line-height: 1.8;
+      word-break: break-word;
+      color: #ffffff;
+    }
+
+    .user-card .row:last-child {
+      margin-bottom: 0;
+    }
+
+    .menu-title {
+      font-size: 12px;
+      color: #dbe6ff;
+      margin: 18px 6px 10px;
+      font-weight: 700;
+    }
+
+    .nav-links {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .nav-links a,
+    .nav-links button {
+      width: 100%;
+      border: none;
+      border-radius: 14px;
+      padding: 13px 14px;
+      font-size: 14px;
+      background: rgba(255, 255, 255, 0.10);
+      color: #ffffff;
+      text-decoration: none;
+      text-align: right;
+      cursor: pointer;
+      transition: 0.2s ease;
+      font-family: inherit;
+      font-weight: 700;
+    }
+
+    .nav-links a:hover,
+    .nav-links button:hover {
+      background: rgba(255, 255, 255, 0.18);
+    }
+
+    .nav-links a.active {
+      background: #ffffff;
+      color: #111827;
+    }
+
+    .main {
+      flex: 1;
+      min-width: 0;
+      padding: 24px;
+    }
+
+    .topbar {
+      background: var(--card);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      padding: 18px 20px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+      margin-bottom: 22px;
+      flex-wrap: wrap;
+      border: 1px solid #e4eaf3;
+    }
+
+    .topbar-title h1 {
+      margin: 0 0 6px;
+      font-size: 30px;
+      color: var(--primary);
+      font-weight: 800;
+    }
+
+    .topbar-title p {
+      margin: 0;
+      color: var(--muted);
+      font-size: 14px;
+      font-weight: 700;
+    }
+
+    .topbar-actions {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+
+    .action-btn,
+    .logout-btn {
+      border: none;
+      border-radius: 12px;
+      padding: 12px 16px;
+      cursor: pointer;
+      font-size: 14px;
+      font-weight: 800;
+      font-family: inherit;
+    }
+
+    .action-btn {
+      background: var(--primary);
+      color: #fff;
+    }
+
+    .employee .action-btn {
+      background: var(--green);
+    }
+
+    .logout-btn {
+      background: var(--danger);
+      color: #fff;
+    }
+
+    .money-box {
+      display: flex;
+      align-items: stretch;
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      overflow: hidden;
+      background: #fff;
+    }
+
+    .money-box input {
+      border: none;
+      border-radius: 0;
+    }
+
+    .money-label {
+      min-width: 60px;
+      background: #f3f6fb;
+      border-right: 1px solid var(--border);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 13px;
+      font-weight: 800;
+      color: #374151;
+    }
+
+    .summary-grid {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 16px;
+      margin-bottom: 22px;
+    }
+
+    .summary-card {
+      background: var(--card);
+      border-radius: 16px;
+      box-shadow: var(--shadow);
+      padding: 18px;
+      border: 1px solid #e4eaf3;
+    }
+
+    .summary-card h3 {
+      margin: 0 0 10px;
+      font-size: 14px;
+      color: var(--muted);
+      font-weight: 800;
+    }
+
+    .summary-card .value {
+      font-size: 30px;
+      font-weight: 800;
+      color: var(--primary);
+    }
+
+    .content-grid {
+      display: grid;
+      grid-template-columns: 430px minmax(0, 1fr);
+      gap: 22px;
+      align-items: start;
+    }
+
+    .panel {
+      background: var(--card);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      padding: 22px;
+      border: 1px solid #e4eaf3;
+      min-width: 0;
+    }
+
+    .panel-header h2 {
+      margin: 0 0 6px;
+      font-size: 24px;
+      color: var(--primary);
+      font-weight: 800;
+    }
+
+    .panel-header p {
+      margin: 0 0 18px;
+      color: var(--muted);
+      font-size: 13px;
+      font-weight: 700;
+    }
+
+    .form-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 14px;
+    }
+
+    .form-group {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .form-group.full {
+      grid-column: 1 / -1;
+    }
+
+    label {
+      font-size: 14px;
+      font-weight: 800;
+      color: #1f2937;
+    }
+
+    input,
+    select,
+    textarea {
+      width: 100%;
+      padding: 12px 13px;
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      font-size: 14px;
+      background: #fff;
+      outline: none;
+      font-family: inherit;
+      color: #111827;
+      font-weight: 700;
+    }
+
+    textarea {
+      min-height: 90px;
+      resize: vertical;
+    }
+
+    .info-strip {
+      background: #f8fbff;
+      border: 1px dashed var(--border);
+      border-radius: 14px;
+      padding: 12px;
+      color: var(--muted);
+      font-size: 13px;
+      line-height: 1.8;
+      font-weight: 700;
+    }
+
+    .plan-pill {
+      display: inline-block;
+      background: var(--info-bg);
+      color: var(--info-text);
+      padding: 6px 10px;
+      border-radius: 999px;
+      font-size: 12px;
+      font-weight: 800;
+      margin: 3px;
+    }
+
+    .form-actions {
+      display: flex;
+      gap: 10px;
+      margin-top: 18px;
+      flex-wrap: wrap;
+    }
+
+    .primary-btn,
+    .secondary-btn,
+    .edit-btn,
+    .danger-btn {
+      border: none;
+      border-radius: 12px;
+      padding: 12px 16px;
+      cursor: pointer;
+      font-size: 14px;
+      font-weight: 800;
+      font-family: inherit;
+    }
+
+    .primary-btn {
+      background: var(--primary);
+      color: #fff;
+    }
+
+    .secondary-btn {
+      background: #edf2f7;
+      color: #111827;
+    }
+
+    .edit-btn {
+      background: var(--info-bg);
+      color: var(--info-text);
+      padding: 9px 14px;
+      font-size: 13px;
+    }
+
+    .danger-btn {
+      background: var(--danger);
+      color: #fff;
+      padding: 9px 14px;
+      font-size: 13px;
+    }
+
+    .message {
+      margin-top: 14px;
+      min-height: 20px;
+      font-size: 14px;
+      font-weight: 800;
+    }
+
+    .message.success {
+      color: #166534;
+    }
+
+    .message.error {
+      color: #b91c1c;
+    }
+
+    .table-tools {
+      display: flex;
+      justify-content: space-between;
+      gap: 12px;
+      flex-wrap: wrap;
+      margin-bottom: 14px;
+    }
+
+    .search-box {
+      max-width: 320px;
+      width: 100%;
+    }
+
+    .table-wrap {
+      overflow-x: auto;
+      border: 1px solid var(--border);
+      border-radius: 16px;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      min-width: 1200px;
+      background: #fff;
+    }
+
+    th,
+    td {
+      padding: 14px 12px;
+      border-bottom: 1px solid var(--border);
+      text-align: right;
+      vertical-align: top;
+      font-size: 14px;
+      color: #111827;
+      font-weight: 700;
+    }
+
+    th {
+      background: #f7faff;
+      color: #1f2937;
+      font-weight: 800;
+    }
+
+    tbody tr:hover {
+      background: #fbfdff;
+    }
+
+    .status-badge {
+      display: inline-block;
+      padding: 6px 10px;
+      border-radius: 999px;
+      font-size: 12px;
+      font-weight: 800;
+      white-space: nowrap;
+    }
+
+    .status-active {
+      background: var(--success-bg);
+      color: var(--success-text);
+    }
+
+    .status-finished {
+      background: var(--warning-bg);
+      color: var(--warning-text);
+    }
+
+    .status-cancelled {
+      background: var(--danger-bg);
+      color: var(--danger-text);
+    }
+
+    .empty {
+      text-align: center;
+      color: var(--muted);
+      padding: 26px 0;
+      font-weight: 800;
+    }
+
+    .actions-inline {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+
+    @media (max-width: 1350px) {
+      .summary-grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+      }
+
+      .content-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    @media (max-width: 900px) {
+      .app-shell {
+        flex-direction: column;
+      }
+
+      .sidebar {
+        width: 100%;
+        height: auto;
+        position: relative;
+      }
+
+      .main {
+        padding: 16px;
+      }
+
+      .form-grid,
+      .summary-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="app-shell">
+    <aside class="sidebar" id="sidebar">
+      <div class="brand">BkTowers</div>
+      <div class="brand-sub">نظام إدارة العقارات</div>
+
+      <div class="user-card">
+        <div class="row"><strong>الاسم:</strong> <span id="sidebarUserName">-</span></div>
+        <div class="row"><strong>البريد:</strong> <span id="sidebarUserEmail">-</span></div>
+        <div class="row"><strong>الصلاحية:</strong> <span id="sidebarUserRole">-</span></div>
+      </div>
+
+      <div class="menu-title">القائمة الرئيسية</div>
+      <div class="nav-links" id="navLinks"></div>
+    </aside>
+
+    <main class="main" id="mainArea">
+      <section class="topbar">
+        <div class="topbar-title">
+          <h1>السكن والحجوزات</h1>
+          <p>تسجيل عمليات الحجز والسكن وربطها بالعميل والوحدة.</p>
+        </div>
+
+        <div class="topbar-actions">
+          <button class="action-btn" onclick="focusAddForm()">إضافة حجز جديد</button>
+          <button class="logout-btn" onclick="logout()">تسجيل الخروج</button>
+        </div>
+      </section>
+
+      <section class="summary-grid">
+        <div class="summary-card">
+          <h3>إجمالي الحجوزات</h3>
+          <div class="value" id="totalStays">0</div>
+        </div>
+        <div class="summary-card">
+          <h3>الحجوزات النشطة</h3>
+          <div class="value" id="activeStays">0</div>
+        </div>
+        <div class="summary-card">
+          <h3>إجمالي المدفوع</h3>
+          <div class="value" id="totalPaid">0</div>
+        </div>
+        <div class="summary-card">
+          <h3>إجمالي المتبقي</h3>
+          <div class="value" id="totalRemaining">0</div>
+        </div>
+      </section>
+
+      <section class="content-grid">
+        <div class="panel">
+          <div class="panel-header">
+            <h2 id="formTitle">إضافة حجز جديد</h2>
+            <p>اختر العميل والوحدة وحدد نوع الإيجار وتواريخ السكن.</p>
+          </div>
+
+          <div class="form-grid">
+            <div class="form-group">
+              <label for="clientSelect">العميل</label>
+              <select id="clientSelect">
+                <option value="">اختر العميل</option>
+              </select>
+            </div>
+
+            <div class="form-group">
+              <label for="unitSelect">الوحدة</label>
+              <select id="unitSelect">
+                <option value="">اختر الوحدة</option>
+              </select>
+            </div>
+
+            <div class="form-group full">
+              <label>بيانات الوحدة</label>
+              <div class="info-strip" id="unitInfo">اختر وحدة لعرض بياناتها.</div>
+            </div>
+
+            <div class="form-group">
+              <label for="rentalType">نوع الإيجار</label>
+              <select id="rentalType">
+                <option value="">اختر نوع الإيجار</option>
+              </select>
+            </div>
+
+            <div class="form-group full">
+              <label>أنظمة الإيجار المتاحة</label>
+              <div class="info-strip" id="plansInfo">اختر وحدة لعرض أنظمة الإيجار المتاحة.</div>
+            </div>
+
+            <div class="form-group">
+              <label for="checkIn">تاريخ الدخول</label>
+              <input type="date" id="checkIn">
+            </div>
+
+            <div class="form-group">
+              <label for="checkOut">تاريخ الخروج</label>
+              <input type="date" id="checkOut">
+            </div>
+
+            <div class="form-group">
+              <label for="durationValue">المدة المحسوبة</label>
+              <input type="text" id="durationValue" placeholder="تظهر تلقائيًا" readonly>
+            </div>
+
+            <div class="form-group">
+              <label for="status">الحالة</label>
+              <select id="status">
+                <option value="active">نشط</option>
+                <option value="finished">منتهي</option>
+                <option value="cancelled">ملغي</option>
+              </select>
+            </div>
+
+            <div class="form-group">
+              <label for="amount">إجمالي المبلغ</label>
+              <div class="money-box">
+                <input type="number" id="amount" min="0" step="0.01" placeholder="يُحسب تلقائيًا أو يُعدل يدويًا">
+                <div class="money-label">ر.س</div>
+              </div>
+            </div>
+
+            <div class="form-group">
+              <label for="paid">المدفوع</label>
+              <div class="money-box">
+                <input type="number" id="paid" min="0" step="0.01" placeholder="اكتب المدفوع">
+                <div class="money-label">ر.س</div>
+              </div>
+            </div>
+
+            <div class="form-group full">
+              <label for="remaining">المتبقي</label>
+              <div class="money-box">
+                <input type="number" id="remaining" min="0" step="0.01" placeholder="يُحسب تلقائيًا" readonly>
+                <div class="money-label">ر.س</div>
+              </div>
+            </div>
+
+            <div class="form-group full">
+              <label for="notes">ملاحظات</label>
+              <textarea id="notes" placeholder="أي ملاحظات إضافية"></textarea>
+            </div>
+          </div>
+
+          <div class="form-actions">
+            <button class="primary-btn" onclick="saveStay()" id="saveBtn">حفظ الحجز</button>
+            <button class="secondary-btn" onclick="clearForm()">تفريغ الحقول</button>
+          </div>
+
+          <div id="formMessage" class="message"></div>
+        </div>
+
+        <div class="panel">
+          <div class="panel-header">
+            <h2>قائمة الحجوزات</h2>
+            <p>عرض جميع عمليات السكن والحجز المسجلة.</p>
+          </div>
+
+          <div class="table-tools">
+            <input type="text" id="searchInput" class="search-box" placeholder="ابحث باسم العميل أو رقم الوحدة أو نوع الإيجار">
+          </div>
+
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr>
+                  <th>العميل</th>
+                  <th>الوحدة</th>
+                  <th>نوع الإيجار</th>
+                  <th>الدخول</th>
+                  <th>الخروج</th>
+                  <th>الحالة</th>
+                  <th>المبلغ</th>
+                  <th>المدفوع</th>
+                  <th>المتبقي</th>
+                  <th>الإجراءات</th>
+                </tr>
+              </thead>
+              <tbody id="staysTableBody">
+                <tr>
+                  <td colspan="10" class="empty">جاري تحميل الحجوزات...</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+    </main>
+  </div>
+
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/12.11.0/firebase-app.js";
+    import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/12.11.0/firebase-auth.js";
+    import {
+      getFirestore,
+      collection,
+      addDoc,
+      getDocs,
+      deleteDoc,
+      doc,
+      getDoc,
+      updateDoc,
+      orderBy,
+      query,
+      serverTimestamp
+    } from "https://www.gstatic.com/firebasejs/12.11.0/firebase-firestore.js";
+
+    const firebaseConfig = {
+      apiKey: "AIzaSyDey3KL3qZUvZBVtFcB38xzBGx6qrG2WYY",
+      authDomain: "bktowers-4b822.firebaseapp.com",
+      projectId: "bktowers-4b822",
+      storageBucket: "bktowers-4b822.firebasestorage.app",
+      messagingSenderId: "336608827796",
+      appId: "1:336608827796:web:4957fe0d411220f6a69781"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+    const db = getFirestore(app);
+
+    const sidebar = document.getElementById("sidebar");
+    const navLinks = document.getElementById("navLinks");
+    const mainArea = document.getElementById("mainArea");
+
+    const userNameEl = document.getElementById("sidebarUserName");
+    const userEmailEl = document.getElementById("sidebarUserEmail");
+    const userRoleEl = document.getElementById("sidebarUserRole");
+
+    const clientSelect = document.getElementById("clientSelect");
+    const unitSelect = document.getElementById("unitSelect");
+    const rentalType = document.getElementById("rentalType");
+    const unitInfo = document.getElementById("unitInfo");
+    const plansInfo = document.getElementById("plansInfo");
+    const checkIn = document.getElementById("checkIn");
+    const checkOut = document.getElementById("checkOut");
+    const durationValue = document.getElementById("durationValue");
+    const amountInput = document.getElementById("amount");
+    const paidInput = document.getElementById("paid");
+    const remainingInput = document.getElementById("remaining");
+    const statusSelect = document.getElementById("status");
+    const notesInput = document.getElementById("notes");
+    const formTitle = document.getElementById("formTitle");
+    const saveBtn = document.getElementById("saveBtn");
+    const formMessage = document.getElementById("formMessage");
+    const searchInput = document.getElementById("searchInput");
+    const staysTableBody = document.getElementById("staysTableBody");
+
+    const totalStaysEl = document.getElementById("totalStays");
+    const activeStaysEl = document.getElementById("activeStays");
+    const totalPaidEl = document.getElementById("totalPaid");
+    const totalRemainingEl = document.getElementById("totalRemaining");
+
+    let allStays = [];
+    let allClients = [];
+    let allUnits = [];
+    let editingStayId = null;
+    let currentRole = "employee";
+
+    function setMessage(text, type = "") {
+      formMessage.textContent = text;
+      formMessage.className = "message";
+      if (type) formMessage.classList.add(type);
+    }
+
+    function buildNav(role) {
+      if (role === "admin") {
+        sidebar.classList.remove("employee");
+        sidebar.classList.add("admin");
+        navLinks.innerHTML = `
+          <a href="dashboard.html">لوحة التحكم</a>
+          <a href="clients.html">العملاء</a>
+          <a href="stays.html" class="active">السكن والحجوزات</a>
+          <a href="revenues.html">الإيرادات</a>
+          <a href="expenses.html">المصروفات</a>
+          <a href="maintenance.html">الصيانة</a>
+          <a href="reports.html">التقارير</a>
+          <a href="employees.html">الموظفين</a>
+          <button onclick="logout()">تسجيل الخروج</button>
+        `;
+      } else {
+        sidebar.classList.remove("admin");
+        sidebar.classList.add("employee");
+        navLinks.innerHTML = `
+          <a href="employee-dashboard.html">صفحة الموظف</a>
+          <a href="clients.html">العملاء</a>
+          <a href="stays.html" class="active">السكن والحجوزات</a>
+          <button onclick="logout()">تسجيل الخروج</button>
+        `;
+        mainArea.classList.add("employee");
+      }
+    }
+
+    function focusAddForm() {
+      clientSelect.focus();
+      window.scrollTo({ top: 0, behavior: "smooth" });
+    }
+
+    function clearRentalTypeOptions() {
+      rentalType.innerHTML = `<option value="">اختر نوع الإيجار</option>`;
+    }
+
+    function clearForm() {
+      editingStayId = null;
+      clientSelect.value = "";
+      unitSelect.value = "";
+      clearRentalTypeOptions();
+      unitInfo.textContent = "اختر وحدة لعرض بياناتها.";
+      plansInfo.textContent = "اختر وحدة لعرض أنظمة الإيجار المتاحة.";
+      checkIn.value = "";
+      checkOut.value = "";
+      durationValue.value = "";
+      amountInput.value = "";
+      paidInput.value = "";
+      remainingInput.value = "";
+      statusSelect.value = "active";
+      notesInput.value = "";
+      formTitle.textContent = "إضافة حجز جديد";
+      saveBtn.textContent = "حفظ الحجز";
+      setMessage("");
+    }
+
+    function formatMoney(value) {
+      return Number(value || 0).toFixed(2);
+    }
+
+    function getStatusBadge(status) {
+      if (status === "active") {
+        return `<span class="status-badge status-active">نشط</span>`;
+      }
+      if (status === "finished") {
+        return `<span class="status-badge status-finished">منتهي</span>`;
+      }
+      return `<span class="status-badge status-cancelled">ملغي</span>`;
+    }
+
+    function findSelectedUnit() {
+      const unitId = unitSelect.value;
+      return allUnits.find(item => item.id === unitId) || null;
+    }
+
+    function populateClients() {
+      clientSelect.innerHTML = `<option value="">اختر العميل</option>`;
+      allClients.forEach((item) => {
+        clientSelect.innerHTML += `<option value="${item.id}">${item.data.name} - ${item.data.phoneNumber || ""}</option>`;
+      });
+    }
+
+    function populateUnits() {
+      unitSelect.innerHTML = `<option value="">اختر الوحدة</option>`;
+      allUnits.forEach((item) => {
+        unitSelect.innerHTML += `<option value="${item.id}">${item.data.propertyName || ""} - ${item.data.unitNumber || ""}</option>`;
+      });
+    }
+
+    function renderUnitInfo() {
+      const selectedUnit = findSelectedUnit();
+
+      if (!selectedUnit) {
+        unitInfo.textContent = "اختر وحدة لعرض بياناتها.";
+        plansInfo.textContent = "اختر وحدة لعرض أنظمة الإيجار المتاحة.";
+        clearRentalTypeOptions();
+        calculateAmounts();
+        return;
+      }
+
+      const unit = selectedUnit.data;
+      unitInfo.innerHTML = `
+        العقار: ${unit.propertyName || "-"}<br>
+        رقم الوحدة: ${unit.unitNumber || "-"}<br>
+        النوع: ${unit.unitType || "-"}<br>
+        الحالة الحالية: ${unit.status || "-"}
+      `;
+
+      const plans = unit.rentalPlans || [];
+      if (!plans.length) {
+        plansInfo.textContent = "لا توجد أنظمة إيجار مضافة لهذه الوحدة.";
+      } else {
+        plansInfo.innerHTML = plans.map(plan => `<span class="plan-pill">${plan.type} - ${plan.price} ر.س</span>`).join("");
+      }
+
+      clearRentalTypeOptions();
+      plans.forEach((plan) => {
+        rentalType.innerHTML += `<option value="${plan.type}">${plan.type}</option>`;
+      });
+
+      calculateAmounts();
+    }
+
+    function getSelectedPlanPrice() {
+      const selectedUnit = findSelectedUnit();
+      if (!selectedUnit) return 0;
+
+      const unit = selectedUnit.data;
+      const plans = unit.rentalPlans || [];
+      const selectedType = rentalType.value;
+      const found = plans.find(plan => plan.type === selectedType);
+      return found ? Number(found.price || 0) : 0;
+    }
+
+    function diffDays(start, end) {
+      const startDate = new Date(start);
+      const endDate = new Date(end);
+      const oneDay = 1000 * 60 * 60 * 24;
+      const result = Math.ceil((endDate - startDate) / oneDay);
+      return result > 0 ? result : 0;
+    }
+
+    function diffMonths(start, end) {
+      const startDate = new Date(start);
+      const endDate = new Date(end);
+      let months = (endDate.getFullYear() - startDate.getFullYear()) * 12;
+      months += endDate.getMonth() - startDate.getMonth();
+      if (endDate.getDate() > startDate.getDate()) {
+        months += 1;
+      }
+      return months > 0 ? months : 0;
+    }
+
+    function calculateAmounts() {
+      const selectedType = rentalType.value;
+      const start = checkIn.value;
+      const end = checkOut.value;
+      const basePrice = getSelectedPlanPrice();
+
+      let durationText = "";
+      let totalAmount = 0;
+
+      if (selectedType && start && end && basePrice > 0) {
+        if (selectedType === "يومي") {
+          const days = diffDays(start, end);
+          durationText = `${days} يوم`;
+          totalAmount = days * basePrice;
+        } else if (selectedType === "شهري") {
+          const months = diffMonths(start, end);
+          durationText = `${months} شهر`;
+          totalAmount = months * basePrice;
+        } else if (selectedType === "ربع سنوي") {
+          const months = diffMonths(start, end);
+          const periods = Math.ceil(months / 3);
+          durationText = `${periods} فترة ربع سنوية`;
+          totalAmount = periods * basePrice;
+        } else if (selectedType === "نصف سنوي") {
+          const months = diffMonths(start, end);
+          const periods = Math.ceil(months / 6);
+          durationText = `${periods} فترة نصف سنوية`;
+          totalAmount = periods * basePrice;
+        } else if (selectedType === "سنوي") {
+          const months = diffMonths(start, end);
+          const periods = Math.ceil(months / 12);
+          durationText = `${periods} سنة`;
+          totalAmount = periods * basePrice;
+        }
+      }
+
+      durationValue.value = durationText;
+      if (!editingStayId || document.activeElement !== amountInput) {
+        amountInput.value = totalAmount ? formatMoney(totalAmount) : "";
+      }
+
+      const amount = Number(amountInput.value || 0);
+      const paid = Number(paidInput.value || 0);
+      const remaining = amount - paid;
+      remainingInput.value = remaining >= 0 ? formatMoney(remaining) : "0.00";
+    }
+
+    function getClientName(clientId) {
+      const found = allClients.find(item => item.id === clientId);
+      return found ? found.data.name : "-";
+    }
+
+    function getUnitNumber(unitId) {
+      const found = allUnits.find(item => item.id === unitId);
+      if (!found) return "-";
+      return `${found.data.propertyName || ""} - ${found.data.unitNumber || ""}`;
+    }
+
+    function renderStays(rows) {
+      let html = "";
+      let total = rows.length;
+      let activeCount = 0;
+      let totalPaid = 0;
+      let totalRemaining = 0;
+
+      rows.forEach((item) => {
+        const stay = item.data;
+        if (stay.status === "active") activeCount++;
+        totalPaid += Number(stay.paid || 0);
+        totalRemaining += Number(stay.remaining || 0);
+
+        html += `
+          <tr>
+            <td>${stay.clientName || getClientName(stay.clientId)}</td>
+            <td>${stay.unitLabel || getUnitNumber(stay.unitId)}</td>
+            <td>${stay.rentalType || "-"}</td>
+            <td>${stay.checkIn || "-"}</td>
+            <td>${stay.checkOut || "-"}</td>
+            <td>${getStatusBadge(stay.status || "active")}</td>
+            <td>${formatMoney(stay.amount)} ر.س</td>
+            <td>${formatMoney(stay.paid)} ر.س</td>
+            <td>${formatMoney(stay.remaining)} ر.س</td>
+            <td>
+              <div class="actions-inline">
+                <button class="edit-btn" onclick="editStay('${item.id}')">تعديل</button>
+                <button class="danger-btn" onclick="deleteStay('${item.id}')">حذف</button>
+              </div>
+            </td>
+          </tr>
+        `;
+      });
+
+      if (!html) {
+        html = `<tr><td colspan="10" class="empty">لا توجد نتائج مطابقة.</td></tr>`;
+      }
+
+      staysTableBody.innerHTML = html;
+      totalStaysEl.textContent = total;
+      activeStaysEl.textContent = activeCount;
+      totalPaidEl.textContent = formatMoney(totalPaid);
+      totalRemainingEl.textContent = formatMoney(totalRemaining);
+    }
+
+    async function loadClients() {
+      const q = query(collection(db, "clients"), orderBy("createdAt", "desc"));
+      const snapshot = await getDocs(q);
+      allClients = [];
+      snapshot.forEach((docSnap) => {
+        allClients.push({
+          id: docSnap.id,
+          data: docSnap.data()
+        });
+      });
+      populateClients();
+    }
+
+    async function loadUnits() {
+      const q = query(collection(db, "units"), orderBy("createdAt", "desc"));
+      const snapshot = await getDocs(q);
+      allUnits = [];
+      snapshot.forEach((docSnap) => {
+        allUnits.push({
+          id: docSnap.id,
+          data: docSnap.data()
+        });
+      });
+      populateUnits();
+    }
+
+    async function loadStays() {
+      staysTableBody.innerHTML = `<tr><td colspan="10" class="empty">جاري تحميل الحجوزات...</td></tr>`;
+      const q = query(collection(db, "stays"), orderBy("createdAt", "desc"));
+      const snapshot = await getDocs(q);
+      allStays = [];
+      snapshot.forEach((docSnap) => {
+        allStays.push({
+          id: docSnap.id,
+          data: docSnap.data()
+        });
+      });
+      renderStays(allStays);
+    }
+
+    async function saveStay() {
+      try {
+        const clientId = clientSelect.value;
+        const unitId = unitSelect.value;
+        const selectedType = rentalType.value;
+        const start = checkIn.value;
+        const end = checkOut.value;
+        const amount = Number(amountInput.value || 0);
+        const paid = Number(paidInput.value || 0);
+        const remaining = Number(remainingInput.value || 0);
+        const status = statusSelect.value;
+        const notes = notesInput.value.trim();
+
+        if (!clientId) throw new Error("اختر العميل.");
+        if (!unitId) throw new Error("اختر الوحدة.");
+        if (!selectedType) throw new Error("اختر نوع الإيجار.");
+        if (!start) throw new Error("تاريخ الدخول مطلوب.");
+        if (!end) throw new Error("تاريخ الخروج مطلوب.");
+        if (new Date(end) <= new Date(start)) throw new Error("تاريخ الخروج يجب أن يكون بعد تاريخ الدخول.");
+        if (amount <= 0) throw new Error("المبلغ يجب أن يكون أكبر من صفر.");
+
+        const clientName = getClientName(clientId);
+        const unitLabel = getUnitNumber(unitId);
+
+        const payload = {
+          clientId,
+          clientName,
+          unitId,
+          unitLabel,
+          rentalType: selectedType,
+          checkIn: start,
+          checkOut: end,
+          durationText: durationValue.value,
+          amount,
+          paid,
+          remaining,
+          status,
+          notes
+        };
+
+        if (editingStayId) {
+          await updateDoc(doc(db, "stays", editingStayId), payload);
+          setMessage("تم تعديل الحجز بنجاح.", "success");
+        } else {
+          await addDoc(collection(db, "stays"), {
+            ...payload,
+            createdAt: serverTimestamp()
+          });
+          setMessage("تمت إضافة الحجز بنجاح.", "success");
+        }
+
+        clearForm();
+        await loadStays();
+      } catch (error) {
+        setMessage(error.message, "error");
+      }
+    }
+
+    function fillFormForEdit(item) {
+      const stay = item.data;
+      editingStayId = item.id;
+
+      clientSelect.value = stay.clientId || "";
+      unitSelect.value = stay.unitId || "";
+      renderUnitInfo();
+      rentalType.value = stay.rentalType || "";
+      checkIn.value = stay.checkIn || "";
+      checkOut.value = stay.checkOut || "";
+      durationValue.value = stay.durationText || "";
+      amountInput.value = stay.amount ?? "";
+      paidInput.value = stay.paid ?? "";
+      remainingInput.value = stay.remaining ?? "";
+      statusSelect.value = stay.status || "active";
+      notesInput.value = stay.notes || "";
+
+      formTitle.textContent = "تعديل الحجز";
+      saveBtn.textContent = "حفظ التعديلات";
+      calculateAmounts();
+      focusAddForm();
+    }
+
+    function editStay(id) {
+      const item = allStays.find(stay => stay.id === id);
+      if (!item) return;
+      fillFormForEdit(item);
+    }
+
+    async function deleteStay(id) {
+      const confirmed = window.confirm("هل أنت متأكد من حذف هذا الحجز؟");
+      if (!confirmed) return;
+
+      try {
+        await deleteDoc(doc(db, "stays", id));
+        if (editingStayId === id) {
+          clearForm();
+        }
+        await loadStays();
+      } catch (error) {
+        alert(error.message);
+      }
+    }
+
+    function filterStays() {
+      const keyword = searchInput.value.trim().toLowerCase();
+
+      if (!keyword) {
+        renderStays(allStays);
+        return;
+      }
+
+      const filtered = allStays.filter((item) => {
+        const stay = item.data;
+        return (
+          String(stay.clientName || "").toLowerCase().includes(keyword) ||
+          String(stay.unitLabel || "").toLowerCase().includes(keyword) ||
+          String(stay.rentalType || "").toLowerCase().includes(keyword)
+        );
+      });
+
+      renderStays(filtered);
+    }
+
+    async function logout() {
+      try {
+        await signOut(auth);
+        localStorage.clear();
+        window.location.href = "index.html";
+      } catch (error) {
+        alert(error.message);
+      }
+    }
+
+    unitSelect.addEventListener("change", renderUnitInfo);
+    rentalType.addEventListener("change", calculateAmounts);
+    checkIn.addEventListener("change", calculateAmounts);
+    checkOut.addEventListener("change", calculateAmounts);
+    amountInput.addEventListener("input", calculateAmounts);
+    paidInput.addEventListener("input", calculateAmounts);
+    searchInput.addEventListener("input", filterStays);
+
+    window.saveStay = saveStay;
+    window.editStay = editStay;
+    window.deleteStay = deleteStay;
+    window.logout = logout;
+    window.clearForm = clearForm;
+    window.focusAddForm = focusAddForm;
+
+    onAuthStateChanged(auth, async (user) => {
+      if (!user) {
+        window.location.href = "index.html";
+        return;
+      }
+
+      try {
+        const userRef = doc(db, "users", user.uid);
+        const userSnap = await getDoc(userRef);
+
+        if (!userSnap.exists()) {
+          window.location.href = "index.html";
+          return;
+        }
+
+        const userData = userSnap.data();
+        currentRole = userData.role || "employee";
+
+        userNameEl.textContent = userData.name || "-";
+        userEmailEl.textContent = userData.email || user.email || "-";
+        userRoleEl.textContent = currentRole === "admin" ? "مدير" : "موظف";
+
+        buildNav(currentRole);
+        await loadClients();
+        await loadUnits();
+        await loadStays();
+      } catch (error) {
+        window.location.href = "index.html";
+      }
+    });
+  </script>
+</body>
+</html>
