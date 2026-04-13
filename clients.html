@@ -1,14 +1,810 @@
 <!DOCTYPE html>
 <html lang="ar" dir="rtl">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>العملاء</title>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>العملاء - BkTowers</title>
+  <style>
+    :root {
+      --primary: #0b1f4d;
+      --primary-dark: #08173a;
+      --green: #065f46;
+      --green-dark: #064e3b;
+      --bg: #eef3f9;
+      --card: #ffffff;
+      --text: #111827;
+      --muted: #4b5563;
+      --border: #d7deea;
+      --danger: #c62828;
+      --danger-dark: #a61f1f;
+      --info-bg: #dbeafe;
+      --info-text: #1d4ed8;
+      --shadow: 0 12px 30px rgba(15, 23, 42, 0.10);
+      --radius: 18px;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      font-family: Arial, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+    }
+
+    .app-shell {
+      display: flex;
+      min-height: 100vh;
+    }
+
+    .sidebar {
+      width: 290px;
+      color: #fff;
+      padding: 24px 18px;
+      position: sticky;
+      top: 0;
+      height: 100vh;
+      overflow-y: auto;
+      flex-shrink: 0;
+    }
+
+    .sidebar.admin {
+      background: linear-gradient(180deg, var(--primary), var(--primary-dark));
+    }
+
+    .sidebar.employee {
+      background: linear-gradient(180deg, var(--green), var(--green-dark));
+    }
+
+    .brand {
+      font-size: 34px;
+      font-weight: 800;
+      margin-bottom: 6px;
+      color: #ffffff;
+    }
+
+    .brand-sub {
+      font-size: 14px;
+      color: #dbe6ff;
+      margin-bottom: 24px;
+      font-weight: 700;
+    }
+
+    .user-card {
+      background: rgba(255, 255, 255, 0.10);
+      border: 1px solid rgba(255, 255, 255, 0.14);
+      border-radius: 16px;
+      padding: 14px;
+      margin-bottom: 20px;
+    }
+
+    .user-card .row {
+      margin-bottom: 10px;
+      font-size: 14px;
+      line-height: 1.8;
+      word-break: break-word;
+      color: #ffffff;
+    }
+
+    .user-card .row:last-child {
+      margin-bottom: 0;
+    }
+
+    .menu-title {
+      font-size: 12px;
+      color: #dbe6ff;
+      margin: 18px 6px 10px;
+      font-weight: 700;
+    }
+
+    .nav-links {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .nav-links a,
+    .nav-links button {
+      width: 100%;
+      border: none;
+      border-radius: 14px;
+      padding: 13px 14px;
+      font-size: 14px;
+      background: rgba(255, 255, 255, 0.10);
+      color: #ffffff;
+      text-decoration: none;
+      text-align: right;
+      cursor: pointer;
+      transition: 0.2s ease;
+      font-family: inherit;
+      font-weight: 700;
+    }
+
+    .nav-links a:hover,
+    .nav-links button:hover {
+      background: rgba(255, 255, 255, 0.18);
+    }
+
+    .nav-links a.active {
+      background: #ffffff;
+      color: #111827;
+    }
+
+    .main {
+      flex: 1;
+      min-width: 0;
+      padding: 24px;
+    }
+
+    .topbar {
+      background: var(--card);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      padding: 18px 20px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+      margin-bottom: 22px;
+      flex-wrap: wrap;
+      border: 1px solid #e4eaf3;
+    }
+
+    .topbar-title h1 {
+      margin: 0 0 6px;
+      font-size: 30px;
+      color: var(--primary);
+      font-weight: 800;
+    }
+
+    .topbar-title p {
+      margin: 0;
+      color: var(--muted);
+      font-size: 14px;
+      font-weight: 700;
+    }
+
+    .topbar-actions {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+
+    .action-btn,
+    .logout-btn {
+      border: none;
+      border-radius: 12px;
+      padding: 12px 16px;
+      cursor: pointer;
+      font-size: 14px;
+      font-weight: 800;
+      font-family: inherit;
+    }
+
+    .action-btn {
+      background: var(--primary);
+      color: #fff;
+    }
+
+    .employee .action-btn {
+      background: var(--green);
+    }
+
+    .logout-btn {
+      background: var(--danger);
+      color: #fff;
+    }
+
+    .content-grid {
+      display: grid;
+      grid-template-columns: 420px minmax(0, 1fr);
+      gap: 22px;
+      align-items: start;
+    }
+
+    .panel {
+      background: var(--card);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      padding: 22px;
+      border: 1px solid #e4eaf3;
+    }
+
+    .panel-header h2 {
+      margin: 0 0 6px;
+      font-size: 24px;
+      color: var(--primary);
+      font-weight: 800;
+    }
+
+    .panel-header p {
+      margin: 0 0 18px;
+      color: var(--muted);
+      font-size: 13px;
+      font-weight: 700;
+    }
+
+    .form-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 14px;
+    }
+
+    .form-group {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .form-group.full {
+      grid-column: 1 / -1;
+    }
+
+    label {
+      font-size: 14px;
+      font-weight: 800;
+      color: #1f2937;
+    }
+
+    input,
+    textarea {
+      width: 100%;
+      padding: 12px 13px;
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      font-size: 14px;
+      background: #fff;
+      outline: none;
+      font-family: inherit;
+      color: #111827;
+      font-weight: 700;
+    }
+
+    textarea {
+      min-height: 90px;
+      resize: vertical;
+    }
+
+    .form-actions {
+      display: flex;
+      gap: 10px;
+      margin-top: 18px;
+      flex-wrap: wrap;
+    }
+
+    .primary-btn,
+    .secondary-btn,
+    .edit-btn,
+    .danger-btn {
+      border: none;
+      border-radius: 12px;
+      padding: 12px 16px;
+      cursor: pointer;
+      font-size: 14px;
+      font-weight: 800;
+      font-family: inherit;
+    }
+
+    .primary-btn {
+      background: var(--primary);
+      color: #fff;
+    }
+
+    .secondary-btn {
+      background: #edf2f7;
+      color: #111827;
+    }
+
+    .edit-btn {
+      background: var(--info-bg);
+      color: var(--info-text);
+      padding: 9px 14px;
+      font-size: 13px;
+    }
+
+    .danger-btn {
+      background: var(--danger);
+      color: #fff;
+      padding: 9px 14px;
+      font-size: 13px;
+    }
+
+    .message {
+      margin-top: 14px;
+      min-height: 20px;
+      font-size: 14px;
+      font-weight: 800;
+    }
+
+    .message.success {
+      color: #166534;
+    }
+
+    .message.error {
+      color: #b91c1c;
+    }
+
+    .table-tools {
+      display: flex;
+      justify-content: space-between;
+      gap: 12px;
+      flex-wrap: wrap;
+      margin-bottom: 14px;
+    }
+
+    .search-box {
+      max-width: 320px;
+      width: 100%;
+    }
+
+    .table-wrap {
+      overflow-x: auto;
+      border: 1px solid var(--border);
+      border-radius: 16px;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      min-width: 900px;
+      background: #fff;
+    }
+
+    th,
+    td {
+      padding: 14px 12px;
+      border-bottom: 1px solid var(--border);
+      text-align: right;
+      vertical-align: top;
+      font-size: 14px;
+      color: #111827;
+      font-weight: 700;
+    }
+
+    th {
+      background: #f7faff;
+      color: #1f2937;
+      font-weight: 800;
+    }
+
+    tbody tr:hover {
+      background: #fbfdff;
+    }
+
+    .empty {
+      text-align: center;
+      color: var(--muted);
+      padding: 26px 0;
+      font-weight: 800;
+    }
+
+    .actions-inline {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+
+    @media (max-width: 1200px) {
+      .content-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    @media (max-width: 900px) {
+      .app-shell {
+        flex-direction: column;
+      }
+
+      .sidebar {
+        width: 100%;
+        height: auto;
+        position: relative;
+      }
+
+      .main {
+        padding: 16px;
+      }
+
+      .form-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+  </style>
 </head>
-<body style="font-family: Arial; background:#f5f7fb; display:flex; justify-content:center; align-items:center; min-height:100vh;">
-  <div style="background:white; padding:40px; border-radius:16px; box-shadow:0 10px 30px rgba(0,0,0,0.08); text-align:center;">
-    <h1>صفحة العملاء</h1>
-    <p>تم الدخول بنجاح.</p>
+<body>
+  <div class="app-shell">
+    <aside class="sidebar" id="sidebar">
+      <div class="brand">BkTowers</div>
+      <div class="brand-sub">نظام إدارة العقارات</div>
+
+      <div class="user-card">
+        <div class="row"><strong>الاسم:</strong> <span id="sidebarUserName">-</span></div>
+        <div class="row"><strong>البريد:</strong> <span id="sidebarUserEmail">-</span></div>
+        <div class="row"><strong>الصلاحية:</strong> <span id="sidebarUserRole">-</span></div>
+      </div>
+
+      <div class="menu-title">القائمة الرئيسية</div>
+      <div class="nav-links" id="navLinks"></div>
+    </aside>
+
+    <main class="main" id="mainArea">
+      <section class="topbar">
+        <div class="topbar-title">
+          <h1>العملاء</h1>
+          <p>إضافة العملاء وتعديلهم وحذفهم وعرض بياناتهم.</p>
+        </div>
+
+        <div class="topbar-actions">
+          <button class="action-btn" onclick="focusAddForm()">إضافة عميل جديد</button>
+          <button class="logout-btn" onclick="logout()">تسجيل الخروج</button>
+        </div>
+      </section>
+
+      <section class="content-grid">
+        <div class="panel">
+          <div class="panel-header">
+            <h2 id="formTitle">إضافة عميل جديد</h2>
+            <p>أدخل بيانات العميل الأساسية.</p>
+          </div>
+
+          <div class="form-grid">
+            <div class="form-group">
+              <label for="clientName">اسم العميل</label>
+              <input type="text" id="clientName" placeholder="اكتب اسم العميل">
+            </div>
+
+            <div class="form-group">
+              <label for="nationality">الجنسية</label>
+              <input type="text" id="nationality" placeholder="اكتب الجنسية">
+            </div>
+
+            <div class="form-group">
+              <label for="idNumber">رقم الهوية / الإقامة</label>
+              <input type="text" id="idNumber" placeholder="اكتب رقم الهوية أو الإقامة">
+            </div>
+
+            <div class="form-group">
+              <label for="phoneNumber">رقم الجوال</label>
+              <input type="text" id="phoneNumber" placeholder="اكتب رقم الجوال">
+            </div>
+
+            <div class="form-group full">
+              <label for="notes">ملاحظات</label>
+              <textarea id="notes" placeholder="أي ملاحظات إضافية"></textarea>
+            </div>
+          </div>
+
+          <div class="form-actions">
+            <button class="primary-btn" onclick="saveClient()" id="saveBtn">حفظ العميل</button>
+            <button class="secondary-btn" onclick="clearForm()">تفريغ الحقول</button>
+          </div>
+
+          <div id="formMessage" class="message"></div>
+        </div>
+
+        <div class="panel">
+          <div class="panel-header">
+            <h2>قائمة العملاء</h2>
+            <p>جميع العملاء المسجلين داخل النظام.</p>
+          </div>
+
+          <div class="table-tools">
+            <input type="text" id="searchInput" class="search-box" placeholder="ابحث بالاسم أو الجوال أو الهوية">
+          </div>
+
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr>
+                  <th>الاسم</th>
+                  <th>الجنسية</th>
+                  <th>رقم الهوية / الإقامة</th>
+                  <th>رقم الجوال</th>
+                  <th>ملاحظات</th>
+                  <th>الإجراءات</th>
+                </tr>
+              </thead>
+              <tbody id="clientsTableBody">
+                <tr>
+                  <td colspan="6" class="empty">جاري تحميل العملاء...</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+    </main>
   </div>
+
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/12.11.0/firebase-app.js";
+    import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/12.11.0/firebase-auth.js";
+    import {
+      getFirestore,
+      collection,
+      addDoc,
+      getDocs,
+      deleteDoc,
+      doc,
+      getDoc,
+      updateDoc,
+      orderBy,
+      query,
+      serverTimestamp
+    } from "https://www.gstatic.com/firebasejs/12.11.0/firebase-firestore.js";
+
+    const firebaseConfig = {
+      apiKey: "AIzaSyDey3KL3qZUvZBVtFcB38xzBGx6qrG2WYY",
+      authDomain: "bktowers-4b822.firebaseapp.com",
+      projectId: "bktowers-4b822",
+      storageBucket: "bktowers-4b822.firebasestorage.app",
+      messagingSenderId: "336608827796",
+      appId: "1:336608827796:web:4957fe0d411220f6a69781"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+    const db = getFirestore(app);
+
+    const sidebar = document.getElementById("sidebar");
+    const navLinks = document.getElementById("navLinks");
+    const mainArea = document.getElementById("mainArea");
+
+    const userNameEl = document.getElementById("sidebarUserName");
+    const userEmailEl = document.getElementById("sidebarUserEmail");
+    const userRoleEl = document.getElementById("sidebarUserRole");
+
+    const clientsTableBody = document.getElementById("clientsTableBody");
+    const formMessage = document.getElementById("formMessage");
+    const formTitle = document.getElementById("formTitle");
+    const saveBtn = document.getElementById("saveBtn");
+    const searchInput = document.getElementById("searchInput");
+
+    let allClients = [];
+    let editingClientId = null;
+    let currentRole = "employee";
+
+    function setMessage(text, type = "") {
+      formMessage.textContent = text;
+      formMessage.className = "message";
+      if (type) formMessage.classList.add(type);
+    }
+
+    function buildNav(role) {
+      if (role === "admin") {
+        sidebar.classList.remove("employee");
+        sidebar.classList.add("admin");
+        navLinks.innerHTML = `
+          <a href="dashboard.html">لوحة التحكم</a>
+          <a href="clients.html" class="active">العملاء</a>
+          <a href="stays.html">السكن والحجوزات</a>
+          <a href="revenues.html">الإيرادات</a>
+          <a href="expenses.html">المصروفات</a>
+          <a href="maintenance.html">الصيانة</a>
+          <a href="reports.html">التقارير</a>
+          <a href="employees.html">الموظفين</a>
+          <button onclick="logout()">تسجيل الخروج</button>
+        `;
+      } else {
+        sidebar.classList.remove("admin");
+        sidebar.classList.add("employee");
+        navLinks.innerHTML = `
+          <a href="employee-dashboard.html">صفحة الموظف</a>
+          <a href="clients.html" class="active">العملاء</a>
+          <a href="stays.html">السكن والحجوزات</a>
+          <button onclick="logout()">تسجيل الخروج</button>
+        `;
+        mainArea.classList.add("employee");
+      }
+    }
+
+    function focusAddForm() {
+      document.getElementById("clientName").focus();
+      window.scrollTo({ top: 0, behavior: "smooth" });
+    }
+
+    function clearForm() {
+      editingClientId = null;
+      document.getElementById("clientName").value = "";
+      document.getElementById("nationality").value = "";
+      document.getElementById("idNumber").value = "";
+      document.getElementById("phoneNumber").value = "";
+      document.getElementById("notes").value = "";
+      formTitle.textContent = "إضافة عميل جديد";
+      saveBtn.textContent = "حفظ العميل";
+      setMessage("");
+    }
+
+    function fillFormForEdit(item) {
+      const data = item.data;
+      editingClientId = item.id;
+
+      document.getElementById("clientName").value = data.name || "";
+      document.getElementById("nationality").value = data.nationality || "";
+      document.getElementById("idNumber").value = data.idNumber || "";
+      document.getElementById("phoneNumber").value = data.phoneNumber || "";
+      document.getElementById("notes").value = data.notes || "";
+
+      formTitle.textContent = "تعديل العميل";
+      saveBtn.textContent = "حفظ التعديلات";
+      focusAddForm();
+    }
+
+    function renderClients(rows) {
+      let html = "";
+
+      rows.forEach((item) => {
+        const client = item.data;
+        html += `
+          <tr>
+            <td>${client.name || "-"}</td>
+            <td>${client.nationality || "-"}</td>
+            <td>${client.idNumber || "-"}</td>
+            <td>${client.phoneNumber || "-"}</td>
+            <td>${client.notes || "-"}</td>
+            <td>
+              <div class="actions-inline">
+                <button class="edit-btn" onclick="editClient('${item.id}')">تعديل</button>
+                <button class="danger-btn" onclick="deleteClient('${item.id}')">حذف</button>
+              </div>
+            </td>
+          </tr>
+        `;
+      });
+
+      if (!html) {
+        html = `<tr><td colspan="6" class="empty">لا توجد نتائج مطابقة.</td></tr>`;
+      }
+
+      clientsTableBody.innerHTML = html;
+    }
+
+    async function loadClients() {
+      clientsTableBody.innerHTML = `<tr><td colspan="6" class="empty">جاري تحميل العملاء...</td></tr>`;
+
+      const q = query(collection(db, "clients"), orderBy("createdAt", "desc"));
+      const snapshot = await getDocs(q);
+
+      allClients = [];
+      snapshot.forEach((docSnap) => {
+        allClients.push({
+          id: docSnap.id,
+          data: docSnap.data()
+        });
+      });
+
+      renderClients(allClients);
+    }
+
+    async function saveClient() {
+      try {
+        const name = document.getElementById("clientName").value.trim();
+        const nationality = document.getElementById("nationality").value.trim();
+        const idNumber = document.getElementById("idNumber").value.trim();
+        const phoneNumber = document.getElementById("phoneNumber").value.trim();
+        const notes = document.getElementById("notes").value.trim();
+
+        if (!name) throw new Error("اسم العميل مطلوب.");
+        if (!idNumber) throw new Error("رقم الهوية / الإقامة مطلوب.");
+        if (!phoneNumber) throw new Error("رقم الجوال مطلوب.");
+
+        const payload = {
+          name,
+          nationality,
+          idNumber,
+          phoneNumber,
+          notes
+        };
+
+        if (editingClientId) {
+          await updateDoc(doc(db, "clients", editingClientId), payload);
+          setMessage("تم تعديل العميل بنجاح.", "success");
+        } else {
+          await addDoc(collection(db, "clients"), {
+            ...payload,
+            createdAt: serverTimestamp()
+          });
+          setMessage("تمت إضافة العميل بنجاح.", "success");
+        }
+
+        clearForm();
+        await loadClients();
+      } catch (error) {
+        setMessage(error.message, "error");
+      }
+    }
+
+    function editClient(id) {
+      const item = allClients.find(client => client.id === id);
+      if (!item) return;
+      fillFormForEdit(item);
+    }
+
+    async function deleteClient(id) {
+      const confirmed = window.confirm("هل أنت متأكد من حذف هذا العميل؟");
+      if (!confirmed) return;
+
+      try {
+        await deleteDoc(doc(db, "clients", id));
+        if (editingClientId === id) {
+          clearForm();
+        }
+        await loadClients();
+      } catch (error) {
+        alert(error.message);
+      }
+    }
+
+    function filterClients() {
+      const keyword = searchInput.value.trim().toLowerCase();
+
+      if (!keyword) {
+        renderClients(allClients);
+        return;
+      }
+
+      const filtered = allClients.filter((item) => {
+        const client = item.data;
+        return (
+          String(client.name || "").toLowerCase().includes(keyword) ||
+          String(client.phoneNumber || "").toLowerCase().includes(keyword) ||
+          String(client.idNumber || "").toLowerCase().includes(keyword) ||
+          String(client.nationality || "").toLowerCase().includes(keyword)
+        );
+      });
+
+      renderClients(filtered);
+    }
+
+    async function logout() {
+      try {
+        await signOut(auth);
+        localStorage.clear();
+        window.location.href = "index.html";
+      } catch (error) {
+        alert(error.message);
+      }
+    }
+
+    searchInput.addEventListener("input", filterClients);
+
+    window.saveClient = saveClient;
+    window.editClient = editClient;
+    window.deleteClient = deleteClient;
+    window.logout = logout;
+    window.clearForm = clearForm;
+    window.focusAddForm = focusAddForm;
+
+    onAuthStateChanged(auth, async (user) => {
+      if (!user) {
+        window.location.href = "index.html";
+        return;
+      }
+
+      try {
+        const userRef = doc(db, "users", user.uid);
+        const userSnap = await getDoc(userRef);
+
+        if (!userSnap.exists()) {
+          window.location.href = "index.html";
+          return;
+        }
+
+        const userData = userSnap.data();
+        currentRole = userData.role || "employee";
+
+        userNameEl.textContent = userData.name || "-";
+        userEmailEl.textContent = userData.email || user.email || "-";
+        userRoleEl.textContent = currentRole === "admin" ? "مدير" : "موظف";
+
+        buildNav(currentRole);
+        await loadClients();
+      } catch (error) {
+        window.location.href = "index.html";
+      }
+    });
+  </script>
 </body>
 </html>
