@@ -29,6 +29,11 @@
       box-sizing: border-box;
     }
 
+    @page {
+      size: A4;
+      margin: 12mm;
+    }
+
     body {
       margin: 0;
       font-family: Arial, sans-serif;
@@ -169,7 +174,8 @@
 
     .action-btn,
     .logout-btn,
-    .print-btn {
+    .print-btn,
+    .export-btn {
       border: none;
       border-radius: 12px;
       padding: 12px 16px;
@@ -180,7 +186,8 @@
     }
 
     .action-btn,
-    .print-btn {
+    .print-btn,
+    .export-btn {
       background: var(--primary);
       color: #fff;
     }
@@ -199,6 +206,8 @@
       padding: 22px;
       border: 1px solid #e4eaf3;
       margin-bottom: 22px;
+      break-inside: avoid;
+      page-break-inside: avoid;
     }
 
     .filter-panel h2,
@@ -294,6 +303,7 @@
       font-size: 28px;
       font-weight: 800;
       color: var(--primary);
+      line-height: 1.3;
     }
 
     .stat-card.profit .value {
@@ -308,22 +318,23 @@
       overflow-x: auto;
       border: 1px solid var(--border);
       border-radius: 16px;
+      background: #fff;
     }
 
     table {
       width: 100%;
       border-collapse: collapse;
-      min-width: 1200px;
+      min-width: 1100px;
       background: #fff;
     }
 
     th,
     td {
-      padding: 14px 12px;
+      padding: 12px 10px;
       border-bottom: 1px solid var(--border);
       text-align: right;
       vertical-align: top;
-      font-size: 14px;
+      font-size: 13px;
       color: #111827;
       font-weight: 700;
     }
@@ -375,6 +386,14 @@
       display: none;
     }
 
+    .report-note {
+      font-size: 13px;
+      color: var(--muted);
+      line-height: 1.8;
+      margin-top: 10px;
+      font-weight: 700;
+    }
+
     @media (max-width: 1450px) {
       .stats-grid {
         grid-template-columns: repeat(2, minmax(0, 1fr));
@@ -407,15 +426,24 @@
     }
 
     @media print {
-      body {
-        background: #fff;
+      @page {
+        size: A4 portrait;
+        margin: 10mm;
+      }
+
+      html, body {
+        width: 210mm;
+        background: #fff !important;
       }
 
       .sidebar,
       .topbar-actions,
       .filter-actions,
       .nav-links,
-      .menu-title {
+      .menu-title,
+      .logout-btn,
+      .print-btn,
+      .export-btn {
         display: none !important;
       }
 
@@ -431,24 +459,70 @@
       .filter-panel,
       .stats-panel,
       .table-panel {
-        box-shadow: none;
-        border: 1px solid #ddd;
-        margin-bottom: 16px;
+        box-shadow: none !important;
+        border: 1px solid #ccc !important;
+        margin-bottom: 10px !important;
+        page-break-inside: avoid;
+        break-inside: avoid;
       }
 
       .print-header {
         display: block;
-        margin-bottom: 16px;
-        padding: 10px 0;
+        margin-bottom: 10px;
+        padding: 0 0 10px;
+        border-bottom: 2px solid #000;
       }
 
       .print-header h1 {
         margin: 0 0 6px;
-        font-size: 26px;
+        font-size: 22px;
       }
 
       .print-header p {
         margin: 0;
+        font-size: 12px;
+      }
+
+      .topbar-title h1 {
+        font-size: 22px;
+      }
+
+      .topbar-title p,
+      .report-note {
+        font-size: 12px;
+      }
+
+      .table-wrap {
+        overflow: visible !important;
+      }
+
+      table {
+        min-width: 100% !important;
+        width: 100% !important;
+        table-layout: fixed;
+      }
+
+      th,
+      td {
+        font-size: 10px !important;
+        padding: 6px 4px !important;
+        word-break: break-word;
+      }
+
+      .stats-grid {
+        grid-template-columns: repeat(5, 1fr);
+        gap: 8px;
+      }
+
+      .stat-card {
+        padding: 8px;
+      }
+
+      .stat-card h3 {
+        font-size: 11px;
+      }
+
+      .stat-card .value {
         font-size: 14px;
       }
     }
@@ -489,11 +563,13 @@
       <section class="topbar">
         <div class="topbar-title">
           <h1>التقارير</h1>
-          <p>تقارير الأرباح والإيرادات والمصروفات والصيانة مع الفلترة والطباعة.</p>
+          <p>تقارير الأرباح والإيرادات والمصروفات والصيانة مع الفلترة والطباعة والتصدير.</p>
         </div>
 
         <div class="topbar-actions">
-          <button class="print-btn" onclick="printReport()">طباعة التقرير</button>
+          <button class="print-btn" onclick="printReport()">طباعة</button>
+          <button class="export-btn" onclick="exportCsv()">تصدير CSV</button>
+          <button class="export-btn" onclick="exportPrintableHtml()">تصدير HTML</button>
           <button class="logout-btn" onclick="logout()">تسجيل الخروج</button>
         </div>
       </section>
@@ -550,6 +626,11 @@
               <button class="secondary-btn" onclick="resetFilters()">إعادة تعيين</button>
             </div>
           </div>
+        </div>
+
+        <div class="report-note">
+          الطباعة مجهزة على مقاس A4.  
+          ولحفظ التقرير PDF استخدم زر الطباعة ثم اختر "Save as PDF" من نافذة الطباعة.
         </div>
       </section>
 
@@ -701,9 +782,23 @@
     let expensesRows = [];
     let maintenanceRows = [];
     let unitsRows = [];
+    let currentFilteredData = {
+      revenues: [],
+      expenses: [],
+      maintenance: []
+    };
+
+    function formatMoneyNumber(value) {
+      return Number(value || 0).toFixed(2);
+    }
 
     function formatMoney(value) {
-      return Number(value || 0).toFixed(2) + " ر.س";
+      return formatMoneyNumber(value) + " ر.س";
+    }
+
+    function escapeCsv(value) {
+      const str = String(value ?? "");
+      return `"${str.replace(/"/g, '""')}"`;
     }
 
     function populateUnitsFilter() {
@@ -758,6 +853,7 @@
     function mapStayRevenue(item) {
       const row = item.data;
       return {
+        section: "revenue",
         source: "من الحجز",
         type: row.rentalType || "-",
         client: row.clientName || "-",
@@ -771,6 +867,7 @@
     function mapManualRevenue(item) {
       const row = item.data;
       return {
+        section: "revenue",
         source: "إضافة يدوية",
         type: row.category || "-",
         client: row.clientName || "-",
@@ -784,7 +881,8 @@
     function mapExpense(item) {
       const row = item.data;
       return {
-        section: "مصروف",
+        section: "expense",
+        label: "مصروف",
         type: row.category || "-",
         unit: row.unitLabel || "-",
         date: row.date || "-",
@@ -796,7 +894,8 @@
     function mapMaintenance(item) {
       const row = item.data;
       return {
-        section: "صيانة",
+        section: "maintenance",
+        label: "صيانة",
         type: row.typeLabel || "-",
         unit: row.unitLabel || "-",
         date: row.date || "-",
@@ -849,7 +948,7 @@
 
       expensesBody.innerHTML = rows.map(row => `
         <tr>
-          <td><span class="section-badge badge-expense">${row.section}</span></td>
+          <td><span class="section-badge badge-expense">${row.label}</span></td>
           <td>${row.type}</td>
           <td>${row.unit}</td>
           <td>${row.date}</td>
@@ -867,7 +966,7 @@
 
       maintenanceBody.innerHTML = rows.map(row => `
         <tr>
-          <td><span class="section-badge badge-maintenance">${row.section}</span></td>
+          <td><span class="section-badge badge-maintenance">${row.label}</span></td>
           <td>${row.type}</td>
           <td>${row.unit}</td>
           <td>${row.date}</td>
@@ -903,6 +1002,7 @@
 
     function applyFilters() {
       const data = filterAllData();
+      currentFilteredData = data;
       renderRevenueTable(data.revenues);
       renderExpenseTable(data.expenses);
       renderMaintenanceTable(data.maintenance);
@@ -922,6 +1022,215 @@
 
     function printReport() {
       window.print();
+    }
+
+    function exportCsv() {
+      const lines = [];
+      lines.push([
+        "القسم",
+        "المصدر/النوع",
+        "التفصيل",
+        "العميل",
+        "الوحدة",
+        "التاريخ",
+        "المبلغ",
+        "البيان"
+      ].map(escapeCsv).join(","));
+
+      currentFilteredData.revenues.forEach(row => {
+        lines.push([
+          "إيراد",
+          row.source,
+          row.type,
+          row.client,
+          row.unit,
+          row.date,
+          formatMoneyNumber(row.amount),
+          row.description
+        ].map(escapeCsv).join(","));
+      });
+
+      currentFilteredData.expenses.forEach(row => {
+        lines.push([
+          "مصروف",
+          row.label,
+          row.type,
+          "",
+          row.unit,
+          row.date,
+          formatMoneyNumber(row.amount),
+          row.description
+        ].map(escapeCsv).join(","));
+      });
+
+      currentFilteredData.maintenance.forEach(row => {
+        lines.push([
+          "صيانة",
+          row.label,
+          row.type,
+          "",
+          row.unit,
+          row.date,
+          formatMoneyNumber(row.amount),
+          row.description
+        ].map(escapeCsv).join(","));
+      });
+
+      const blob = new Blob(["\uFEFF" + lines.join("\n")], { type: "text/csv;charset=utf-8;" });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = "bktowers-report.csv";
+      document.body.appendChild(a);
+      a.click();
+      a.remove();
+      URL.revokeObjectURL(url);
+    }
+
+    function buildPrintableHtml() {
+      const totalRevenue = currentFilteredData.revenues.reduce((sum, row) => sum + Number(row.amount || 0), 0);
+      const totalExpenses = currentFilteredData.expenses.reduce((sum, row) => sum + Number(row.amount || 0), 0);
+      const totalMaintenance = currentFilteredData.maintenance.reduce((sum, row) => sum + Number(row.amount || 0), 0);
+      const netProfit = totalRevenue - totalExpenses - totalMaintenance;
+
+      const revenueRows = currentFilteredData.revenues.length
+        ? currentFilteredData.revenues.map(row => `
+          <tr>
+            <td>${row.source}</td>
+            <td>${row.type}</td>
+            <td>${row.client}</td>
+            <td>${row.unit}</td>
+            <td>${row.date}</td>
+            <td>${formatMoney(row.amount)}</td>
+            <td>${row.description}</td>
+          </tr>
+        `).join("")
+        : `<tr><td colspan="7">لا توجد بيانات.</td></tr>`;
+
+      const expenseRows = currentFilteredData.expenses.length
+        ? currentFilteredData.expenses.map(row => `
+          <tr>
+            <td>${row.label}</td>
+            <td>${row.type}</td>
+            <td>${row.unit}</td>
+            <td>${row.date}</td>
+            <td>${formatMoney(row.amount)}</td>
+            <td>${row.description}</td>
+          </tr>
+        `).join("")
+        : `<tr><td colspan="6">لا توجد بيانات.</td></tr>`;
+
+      const maintenanceRowsHtml = currentFilteredData.maintenance.length
+        ? currentFilteredData.maintenance.map(row => `
+          <tr>
+            <td>${row.label}</td>
+            <td>${row.type}</td>
+            <td>${row.unit}</td>
+            <td>${row.date}</td>
+            <td>${formatMoney(row.amount)}</td>
+            <td>${row.description}</td>
+          </tr>
+        `).join("")
+        : `<tr><td colspan="6">لا توجد بيانات.</td></tr>`;
+
+      return `
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<title>BkTowers Report</title>
+<style>
+  @page { size: A4; margin: 10mm; }
+  body { font-family: Arial, sans-serif; color: #111; }
+  h1, h2 { margin: 0 0 8px; }
+  .box { border: 1px solid #ccc; border-radius: 10px; padding: 12px; margin-bottom: 12px; }
+  .stats { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; margin-top: 10px; }
+  .stat { border: 1px solid #ddd; padding: 10px; border-radius: 8px; }
+  .stat strong { display: block; margin-bottom: 6px; }
+  table { width: 100%; border-collapse: collapse; margin-top: 8px; table-layout: fixed; }
+  th, td { border: 1px solid #ddd; padding: 6px; font-size: 11px; word-break: break-word; }
+  th { background: #f2f2f2; }
+</style>
+</head>
+<body>
+  <div class="box">
+    <h1>BkTowers - تقرير مالي</h1>
+    <div>${printSummaryText.textContent}</div>
+    <div class="stats">
+      <div class="stat"><strong>إجمالي الإيرادات</strong>${formatMoney(totalRevenue)}</div>
+      <div class="stat"><strong>إجمالي المصروفات</strong>${formatMoney(totalExpenses)}</div>
+      <div class="stat"><strong>إجمالي الصيانة</strong>${formatMoney(totalMaintenance)}</div>
+      <div class="stat"><strong>صافي الربح</strong>${formatMoney(netProfit)}</div>
+    </div>
+  </div>
+
+  <div class="box">
+    <h2>الإيرادات</h2>
+    <table>
+      <thead>
+        <tr>
+          <th>المصدر</th>
+          <th>النوع</th>
+          <th>العميل</th>
+          <th>الوحدة</th>
+          <th>التاريخ</th>
+          <th>المبلغ</th>
+          <th>البيان</th>
+        </tr>
+      </thead>
+      <tbody>${revenueRows}</tbody>
+    </table>
+  </div>
+
+  <div class="box">
+    <h2>المصروفات</h2>
+    <table>
+      <thead>
+        <tr>
+          <th>القسم</th>
+          <th>النوع</th>
+          <th>الوحدة</th>
+          <th>التاريخ</th>
+          <th>المبلغ</th>
+          <th>البيان</th>
+        </tr>
+      </thead>
+      <tbody>${expenseRows}</tbody>
+    </table>
+  </div>
+
+  <div class="box">
+    <h2>الصيانة</h2>
+    <table>
+      <thead>
+        <tr>
+          <th>القسم</th>
+          <th>نوع الصيانة</th>
+          <th>الوحدة</th>
+          <th>التاريخ</th>
+          <th>المبلغ</th>
+          <th>البيان</th>
+        </tr>
+      </thead>
+      <tbody>${maintenanceRowsHtml}</tbody>
+    </table>
+  </div>
+</body>
+</html>
+      `.trim();
+    }
+
+    function exportPrintableHtml() {
+      const html = buildPrintableHtml();
+      const blob = new Blob([html], { type: "text/html;charset=utf-8" });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = "bktowers-report.html";
+      document.body.appendChild(a);
+      a.click();
+      a.remove();
+      URL.revokeObjectURL(url);
     }
 
     async function loadAllData() {
@@ -983,6 +1292,8 @@
     window.printReport = printReport;
     window.applyFilters = applyFilters;
     window.resetFilters = resetFilters;
+    window.exportCsv = exportCsv;
+    window.exportPrintableHtml = exportPrintableHtml;
 
     onAuthStateChanged(auth, async (user) => {
       if (!user) {
