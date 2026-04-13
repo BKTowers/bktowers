@@ -1,0 +1,1001 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>الصيانة - BkTowers</title>
+  <style>
+    :root {
+      --primary: #0b1f4d;
+      --primary-dark: #08173a;
+      --bg: #eef3f9;
+      --card: #ffffff;
+      --text: #111827;
+      --muted: #4b5563;
+      --border: #d7deea;
+      --danger: #c62828;
+      --warning-bg: #fef3c7;
+      --warning-text: #92400e;
+      --info-bg: #dbeafe;
+      --info-text: #1d4ed8;
+      --success-bg: #dcfce7;
+      --success-text: #166534;
+      --shadow: 0 12px 30px rgba(15, 23, 42, 0.10);
+      --radius: 18px;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      font-family: Arial, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+    }
+
+    .app-shell {
+      display: flex;
+      min-height: 100vh;
+    }
+
+    .sidebar {
+      width: 290px;
+      background: linear-gradient(180deg, var(--primary), var(--primary-dark));
+      color: #fff;
+      padding: 24px 18px;
+      position: sticky;
+      top: 0;
+      height: 100vh;
+      overflow-y: auto;
+      flex-shrink: 0;
+    }
+
+    .brand {
+      font-size: 34px;
+      font-weight: 800;
+      margin-bottom: 6px;
+      color: #ffffff;
+    }
+
+    .brand-sub {
+      font-size: 14px;
+      color: #dbe6ff;
+      margin-bottom: 24px;
+      font-weight: 700;
+    }
+
+    .user-card {
+      background: rgba(255, 255, 255, 0.10);
+      border: 1px solid rgba(255, 255, 255, 0.14);
+      border-radius: 16px;
+      padding: 14px;
+      margin-bottom: 20px;
+    }
+
+    .user-card .row {
+      margin-bottom: 10px;
+      font-size: 14px;
+      line-height: 1.8;
+      color: #ffffff;
+      word-break: break-word;
+    }
+
+    .user-card .row:last-child {
+      margin-bottom: 0;
+    }
+
+    .menu-title {
+      font-size: 12px;
+      color: #dbe6ff;
+      margin: 18px 6px 10px;
+      font-weight: 700;
+    }
+
+    .nav-links {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .nav-links a,
+    .nav-links button {
+      width: 100%;
+      border: none;
+      border-radius: 14px;
+      padding: 13px 14px;
+      font-size: 14px;
+      background: rgba(255, 255, 255, 0.10);
+      color: #ffffff;
+      text-decoration: none;
+      text-align: right;
+      cursor: pointer;
+      transition: 0.2s ease;
+      font-family: inherit;
+      font-weight: 700;
+    }
+
+    .nav-links a:hover,
+    .nav-links button:hover {
+      background: rgba(255, 255, 255, 0.18);
+    }
+
+    .nav-links a.active {
+      background: #ffffff;
+      color: #111827;
+    }
+
+    .main {
+      flex: 1;
+      min-width: 0;
+      padding: 24px;
+    }
+
+    .topbar {
+      background: var(--card);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      padding: 18px 20px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+      margin-bottom: 22px;
+      flex-wrap: wrap;
+      border: 1px solid #e4eaf3;
+    }
+
+    .topbar-title h1 {
+      margin: 0 0 6px;
+      font-size: 30px;
+      color: var(--primary);
+      font-weight: 800;
+    }
+
+    .topbar-title p {
+      margin: 0;
+      color: var(--muted);
+      font-size: 14px;
+      font-weight: 700;
+    }
+
+    .topbar-actions {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+
+    .action-btn,
+    .logout-btn {
+      border: none;
+      border-radius: 12px;
+      padding: 12px 16px;
+      cursor: pointer;
+      font-size: 14px;
+      font-weight: 800;
+      font-family: inherit;
+    }
+
+    .action-btn {
+      background: var(--primary);
+      color: #fff;
+    }
+
+    .logout-btn {
+      background: var(--danger);
+      color: #fff;
+    }
+
+    .summary-grid {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 16px;
+      margin-bottom: 22px;
+    }
+
+    .summary-card {
+      background: var(--card);
+      border-radius: 16px;
+      box-shadow: var(--shadow);
+      padding: 18px;
+      border: 1px solid #e4eaf3;
+    }
+
+    .summary-card h3 {
+      margin: 0 0 10px;
+      font-size: 14px;
+      color: var(--muted);
+      font-weight: 800;
+    }
+
+    .summary-card .value {
+      font-size: 30px;
+      font-weight: 800;
+      color: var(--primary);
+    }
+
+    .content-grid {
+      display: grid;
+      grid-template-columns: 430px minmax(0, 1fr);
+      gap: 22px;
+      align-items: start;
+    }
+
+    .panel {
+      background: var(--card);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      padding: 22px;
+      border: 1px solid #e4eaf3;
+      min-width: 0;
+    }
+
+    .panel-header h2 {
+      margin: 0 0 6px;
+      font-size: 24px;
+      color: var(--primary);
+      font-weight: 800;
+    }
+
+    .panel-header p {
+      margin: 0 0 18px;
+      color: var(--muted);
+      font-size: 13px;
+      font-weight: 700;
+    }
+
+    .form-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 14px;
+    }
+
+    .form-group {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .form-group.full {
+      grid-column: 1 / -1;
+    }
+
+    label {
+      font-size: 14px;
+      font-weight: 800;
+      color: #1f2937;
+    }
+
+    input,
+    select,
+    textarea {
+      width: 100%;
+      padding: 12px 13px;
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      font-size: 14px;
+      background: #fff;
+      outline: none;
+      font-family: inherit;
+      color: #111827;
+      font-weight: 700;
+    }
+
+    textarea {
+      min-height: 90px;
+      resize: vertical;
+    }
+
+    .money-box {
+      display: flex;
+      align-items: stretch;
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      overflow: hidden;
+      background: #fff;
+    }
+
+    .money-box input {
+      border: none;
+      border-radius: 0;
+    }
+
+    .money-label {
+      min-width: 60px;
+      background: #f3f6fb;
+      border-right: 1px solid var(--border);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 13px;
+      font-weight: 800;
+      color: #374151;
+    }
+
+    .info-strip {
+      background: #f8fbff;
+      border: 1px dashed var(--border);
+      border-radius: 14px;
+      padding: 12px;
+      color: var(--muted);
+      font-size: 13px;
+      line-height: 1.8;
+      font-weight: 700;
+    }
+
+    .form-actions {
+      display: flex;
+      gap: 10px;
+      margin-top: 18px;
+      flex-wrap: wrap;
+    }
+
+    .primary-btn,
+    .secondary-btn,
+    .edit-btn,
+    .danger-btn {
+      border: none;
+      border-radius: 12px;
+      padding: 12px 16px;
+      cursor: pointer;
+      font-size: 14px;
+      font-weight: 800;
+      font-family: inherit;
+    }
+
+    .primary-btn {
+      background: var(--primary);
+      color: #fff;
+    }
+
+    .secondary-btn {
+      background: #edf2f7;
+      color: #111827;
+    }
+
+    .edit-btn {
+      background: var(--info-bg);
+      color: var(--info-text);
+      padding: 9px 14px;
+      font-size: 13px;
+    }
+
+    .danger-btn {
+      background: var(--danger);
+      color: #fff;
+      padding: 9px 14px;
+      font-size: 13px;
+    }
+
+    .message {
+      margin-top: 14px;
+      min-height: 20px;
+      font-size: 14px;
+      font-weight: 800;
+    }
+
+    .message.success {
+      color: var(--success-text);
+    }
+
+    .message.error {
+      color: #b91c1c;
+    }
+
+    .table-tools {
+      display: flex;
+      justify-content: space-between;
+      gap: 12px;
+      flex-wrap: wrap;
+      margin-bottom: 14px;
+    }
+
+    .search-box {
+      max-width: 320px;
+      width: 100%;
+    }
+
+    .table-wrap {
+      overflow-x: auto;
+      border: 1px solid var(--border);
+      border-radius: 16px;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      min-width: 1100px;
+      background: #fff;
+    }
+
+    th,
+    td {
+      padding: 14px 12px;
+      border-bottom: 1px solid var(--border);
+      text-align: right;
+      vertical-align: top;
+      font-size: 14px;
+      color: #111827;
+      font-weight: 700;
+    }
+
+    th {
+      background: #f7faff;
+      color: #1f2937;
+      font-weight: 800;
+    }
+
+    tbody tr:hover {
+      background: #fbfdff;
+    }
+
+    .type-badge {
+      display: inline-block;
+      padding: 6px 10px;
+      border-radius: 999px;
+      font-size: 12px;
+      font-weight: 800;
+      background: var(--warning-bg);
+      color: var(--warning-text);
+    }
+
+    .empty {
+      text-align: center;
+      color: var(--muted);
+      padding: 26px 0;
+      font-weight: 800;
+    }
+
+    .actions-inline {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+
+    @media (max-width: 1350px) {
+      .summary-grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+      }
+
+      .content-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    @media (max-width: 900px) {
+      .app-shell {
+        flex-direction: column;
+      }
+
+      .sidebar {
+        width: 100%;
+        height: auto;
+        position: relative;
+      }
+
+      .main {
+        padding: 16px;
+      }
+
+      .form-grid,
+      .summary-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="app-shell">
+    <aside class="sidebar">
+      <div class="brand">BkTowers</div>
+      <div class="brand-sub">نظام إدارة العقارات</div>
+
+      <div class="user-card">
+        <div class="row"><strong>الاسم:</strong> <span id="sidebarUserName">-</span></div>
+        <div class="row"><strong>البريد:</strong> <span id="sidebarUserEmail">-</span></div>
+        <div class="row"><strong>الصلاحية:</strong> <span id="sidebarUserRole">-</span></div>
+      </div>
+
+      <div class="menu-title">القائمة الرئيسية</div>
+      <div class="nav-links">
+        <a href="dashboard.html">لوحة التحكم</a>
+        <a href="clients.html">العملاء</a>
+        <a href="stays.html">السكن والحجوزات</a>
+        <a href="revenues.html">الإيرادات</a>
+        <a href="expenses.html">المصروفات</a>
+        <a href="maintenance.html" class="active">الصيانة</a>
+        <a href="reports.html">التقارير</a>
+        <a href="employees.html">الموظفين</a>
+        <button onclick="logout()">تسجيل الخروج</button>
+      </div>
+    </aside>
+
+    <main class="main">
+      <section class="topbar">
+        <div class="topbar-title">
+          <h1>الصيانة</h1>
+          <p>تسجيل أعمال الصيانة وربطها بالوحدات ومتابعة تكلفتها.</p>
+        </div>
+
+        <div class="topbar-actions">
+          <button class="action-btn" onclick="focusAddForm()">إضافة صيانة جديدة</button>
+          <button class="logout-btn" onclick="logout()">تسجيل الخروج</button>
+        </div>
+      </section>
+
+      <section class="summary-grid">
+        <div class="summary-card">
+          <h3>إجمالي عمليات الصيانة</h3>
+          <div class="value" id="totalMaintenance">0</div>
+        </div>
+        <div class="summary-card">
+          <h3>إجمالي تكلفة الصيانة</h3>
+          <div class="value" id="totalCost">0</div>
+        </div>
+        <div class="summary-card">
+          <h3>عدد وحدات لها صيانة</h3>
+          <div class="value" id="affectedUnits">0</div>
+        </div>
+        <div class="summary-card">
+          <h3>عدد أنواع الصيانة</h3>
+          <div class="value" id="typesCount">0</div>
+        </div>
+      </section>
+
+      <section class="content-grid">
+        <div class="panel">
+          <div class="panel-header">
+            <h2 id="formTitle">إضافة صيانة جديدة</h2>
+            <p>اختر الوحدة وحدد نوع الصيانة وتكلفتها ووصفها.</p>
+          </div>
+
+          <div class="form-grid">
+            <div class="form-group">
+              <label for="unitSelect">الوحدة</label>
+              <select id="unitSelect">
+                <option value="">اختر الوحدة</option>
+              </select>
+            </div>
+
+            <div class="form-group">
+              <label for="date">التاريخ</label>
+              <input type="date" id="date">
+            </div>
+
+            <div class="form-group full">
+              <label>بيانات الوحدة</label>
+              <div class="info-strip" id="unitInfo">اختر وحدة لعرض بياناتها.</div>
+            </div>
+
+            <div class="form-group">
+              <label for="maintenanceType">نوع الصيانة</label>
+              <select id="maintenanceType">
+                <option value="كهرباء">كهرباء</option>
+                <option value="سباكة">سباكة</option>
+                <option value="تكييف">تكييف</option>
+                <option value="دهانات">دهانات</option>
+                <option value="نجارة">نجارة</option>
+                <option value="أجهزة كهربائية">أجهزة كهربائية</option>
+                <option value="تنظيف">تنظيف</option>
+                <option value="أخرى">أخرى</option>
+              </select>
+            </div>
+
+            <div class="form-group">
+              <label for="customType">نوع آخر</label>
+              <input type="text" id="customType" placeholder="يظهر عند اختيار أخرى">
+            </div>
+
+            <div class="form-group full">
+              <label for="amount">المبلغ</label>
+              <div class="money-box">
+                <input type="number" id="amount" min="0" step="0.01" placeholder="اكتب تكلفة الصيانة">
+                <div class="money-label">ر.س</div>
+              </div>
+            </div>
+
+            <div class="form-group full">
+              <label for="description">البيان</label>
+              <textarea id="description" placeholder="اكتب وصف عملية الصيانة"></textarea>
+            </div>
+          </div>
+
+          <div class="form-actions">
+            <button class="primary-btn" onclick="saveMaintenance()" id="saveBtn">حفظ الصيانة</button>
+            <button class="secondary-btn" onclick="clearForm()">تفريغ الحقول</button>
+          </div>
+
+          <div id="formMessage" class="message"></div>
+        </div>
+
+        <div class="panel">
+          <div class="panel-header">
+            <h2>قائمة الصيانة</h2>
+            <p>عرض جميع أعمال الصيانة المسجلة داخل النظام.</p>
+          </div>
+
+          <div class="table-tools">
+            <input type="text" id="searchInput" class="search-box" placeholder="ابحث بالوحدة أو النوع أو التاريخ أو البيان">
+          </div>
+
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr>
+                  <th>الوحدة</th>
+                  <th>التاريخ</th>
+                  <th>نوع الصيانة</th>
+                  <th>المبلغ</th>
+                  <th>البيان</th>
+                  <th>الإجراءات</th>
+                </tr>
+              </thead>
+              <tbody id="maintenanceTableBody">
+                <tr>
+                  <td colspan="6" class="empty">جاري تحميل الصيانة...</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+    </main>
+  </div>
+
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/12.11.0/firebase-app.js";
+    import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/12.11.0/firebase-auth.js";
+    import {
+      getFirestore,
+      collection,
+      addDoc,
+      getDocs,
+      deleteDoc,
+      doc,
+      getDoc,
+      updateDoc,
+      orderBy,
+      query,
+      serverTimestamp
+    } from "https://www.gstatic.com/firebasejs/12.11.0/firebase-firestore.js";
+
+    const firebaseConfig = {
+      apiKey: "AIzaSyDey3KL3qZUvZBVtFcB38xzBGx6qrG2WYY",
+      authDomain: "bktowers-4b822.firebaseapp.com",
+      projectId: "bktowers-4b822",
+      storageBucket: "bktowers-4b822.firebasestorage.app",
+      messagingSenderId: "336608827796",
+      appId: "1:336608827796:web:4957fe0d411220f6a69781"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+    const db = getFirestore(app);
+
+    const userNameEl = document.getElementById("sidebarUserName");
+    const userEmailEl = document.getElementById("sidebarUserEmail");
+    const userRoleEl = document.getElementById("sidebarUserRole");
+
+    const unitSelect = document.getElementById("unitSelect");
+    const dateInput = document.getElementById("date");
+    const maintenanceType = document.getElementById("maintenanceType");
+    const customType = document.getElementById("customType");
+    const amountInput = document.getElementById("amount");
+    const descriptionInput = document.getElementById("description");
+    const unitInfo = document.getElementById("unitInfo");
+    const formTitle = document.getElementById("formTitle");
+    const saveBtn = document.getElementById("saveBtn");
+    const formMessage = document.getElementById("formMessage");
+    const searchInput = document.getElementById("searchInput");
+    const maintenanceTableBody = document.getElementById("maintenanceTableBody");
+
+    const totalMaintenanceEl = document.getElementById("totalMaintenance");
+    const totalCostEl = document.getElementById("totalCost");
+    const affectedUnitsEl = document.getElementById("affectedUnits");
+    const typesCountEl = document.getElementById("typesCount");
+
+    let allUnits = [];
+    let allMaintenance = [];
+    let editingMaintenanceId = null;
+
+    function setMessage(text, type = "") {
+      formMessage.textContent = text;
+      formMessage.className = "message";
+      if (type) formMessage.classList.add(type);
+    }
+
+    function focusAddForm() {
+      unitSelect.focus();
+      window.scrollTo({ top: 0, behavior: "smooth" });
+    }
+
+    function formatMoney(value) {
+      return Number(value || 0).toFixed(2);
+    }
+
+    function clearForm() {
+      editingMaintenanceId = null;
+      unitSelect.value = "";
+      dateInput.value = "";
+      maintenanceType.value = "كهرباء";
+      customType.value = "";
+      amountInput.value = "";
+      descriptionInput.value = "";
+      unitInfo.textContent = "اختر وحدة لعرض بياناتها.";
+      formTitle.textContent = "إضافة صيانة جديدة";
+      saveBtn.textContent = "حفظ الصيانة";
+      setMessage("");
+      toggleCustomTypeField();
+    }
+
+    function toggleCustomTypeField() {
+      customType.disabled = maintenanceType.value !== "أخرى";
+      if (maintenanceType.value !== "أخرى") {
+        customType.value = "";
+      }
+    }
+
+    function populateUnits() {
+      unitSelect.innerHTML = `<option value="">اختر الوحدة</option>`;
+      allUnits.forEach((item) => {
+        unitSelect.innerHTML += `<option value="${item.id}">${item.data.propertyName || ""} - ${item.data.unitNumber || ""}</option>`;
+      });
+    }
+
+    function getUnitById(unitId) {
+      return allUnits.find(item => item.id === unitId) || null;
+    }
+
+    function renderUnitInfo() {
+      const selectedUnit = getUnitById(unitSelect.value);
+
+      if (!selectedUnit) {
+        unitInfo.textContent = "اختر وحدة لعرض بياناتها.";
+        return;
+      }
+
+      const unit = selectedUnit.data;
+      unitInfo.innerHTML = `
+        العقار: ${unit.propertyName || "-"}<br>
+        رقم الوحدة: ${unit.unitNumber || "-"}<br>
+        نوع الوحدة: ${unit.unitType || "-"}<br>
+        الحالة: ${unit.status || "-"}
+      `;
+    }
+
+    function getUnitLabelById(unitId) {
+      const found = getUnitById(unitId);
+      if (!found) return "-";
+      return `${found.data.propertyName || ""} - ${found.data.unitNumber || ""}`;
+    }
+
+    function renderMaintenance(rows) {
+      let html = "";
+      let totalCount = rows.length;
+      let totalCost = 0;
+      const unitSet = new Set();
+      const typeSet = new Set();
+
+      rows.forEach((item) => {
+        const row = item.data;
+        totalCost += Number(row.amount || 0);
+        if (row.unitId) unitSet.add(row.unitId);
+        if (row.typeLabel) typeSet.add(row.typeLabel);
+
+        html += `
+          <tr>
+            <td>${row.unitLabel || "-"}</td>
+            <td>${row.date || "-"}</td>
+            <td><span class="type-badge">${row.typeLabel || "-"}</span></td>
+            <td>${formatMoney(row.amount)} ر.س</td>
+            <td>${row.description || "-"}</td>
+            <td>
+              <div class="actions-inline">
+                <button class="edit-btn" onclick="editMaintenance('${item.id}')">تعديل</button>
+                <button class="danger-btn" onclick="deleteMaintenance('${item.id}')">حذف</button>
+              </div>
+            </td>
+          </tr>
+        `;
+      });
+
+      if (!html) {
+        html = `<tr><td colspan="6" class="empty">لا توجد نتائج مطابقة.</td></tr>`;
+      }
+
+      maintenanceTableBody.innerHTML = html;
+      totalMaintenanceEl.textContent = totalCount;
+      totalCostEl.textContent = formatMoney(totalCost);
+      affectedUnitsEl.textContent = unitSet.size;
+      typesCountEl.textContent = typeSet.size;
+    }
+
+    async function loadUnits() {
+      const snapshot = await getDocs(query(collection(db, "units"), orderBy("createdAt", "desc")));
+      allUnits = [];
+      snapshot.forEach((docSnap) => {
+        allUnits.push({
+          id: docSnap.id,
+          data: docSnap.data()
+        });
+      });
+      populateUnits();
+    }
+
+    async function loadMaintenance() {
+      maintenanceTableBody.innerHTML = `<tr><td colspan="6" class="empty">جاري تحميل الصيانة...</td></tr>`;
+
+      const snapshot = await getDocs(query(collection(db, "maintenance"), orderBy("createdAt", "desc")));
+      allMaintenance = [];
+      snapshot.forEach((docSnap) => {
+        allMaintenance.push({
+          id: docSnap.id,
+          data: docSnap.data()
+        });
+      });
+
+      renderMaintenance(allMaintenance);
+    }
+
+    async function saveMaintenance() {
+      try {
+        const unitId = unitSelect.value;
+        const typeValue = maintenanceType.value;
+        const customTypeValue = customType.value.trim();
+        const typeLabel = typeValue === "أخرى" ? customTypeValue : typeValue;
+
+        if (!unitId) throw new Error("اختر الوحدة.");
+        if (!dateInput.value) throw new Error("التاريخ مطلوب.");
+        if (!typeValue) throw new Error("نوع الصيانة مطلوب.");
+        if (typeValue === "أخرى" && !customTypeValue) throw new Error("اكتب نوع الصيانة الآخر.");
+        if (Number(amountInput.value || 0) <= 0) throw new Error("المبلغ يجب أن يكون أكبر من صفر.");
+        if (!descriptionInput.value.trim()) throw new Error("البيان مطلوب.");
+
+        const payload = {
+          unitId,
+          unitLabel: getUnitLabelById(unitId),
+          date: dateInput.value,
+          maintenanceType: typeValue,
+          customType: customTypeValue,
+          typeLabel,
+          amount: Number(amountInput.value || 0),
+          description: descriptionInput.value.trim()
+        };
+
+        if (editingMaintenanceId) {
+          await updateDoc(doc(db, "maintenance", editingMaintenanceId), payload);
+          setMessage("تم تعديل الصيانة بنجاح.", "success");
+        } else {
+          await addDoc(collection(db, "maintenance"), {
+            ...payload,
+            createdAt: serverTimestamp()
+          });
+          setMessage("تمت إضافة الصيانة بنجاح.", "success");
+        }
+
+        clearForm();
+        await loadMaintenance();
+      } catch (error) {
+        setMessage(error.message, "error");
+      }
+    }
+
+    function fillFormForEdit(item) {
+      const row = item.data;
+      editingMaintenanceId = item.id;
+
+      unitSelect.value = row.unitId || "";
+      renderUnitInfo();
+      dateInput.value = row.date || "";
+      maintenanceType.value = row.maintenanceType || "كهرباء";
+      customType.value = row.customType || "";
+      amountInput.value = row.amount ?? "";
+      descriptionInput.value = row.description || "";
+
+      toggleCustomTypeField();
+
+      formTitle.textContent = "تعديل الصيانة";
+      saveBtn.textContent = "حفظ التعديلات";
+      focusAddForm();
+    }
+
+    function editMaintenance(id) {
+      const item = allMaintenance.find(row => row.id === id);
+      if (!item) return;
+      fillFormForEdit(item);
+    }
+
+    async function deleteMaintenance(id) {
+      const confirmed = window.confirm("هل أنت متأكد من حذف سجل الصيانة هذا؟");
+      if (!confirmed) return;
+
+      try {
+        await deleteDoc(doc(db, "maintenance", id));
+        if (editingMaintenanceId === id) {
+          clearForm();
+        }
+        await loadMaintenance();
+      } catch (error) {
+        alert(error.message);
+      }
+    }
+
+    function filterMaintenance() {
+      const keyword = searchInput.value.trim().toLowerCase();
+
+      if (!keyword) {
+        renderMaintenance(allMaintenance);
+        return;
+      }
+
+      const filtered = allMaintenance.filter((item) => {
+        const row = item.data;
+        return (
+          String(row.unitLabel || "").toLowerCase().includes(keyword) ||
+          String(row.date || "").toLowerCase().includes(keyword) ||
+          String(row.typeLabel || "").toLowerCase().includes(keyword) ||
+          String(row.description || "").toLowerCase().includes(keyword)
+        );
+      });
+
+      renderMaintenance(filtered);
+    }
+
+    async function logout() {
+      try {
+        await signOut(auth);
+        localStorage.clear();
+        window.location.href = "index.html";
+      } catch (error) {
+        alert(error.message);
+      }
+    }
+
+    maintenanceType.addEventListener("change", toggleCustomTypeField);
+    unitSelect.addEventListener("change", renderUnitInfo);
+    searchInput.addEventListener("input", filterMaintenance);
+
+    window.saveMaintenance = saveMaintenance;
+    window.editMaintenance = editMaintenance;
+    window.deleteMaintenance = deleteMaintenance;
+    window.logout = logout;
+    window.clearForm = clearForm;
+    window.focusAddForm = focusAddForm;
+
+    onAuthStateChanged(auth, async (user) => {
+      if (!user) {
+        window.location.href = "index.html";
+        return;
+      }
+
+      try {
+        const userRef = doc(db, "users", user.uid);
+        const userSnap = await getDoc(userRef);
+
+        if (!userSnap.exists()) {
+          window.location.href = "index.html";
+          return;
+        }
+
+        const userData = userSnap.data();
+
+        if (userData.role !== "admin") {
+          window.location.href = "employee-dashboard.html";
+          return;
+        }
+
+        userNameEl.textContent = userData.name || "-";
+        userEmailEl.textContent = userData.email || user.email || "-";
+        userRoleEl.textContent = "مدير";
+
+        toggleCustomTypeField();
+        await loadUnits();
+        await loadMaintenance();
+      } catch (error) {
+        window.location.href = "index.html";
+      }
+    });
+  </script>
+</body>
+</html>
