@@ -18,6 +18,7 @@
       --danger-dark: #a61f1f;
       --success: #166534;
       --success-bg: #dcfce7;
+      --success-text: #166534;
       --warning-bg: #fef3c7;
       --warning-text: #92400e;
       --danger-bg: #fee2e2;
@@ -349,7 +350,8 @@
     .secondary-btn,
     .danger-btn,
     .edit-btn,
-    .toggle-btn {
+    .toggle-btn,
+    .info-btn {
       border: none;
       border-radius: 12px;
       padding: 12px 16px;
@@ -387,6 +389,17 @@
 
     .edit-btn:hover {
       background: #bfdbfe;
+    }
+
+    .info-btn {
+      background: #eef2ff;
+      color: #4338ca;
+      padding: 9px 14px;
+      font-size: 13px;
+    }
+
+    .info-btn:hover {
+      background: #e0e7ff;
     }
 
     .danger-btn {
@@ -448,7 +461,7 @@
     table {
       width: 100%;
       border-collapse: collapse;
-      min-width: 1120px;
+      min-width: 1280px;
       background: #fff;
     }
 
@@ -516,6 +529,81 @@
       display: flex;
       gap: 8px;
       flex-wrap: wrap;
+    }
+
+    .note-box {
+      margin-top: 14px;
+      padding: 12px 14px;
+      background: var(--warning-bg);
+      color: var(--warning-text);
+      border-radius: 12px;
+      font-size: 13px;
+      font-weight: 700;
+      line-height: 1.8;
+    }
+
+    .modal-backdrop {
+      position: fixed;
+      inset: 0;
+      background: rgba(15, 23, 42, 0.45);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      z-index: 999;
+      padding: 16px;
+    }
+
+    .modal-backdrop.show {
+      display: flex;
+    }
+
+    .modal {
+      width: 100%;
+      max-width: 480px;
+      background: #fff;
+      border-radius: 18px;
+      box-shadow: var(--shadow);
+      padding: 22px;
+    }
+
+    .modal-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 18px;
+    }
+
+    .modal-header h3 {
+      margin: 0;
+      font-size: 22px;
+      color: var(--primary);
+      font-weight: 800;
+    }
+
+    .close-btn {
+      border: none;
+      background: #f3f4f6;
+      width: 38px;
+      height: 38px;
+      border-radius: 10px;
+      cursor: pointer;
+      font-size: 18px;
+      font-weight: 800;
+    }
+
+    .modal-actions {
+      display: flex;
+      gap: 10px;
+      margin-top: 18px;
+      flex-wrap: wrap;
+    }
+
+    .small-text {
+      font-size: 13px;
+      color: var(--muted);
+      font-weight: 700;
+      line-height: 1.8;
     }
 
     @media (max-width: 1450px) {
@@ -676,6 +764,10 @@
             <button class="secondary-btn" onclick="clearForm()">تفريغ الحقول</button>
           </div>
 
+          <div class="note-box">
+            تغيير كلمة المرور من هذه الصفحة يحدّث بيانات النظام. التحديث المباشر لكلمة المرور داخل Firebase Authentication لمستخدم آخر يحتاج Admin SDK أو Backend.
+          </div>
+
           <div id="formMessage" class="message"></div>
         </div>
 
@@ -716,6 +808,36 @@
     </main>
   </div>
 
+  <div class="modal-backdrop" id="passwordModalBackdrop">
+    <div class="modal">
+      <div class="modal-header">
+        <h3>تغيير كلمة المرور</h3>
+        <button class="close-btn" onclick="closePasswordModal()">×</button>
+      </div>
+
+      <div class="form-grid">
+        <div class="form-group full">
+          <label for="passwordTargetName">المستخدم</label>
+          <input type="text" id="passwordTargetName" readonly>
+        </div>
+
+        <div class="form-group full">
+          <label for="newPasswordInput">كلمة المرور الجديدة</label>
+          <input type="password" id="newPasswordInput" placeholder="اكتب كلمة المرور الجديدة">
+        </div>
+      </div>
+
+      <div class="small-text">
+        سيتم تحديث كلمة المرور المحفوظة في بيانات المستخدم داخل النظام.
+      </div>
+
+      <div class="modal-actions">
+        <button class="primary-btn" onclick="submitPasswordChange()">حفظ كلمة المرور</button>
+        <button class="secondary-btn" onclick="closePasswordModal()">إلغاء</button>
+      </div>
+    </div>
+  </div>
+
   <script type="module">
     import { initializeApp, getApps, getApp, deleteApp } from "https://www.gstatic.com/firebasejs/12.11.0/firebase-app.js";
     import {
@@ -727,7 +849,6 @@
     import {
       getFirestore,
       collection,
-      addDoc,
       getDocs,
       deleteDoc,
       doc,
@@ -769,8 +890,13 @@
     const userEmailEl = document.getElementById("sidebarUserEmail");
     const userRoleEl = document.getElementById("sidebarUserRole");
 
+    const passwordModalBackdrop = document.getElementById("passwordModalBackdrop");
+    const passwordTargetName = document.getElementById("passwordTargetName");
+    const newPasswordInput = document.getElementById("newPasswordInput");
+
     let allEmployees = [];
     let editingEmployeeId = null;
+    let changingPasswordEmployeeId = null;
 
     function setMessage(text, type = "") {
       formMessage.textContent = text;
@@ -784,7 +910,7 @@
     }
 
     function normalizeUsername(value) {
-      return value.trim().toLowerCase().replace(/\s+/g, "");
+      return String(value || "").trim().toLowerCase().replace(/\s+/g, "");
     }
 
     function buildInternalEmail(username) {
@@ -849,6 +975,7 @@
               <div class="actions-inline">
                 <button class="edit-btn" onclick="editEmployee('${item.id}')">تعديل</button>
                 <button class="toggle-btn" onclick="toggleEmployeeStatus('${item.id}')">${emp.active ? "إيقاف" : "تفعيل"}</button>
+                <button class="info-btn" onclick="openPasswordModal('${item.id}')">تغيير كلمة المرور</button>
                 <button class="danger-btn" onclick="deleteEmployee('${item.id}')">حذف</button>
               </div>
             </td>
@@ -875,10 +1002,9 @@
 
       allEmployees = [];
       snapshot.forEach((docSnap) => {
-        const data = docSnap.data();
         allEmployees.push({
           id: docSnap.id,
-          data
+          data: docSnap.data()
         });
       });
 
@@ -886,7 +1012,8 @@
     }
 
     async function checkUsernameExists(username, excludeId = null) {
-      const q = query(collection(db, "users"), where("username", "==", username));
+      const normalized = normalizeUsername(username);
+      const q = query(collection(db, "users"), where("username", "==", normalized));
       const snapshot = await getDocs(q);
 
       if (snapshot.empty) return false;
@@ -926,6 +1053,7 @@
         if (!nationalId) throw new Error("رقم الهوية مطلوب.");
         if (!username) throw new Error("اسم المستخدم مطلوب.");
         if (!editingEmployeeId && !password) throw new Error("كلمة المرور مطلوبة عند إنشاء موظف جديد.");
+        if (!editingEmployeeId && password.length < 4) throw new Error("كلمة المرور يجب ألا تقل عن 4 أحرف.");
 
         const email = buildInternalEmail(username);
         const usernameExists = await checkUsernameExists(username, editingEmployeeId);
@@ -971,7 +1099,7 @@
         clearForm();
         await loadEmployees();
       } catch (error) {
-        setMessage(error.message, "error");
+        setMessage(error.message || "حدث خطأ أثناء الحفظ.", "error");
       }
     }
 
@@ -1012,7 +1140,7 @@
         });
         await loadEmployees();
       } catch (error) {
-        alert(error.message);
+        alert(error.message || "تعذر تحديث الحالة");
       }
     }
 
@@ -1030,7 +1158,7 @@
         }
         await loadEmployees();
       } catch (error) {
-        alert(error.message);
+        alert(error.message || "تعذر حذف الموظف");
       }
     }
 
@@ -1055,18 +1183,73 @@
       renderEmployees(filtered);
     }
 
+    function openPasswordModal(id) {
+      const item = allEmployees.find(emp => emp.id === id);
+      if (!item) return;
+
+      changingPasswordEmployeeId = id;
+      passwordTargetName.value = `${item.data.name || "-"} (${item.data.username || "-"})`;
+      newPasswordInput.value = "";
+      passwordModalBackdrop.classList.add("show");
+      setTimeout(() => newPasswordInput.focus(), 50);
+    }
+
+    function closePasswordModal() {
+      changingPasswordEmployeeId = null;
+      passwordTargetName.value = "";
+      newPasswordInput.value = "";
+      passwordModalBackdrop.classList.remove("show");
+    }
+
+    async function submitPasswordChange() {
+      try {
+        if (!changingPasswordEmployeeId) {
+          alert("لم يتم تحديد المستخدم");
+          return;
+        }
+
+        const newPassword = newPasswordInput.value.trim();
+
+        if (!newPassword) {
+          alert("اكتب كلمة المرور الجديدة");
+          return;
+        }
+
+        if (newPassword.length < 4) {
+          alert("كلمة المرور يجب ألا تقل عن 4 أحرف");
+          return;
+        }
+
+        await updateDoc(doc(db, "users", changingPasswordEmployeeId), {
+          plainPassword: newPassword,
+          updatedAt: serverTimestamp()
+        });
+
+        closePasswordModal();
+        await loadEmployees();
+        setMessage("تم تحديث كلمة المرور داخل بيانات النظام.", "success");
+      } catch (error) {
+        alert(error.message || "تعذر تحديث كلمة المرور");
+      }
+    }
+
     async function logout() {
       try {
         await signOut(auth);
         localStorage.clear();
         window.location.href = "index.html";
       } catch (error) {
-        alert(error.message);
+        alert(error.message || "تعذر تسجيل الخروج");
       }
     }
 
     document.getElementById("username").addEventListener("input", updateGeneratedEmailPreview);
     searchInput.addEventListener("input", filterEmployees);
+    passwordModalBackdrop.addEventListener("click", function(e) {
+      if (e.target === passwordModalBackdrop) {
+        closePasswordModal();
+      }
+    });
 
     window.saveEmployee = saveEmployee;
     window.editEmployee = editEmployee;
@@ -1075,6 +1258,9 @@
     window.logout = logout;
     window.clearForm = clearForm;
     window.focusAddForm = focusAddForm;
+    window.openPasswordModal = openPasswordModal;
+    window.closePasswordModal = closePasswordModal;
+    window.submitPasswordChange = submitPasswordChange;
 
     onAuthStateChanged(auth, async (user) => {
       if (!user) {
