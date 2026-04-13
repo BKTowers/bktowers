@@ -77,7 +77,7 @@ button{
 <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/12.11.0/firebase-app.js";
 import { getAuth, signInWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/12.11.0/firebase-auth.js";
-import { getFirestore, collection, query, where, getDocs } from "https://www.gstatic.com/firebasejs/12.11.0/firebase-firestore.js";
+import { getFirestore, collection, getDocs } from "https://www.gstatic.com/firebasejs/12.11.0/firebase-firestore.js";
 
 const firebaseConfig = {
   apiKey: "AIzaSyDey3KL3qZUvZBVtFcB38xzBGx6qrG2WYY",
@@ -92,42 +92,49 @@ const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
 const db = getFirestore(app);
 
-async function findUser(username){
-  const usersRef = collection(db, "users");
+function normalizeValue(value){
+  return String(value || "").trim().toLowerCase();
+}
 
-  // Try exact username first
-  let q = query(usersRef, where("username", "==", username));
-  let snap = await getDocs(q);
+async function findUserByUsername(usernameValue){
+  const normalizedInput = normalizeValue(usernameValue);
+  const snap = await getDocs(collection(db, "users"));
 
-  if (!snap.empty) {
-    return { id: snap.docs[0].id, ...snap.docs[0].data() };
+  if (snap.empty) {
+    return null;
   }
 
-  // Try lowercase as fallback
-  q = query(usersRef, where("username", "==", username.toLowerCase()));
-  snap = await getDocs(q);
+  let foundUser = null;
 
-  if (!snap.empty) {
-    return { id: snap.docs[0].id, ...snap.docs[0].data() };
-  }
+  snap.forEach(docSnap => {
+    const data = docSnap.data();
+    const storedUsername = normalizeValue(data.username);
 
-  return null;
+    if (storedUsername === normalizedInput) {
+      foundUser = {
+        id: docSnap.id,
+        ...data
+      };
+    }
+  });
+
+  return foundUser;
 }
 
 window.login = async function(){
-  const username = document.getElementById("username").value.trim();
+  const username = document.getElementById("username").value;
   const password = document.getElementById("password").value;
   const msg = document.getElementById("msg");
 
   msg.innerText = "";
 
-  if(!username || !password){
+  if(!username.trim() || !password.trim()){
     msg.innerText = "اكتب اسم المستخدم وكلمة المرور";
     return;
   }
 
   try{
-    const user = await findUser(username);
+    const user = await findUserByUsername(username);
 
     if(!user){
       msg.innerText = "اسم المستخدم غير موجود داخل users";
@@ -135,7 +142,7 @@ window.login = async function(){
     }
 
     if(!user.email){
-      msg.innerText = "هذا المستخدم لا يحتوي على email داخل users";
+      msg.innerText = "هذا المستخدم لا يحتوي على email";
       return;
     }
 
@@ -153,25 +160,25 @@ window.login = async function(){
     }
 
   }catch(e){
-    console.log("Login error:", e);
+    console.log(e);
 
-    if (e.code === "auth/user-not-found") {
-      msg.innerText = "الإيميل المرتبط بهذا المستخدم غير موجود في Firebase Auth";
-    } else if (e.code === "auth/wrong-password" || e.code === "auth/invalid-credential") {
+    if (e.code === "auth/invalid-credential" || e.code === "auth/wrong-password") {
       msg.innerText = "كلمة المرور غير صحيحة";
+    } else if (e.code === "auth/user-not-found") {
+      msg.innerText = "الإيميل غير موجود في Firebase Authentication";
     } else if (e.code === "auth/invalid-email") {
-      msg.innerText = "الإيميل المخزن لهذا المستخدم غير صالح";
+      msg.innerText = "الإيميل المخزن غير صالح";
     } else {
       msg.innerText = "فشل تسجيل الدخول";
     }
   }
 };
 
-document.getElementById("password").addEventListener("keydown", function(e){
+document.getElementById("username").addEventListener("keydown", function(e){
   if(e.key === "Enter") login();
 });
 
-document.getElementById("username").addEventListener("keydown", function(e){
+document.getElementById("password").addEventListener("keydown", function(e){
   if(e.key === "Enter") login();
 });
 </script>
