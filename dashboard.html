@@ -22,6 +22,8 @@
       --warning-text: #92400e;
       --danger-bg: #fee2e2;
       --danger-text: #991b1b;
+      --info-bg: #dbeafe;
+      --info-text: #1d4ed8;
       --shadow: 0 12px 30px rgba(15, 23, 42, 0.10);
       --radius: 18px;
     }
@@ -178,7 +180,8 @@
     }
 
     .logout-btn,
-    .action-btn {
+    .action-btn,
+    .secondary-top-btn {
       border: none;
       border-radius: 12px;
       padding: 12px 16px;
@@ -195,6 +198,15 @@
 
     .action-btn:hover {
       background: #163b86;
+    }
+
+    .secondary-top-btn {
+      background: #eef2ff;
+      color: #3730a3;
+    }
+
+    .secondary-top-btn:hover {
+      background: #e0e7ff;
     }
 
     .logout-btn {
@@ -553,6 +565,70 @@
       flex-wrap: wrap;
     }
 
+    .modal-backdrop {
+      position: fixed;
+      inset: 0;
+      background: rgba(15, 23, 42, 0.45);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      z-index: 999;
+      padding: 16px;
+    }
+
+    .modal-backdrop.show {
+      display: flex;
+    }
+
+    .modal {
+      width: 100%;
+      max-width: 480px;
+      background: #fff;
+      border-radius: 18px;
+      box-shadow: var(--shadow);
+      padding: 22px;
+    }
+
+    .modal-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 18px;
+    }
+
+    .modal-header h3 {
+      margin: 0;
+      font-size: 22px;
+      color: var(--primary);
+      font-weight: 800;
+    }
+
+    .close-btn {
+      border: none;
+      background: #f3f4f6;
+      width: 38px;
+      height: 38px;
+      border-radius: 10px;
+      cursor: pointer;
+      font-size: 18px;
+      font-weight: 800;
+    }
+
+    .modal-actions {
+      display: flex;
+      gap: 10px;
+      margin-top: 18px;
+      flex-wrap: wrap;
+    }
+
+    .small-text {
+      font-size: 13px;
+      color: var(--muted);
+      font-weight: 700;
+      line-height: 1.8;
+    }
+
     @media (max-width: 1400px) {
       .stats-grid {
         grid-template-columns: repeat(2, minmax(0, 1fr));
@@ -615,6 +691,7 @@
         <a href="maintenance.html">الصيانة</a>
         <a href="reports.html">التقارير</a>
         <a href="employees.html" id="employeesLink">الموظفين</a>
+        <button onclick="openPasswordModal()">تغيير كلمة المرور</button>
         <button onclick="logout()">تسجيل الخروج</button>
       </div>
 
@@ -632,6 +709,7 @@
 
         <div class="topbar-actions">
           <button class="action-btn" onclick="focusAddForm()">إضافة وحدة جديدة</button>
+          <button class="secondary-top-btn" onclick="openPasswordModal()">تغيير كلمة المرور</button>
           <button class="logout-btn" onclick="logout()">تسجيل الخروج</button>
         </div>
       </section>
@@ -829,12 +907,52 @@
     </main>
   </div>
 
+  <div class="modal-backdrop" id="passwordModalBackdrop">
+    <div class="modal">
+      <div class="modal-header">
+        <h3>تغيير كلمة المرور</h3>
+        <button class="close-btn" onclick="closePasswordModal()">×</button>
+      </div>
+
+      <div class="form-grid">
+        <div class="form-group full">
+          <label for="currentPassword">كلمة المرور الحالية</label>
+          <input type="password" id="currentPassword" placeholder="اكتب كلمة المرور الحالية">
+        </div>
+
+        <div class="form-group full">
+          <label for="newPassword">كلمة المرور الجديدة</label>
+          <input type="password" id="newPassword" placeholder="اكتب كلمة المرور الجديدة">
+        </div>
+
+        <div class="form-group full">
+          <label for="confirmPassword">تأكيد كلمة المرور الجديدة</label>
+          <input type="password" id="confirmPassword" placeholder="أعد كتابة كلمة المرور الجديدة">
+        </div>
+      </div>
+
+      <div class="small-text">
+        سيتم تحديث كلمة المرور لحسابك الحالي، وكذلك تحديثها داخل بيانات المستخدم في النظام.
+      </div>
+
+      <div id="passwordMessage" class="message"></div>
+
+      <div class="modal-actions">
+        <button class="primary-btn" onclick="changeMyPassword()">حفظ كلمة المرور</button>
+        <button class="secondary-btn" onclick="closePasswordModal()">إلغاء</button>
+      </div>
+    </div>
+  </div>
+
   <script type="module">
-    import { initializeApp } from "https://www.gstatic.com/firebasejs/12.11.0/firebase-app.js";
+    import { initializeApp, getApps, getApp } from "https://www.gstatic.com/firebasejs/12.11.0/firebase-app.js";
     import {
       getAuth,
       onAuthStateChanged,
-      signOut
+      signOut,
+      EmailAuthProvider,
+      reauthenticateWithCredential,
+      updatePassword
     } from "https://www.gstatic.com/firebasejs/12.11.0/firebase-auth.js";
     import {
       getFirestore,
@@ -859,7 +977,7 @@
       appId: "1:336608827796:web:4957fe0d411220f6a69781"
     };
 
-    const app = initializeApp(firebaseConfig);
+    const app = getApps().length ? getApp() : initializeApp(firebaseConfig);
     const auth = getAuth(app);
     const db = getFirestore(app);
 
@@ -878,13 +996,39 @@
     const userRoleEl = document.getElementById("sidebarUserRole");
     const employeesLink = document.getElementById("employeesLink");
 
+    const passwordModalBackdrop = document.getElementById("passwordModalBackdrop");
+    const passwordMessage = document.getElementById("passwordMessage");
+
     let allUnits = [];
     let editingUnitId = null;
+    let currentUserDocId = null;
+    let currentUserData = null;
 
     function setMessage(text, type = "") {
       formMessage.textContent = text;
       formMessage.className = "message";
       if (type) formMessage.classList.add(type);
+    }
+
+    function setPasswordMessage(text, type = "") {
+      passwordMessage.textContent = text;
+      passwordMessage.className = "message";
+      if (type) passwordMessage.classList.add(type);
+    }
+
+    function openPasswordModal() {
+      document.getElementById("currentPassword").value = "";
+      document.getElementById("newPassword").value = "";
+      document.getElementById("confirmPassword").value = "";
+      setPasswordMessage("");
+      passwordModalBackdrop.classList.add("show");
+      setTimeout(() => {
+        document.getElementById("currentPassword").focus();
+      }, 50);
+    }
+
+    function closePasswordModal() {
+      passwordModalBackdrop.classList.remove("show");
     }
 
     function focusAddForm() {
@@ -1108,18 +1252,20 @@
 
         if (editingUnitId) {
           await updateDoc(doc(db, "units", editingUnitId), payload);
+          clearForm();
+          setMessage("تم تعديل الوحدة بنجاح.", "success");
         } else {
           await addDoc(collection(db, "units"), {
             ...payload,
             createdAt: serverTimestamp()
           });
+          clearForm();
+          setMessage("تمت إضافة الوحدة بنجاح.", "success");
         }
 
-        clearForm();
-        setMessage(editingUnitId ? "تم تعديل الوحدة بنجاح." : "تمت إضافة الوحدة بنجاح.", "success");
         await loadUnits();
       } catch (error) {
-        setMessage(error.message, "error");
+        setMessage(error.message || "تعذر حفظ الوحدة", "error");
       }
     }
 
@@ -1140,7 +1286,71 @@
         }
         await loadUnits();
       } catch (error) {
-        alert(error.message);
+        alert(error.message || "تعذر حذف الوحدة");
+      }
+    }
+
+    async function changeMyPassword() {
+      try {
+        const user = auth.currentUser;
+        const currentPassword = document.getElementById("currentPassword").value.trim();
+        const newPassword = document.getElementById("newPassword").value.trim();
+        const confirmPassword = document.getElementById("confirmPassword").value.trim();
+
+        setPasswordMessage("");
+
+        if (!user) {
+          setPasswordMessage("المستخدم غير مسجل دخول", "error");
+          return;
+        }
+
+        if (!currentPassword || !newPassword || !confirmPassword) {
+          setPasswordMessage("اكتب كل البيانات المطلوبة", "error");
+          return;
+        }
+
+        if (newPassword.length < 4) {
+          setPasswordMessage("كلمة المرور الجديدة يجب ألا تقل عن 4 أحرف", "error");
+          return;
+        }
+
+        if (newPassword !== confirmPassword) {
+          setPasswordMessage("تأكيد كلمة المرور غير مطابق", "error");
+          return;
+        }
+
+        if (!currentUserData || !currentUserData.email) {
+          setPasswordMessage("لا يوجد بريد إلكتروني مرتبط بالحساب", "error");
+          return;
+        }
+
+        const credential = EmailAuthProvider.credential(currentUserData.email, currentPassword);
+        await reauthenticateWithCredential(user, credential);
+        await updatePassword(user, newPassword);
+
+        if (currentUserDocId) {
+          await updateDoc(doc(db, "users", currentUserDocId), {
+            plainPassword: newPassword,
+            updatedAt: serverTimestamp()
+          });
+        }
+
+        setPasswordMessage("تم تغيير كلمة المرور بنجاح", "success");
+
+        setTimeout(() => {
+          closePasswordModal();
+        }, 900);
+
+      } catch (error) {
+        console.log(error);
+
+        if (error.code === "auth/invalid-credential" || error.code === "auth/wrong-password") {
+          setPasswordMessage("كلمة المرور الحالية غير صحيحة", "error");
+        } else if (error.code === "auth/weak-password") {
+          setPasswordMessage("كلمة المرور الجديدة ضعيفة", "error");
+        } else {
+          setPasswordMessage("تعذر تغيير كلمة المرور", "error");
+        }
       }
     }
 
@@ -1150,7 +1360,7 @@
         localStorage.clear();
         window.location.href = "index.html";
       } catch (error) {
-        alert(error.message);
+        alert(error.message || "تعذر تسجيل الخروج");
       }
     }
 
@@ -1175,6 +1385,17 @@
     }
 
     searchInput.addEventListener("input", filterUnits);
+    passwordModalBackdrop.addEventListener("click", function(e) {
+      if (e.target === passwordModalBackdrop) {
+        closePasswordModal();
+      }
+    });
+
+    document.getElementById("confirmPassword").addEventListener("keydown", function(e) {
+      if (e.key === "Enter") {
+        changeMyPassword();
+      }
+    });
 
     window.saveUnit = saveUnit;
     window.editUnit = editUnit;
@@ -1182,6 +1403,9 @@
     window.logout = logout;
     window.clearForm = clearForm;
     window.focusAddForm = focusAddForm;
+    window.openPasswordModal = openPasswordModal;
+    window.closePasswordModal = closePasswordModal;
+    window.changeMyPassword = changeMyPassword;
 
     onAuthStateChanged(auth, async (user) => {
       if (!user) {
@@ -1200,6 +1424,9 @@
 
         const userData = userSnap.data();
         const roleValue = userData.role || "employee";
+
+        currentUserDocId = user.uid;
+        currentUserData = userData;
 
         if (roleValue !== "admin") {
           window.location.href = "clients.html";
