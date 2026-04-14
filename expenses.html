@@ -14,10 +14,13 @@
       --muted: #4b5563;
       --border: #d7deea;
       --danger: #c62828;
+      --danger-dark: #a61f1f;
       --success-bg: #dcfce7;
       --success-text: #166534;
       --info-bg: #dbeafe;
       --info-text: #1d4ed8;
+      --warning-bg: #fef3c7;
+      --warning-text: #92400e;
       --shadow: 0 12px 30px rgba(15, 23, 42, 0.10);
       --radius: 18px;
     }
@@ -180,9 +183,17 @@
       color: #fff;
     }
 
+    .action-btn:hover {
+      background: #163b86;
+    }
+
     .logout-btn {
       background: var(--danger);
       color: #fff;
+    }
+
+    .logout-btn:hover {
+      background: var(--danger-dark);
     }
 
     .summary-grid {
@@ -311,6 +322,17 @@
       color: #374151;
     }
 
+    .info-strip {
+      background: #f8fbff;
+      border: 1px dashed var(--border);
+      border-radius: 14px;
+      padding: 12px;
+      color: var(--muted);
+      font-size: 13px;
+      line-height: 1.8;
+      font-weight: 700;
+    }
+
     .form-actions {
       display: flex;
       gap: 10px;
@@ -336,9 +358,17 @@
       color: #fff;
     }
 
+    .primary-btn:hover {
+      background: #163b86;
+    }
+
     .secondary-btn {
       background: #edf2f7;
       color: #111827;
+    }
+
+    .secondary-btn:hover {
+      background: #e1e8f0;
     }
 
     .edit-btn {
@@ -353,6 +383,10 @@
       color: #fff;
       padding: 9px 14px;
       font-size: 13px;
+    }
+
+    .danger-btn:hover {
+      background: var(--danger-dark);
     }
 
     .message {
@@ -392,7 +426,7 @@
     table {
       width: 100%;
       border-collapse: collapse;
-      min-width: 1100px;
+      min-width: 1220px;
       background: #fff;
     }
 
@@ -417,6 +451,16 @@
       background: #fbfdff;
     }
 
+    .scope-badge {
+      display: inline-block;
+      padding: 6px 10px;
+      border-radius: 999px;
+      font-size: 12px;
+      font-weight: 800;
+      background: var(--warning-bg);
+      color: var(--warning-text);
+    }
+
     .empty {
       text-align: center;
       color: var(--muted);
@@ -428,6 +472,10 @@
       display: flex;
       gap: 8px;
       flex-wrap: wrap;
+    }
+
+    .hidden {
+      display: none !important;
     }
 
     @media (max-width: 1350px) {
@@ -492,7 +540,7 @@
       <section class="topbar">
         <div class="topbar-title">
           <h1>المصروفات</h1>
-          <p>إضافة ومتابعة المصروفات اليومية والشهرية والسنوية.</p>
+          <p>إضافة ومتابعة المصروفات اليومية والشهرية والسنوية للوحدات أو المباني أو المصروفات العامة.</p>
         </div>
 
         <div class="topbar-actions">
@@ -524,7 +572,7 @@
         <div class="panel">
           <div class="panel-header">
             <h2 id="formTitle">إضافة مصروف جديد</h2>
-            <p>سجّل تفاصيل المصروف وربطه بوحدة إذا احتجت.</p>
+            <p>اختر هل المصروف عام أو خاص بوحدة أو بمبنى كامل، ثم أكمل البيانات.</p>
           </div>
 
           <div class="form-grid">
@@ -552,15 +600,36 @@
             </div>
 
             <div class="form-group">
-              <label for="unitSelect">الوحدة (اختياري)</label>
+              <label for="scopeType">نطاق المصروف</label>
+              <select id="scopeType">
+                <option value="general">عام</option>
+                <option value="unit">وحدة</option>
+                <option value="building">مبنى كامل</option>
+              </select>
+            </div>
+
+            <div class="form-group" id="unitGroup">
+              <label for="unitSelect">الوحدة</label>
               <select id="unitSelect">
-                <option value="">بدون ربط بوحدة</option>
+                <option value="">اختر الوحدة</option>
+              </select>
+            </div>
+
+            <div class="form-group hidden" id="buildingGroup">
+              <label for="buildingSelect">المبنى</label>
+              <select id="buildingSelect">
+                <option value="">اختر المبنى</option>
               </select>
             </div>
 
             <div class="form-group">
               <label for="date">التاريخ</label>
               <input type="date" id="date">
+            </div>
+
+            <div class="form-group full">
+              <label>الربط الحالي</label>
+              <div class="info-strip" id="scopeInfo">هذا المصروف غير مرتبط بوحدة أو مبنى.</div>
             </div>
 
             <div class="form-group full">
@@ -592,7 +661,7 @@
           </div>
 
           <div class="table-tools">
-            <input type="text" id="searchInput" class="search-box" placeholder="ابحث بالتاريخ أو الوحدة أو التصنيف أو البيان">
+            <input type="text" id="searchInput" class="search-box" placeholder="ابحث بالفترة أو النطاق أو الوحدة أو المبنى أو التصنيف أو البيان">
           </div>
 
           <div class="table-wrap">
@@ -600,8 +669,9 @@
               <thead>
                 <tr>
                   <th>نوع الفترة</th>
+                  <th>النطاق</th>
+                  <th>المستهدف</th>
                   <th>التصنيف</th>
-                  <th>الوحدة</th>
                   <th>التاريخ</th>
                   <th>المبلغ</th>
                   <th>البيان</th>
@@ -610,7 +680,7 @@
               </thead>
               <tbody id="expensesTableBody">
                 <tr>
-                  <td colspan="7" class="empty">جاري تحميل المصروفات...</td>
+                  <td colspan="8" class="empty">جاري تحميل المصروفات...</td>
                 </tr>
               </tbody>
             </table>
@@ -621,7 +691,7 @@
   </div>
 
   <script type="module">
-    import { initializeApp } from "https://www.gstatic.com/firebasejs/12.11.0/firebase-app.js";
+    import { initializeApp, getApps, getApp } from "https://www.gstatic.com/firebasejs/12.11.0/firebase-app.js";
     import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/12.11.0/firebase-auth.js";
     import {
       getFirestore,
@@ -646,7 +716,7 @@
       appId: "1:336608827796:web:4957fe0d411220f6a69781"
     };
 
-    const app = initializeApp(firebaseConfig);
+    const app = getApps().length ? getApp() : initializeApp(firebaseConfig);
     const auth = getAuth(app);
     const db = getFirestore(app);
 
@@ -656,10 +726,15 @@
 
     const periodType = document.getElementById("periodType");
     const category = document.getElementById("category");
+    const scopeType = document.getElementById("scopeType");
+    const unitGroup = document.getElementById("unitGroup");
+    const buildingGroup = document.getElementById("buildingGroup");
     const unitSelect = document.getElementById("unitSelect");
+    const buildingSelect = document.getElementById("buildingSelect");
     const dateInput = document.getElementById("date");
     const amountInput = document.getElementById("amount");
     const descriptionInput = document.getElementById("description");
+    const scopeInfo = document.getElementById("scopeInfo");
     const formTitle = document.getElementById("formTitle");
     const saveBtn = document.getElementById("saveBtn");
     const formMessage = document.getElementById("formMessage");
@@ -690,23 +765,45 @@
       return Number(value || 0).toFixed(2);
     }
 
+    function getScopeLabel(scope) {
+      if (scope === "unit") return "وحدة";
+      if (scope === "building") return "مبنى كامل";
+      return "عام";
+    }
+
     function clearForm() {
       editingExpenseId = null;
       periodType.value = "يومي";
       category.value = "إيجار";
+      scopeType.value = "general";
       unitSelect.value = "";
+      buildingSelect.value = "";
       dateInput.value = "";
       amountInput.value = "";
       descriptionInput.value = "";
       formTitle.textContent = "إضافة مصروف جديد";
       saveBtn.textContent = "حفظ المصروف";
       setMessage("");
+      updateScopeView();
     }
 
     function populateUnits() {
-      unitSelect.innerHTML = `<option value="">بدون ربط بوحدة</option>`;
+      unitSelect.innerHTML = `<option value="">اختر الوحدة</option>`;
       allUnits.forEach((item) => {
         unitSelect.innerHTML += `<option value="${item.id}">${item.data.propertyName || ""} - ${item.data.unitNumber || ""}</option>`;
+      });
+    }
+
+    function populateBuildings() {
+      const uniqueBuildings = [...new Set(
+        allUnits
+          .map(item => String(item.data.propertyName || "").trim())
+          .filter(Boolean)
+      )];
+
+      buildingSelect.innerHTML = `<option value="">اختر المبنى</option>`;
+      uniqueBuildings.forEach((name) => {
+        buildingSelect.innerHTML += `<option value="${name}">${name}</option>`;
       });
     }
 
@@ -714,6 +811,48 @@
       const found = allUnits.find(item => item.id === unitId);
       if (!found) return "-";
       return `${found.data.propertyName || ""} - ${found.data.unitNumber || ""}`;
+    }
+
+    function updateScopeView() {
+      const scope = scopeType.value;
+      unitGroup.classList.toggle("hidden", scope !== "unit");
+      buildingGroup.classList.toggle("hidden", scope !== "building");
+      renderScopeInfo();
+    }
+
+    function renderScopeInfo() {
+      const scope = scopeType.value;
+
+      if (scope === "general") {
+        scopeInfo.textContent = "هذا المصروف غير مرتبط بوحدة أو مبنى.";
+        return;
+      }
+
+      if (scope === "building") {
+        const building = buildingSelect.value.trim();
+        if (!building) {
+          scopeInfo.textContent = "اختر المبنى لربط المصروف به.";
+          return;
+        }
+
+        const buildingUnits = allUnits.filter(item => String(item.data.propertyName || "").trim() === building);
+        scopeInfo.innerHTML = `المبنى: ${building}<br>عدد الوحدات المرتبطة: ${buildingUnits.length}`;
+        return;
+      }
+
+      const unitId = unitSelect.value;
+      if (!unitId) {
+        scopeInfo.textContent = "اختر الوحدة لربط المصروف بها.";
+        return;
+      }
+
+      scopeInfo.textContent = `الوحدة المختارة: ${getUnitLabelById(unitId)}`;
+    }
+
+    function getTargetLabel(exp) {
+      if (exp.scope === "building") return exp.propertyName || "-";
+      if (exp.scope === "unit") return exp.unitLabel || "-";
+      return "مصروف عام";
     }
 
     function renderExpenses(rows) {
@@ -735,8 +874,9 @@
         html += `
           <tr>
             <td>${exp.periodType || "-"}</td>
+            <td><span class="scope-badge">${getScopeLabel(exp.scope || "general")}</span></td>
+            <td>${getTargetLabel(exp)}</td>
             <td>${exp.category || "-"}</td>
-            <td>${exp.unitLabel || "-"}</td>
             <td>${exp.date || "-"}</td>
             <td>${formatMoney(exp.amount)} ر.س</td>
             <td>${exp.description || "-"}</td>
@@ -751,7 +891,7 @@
       });
 
       if (!html) {
-        html = `<tr><td colspan="7" class="empty">لا توجد نتائج مطابقة.</td></tr>`;
+        html = `<tr><td colspan="8" class="empty">لا توجد نتائج مطابقة.</td></tr>`;
       }
 
       expensesTableBody.innerHTML = html;
@@ -770,11 +910,14 @@
           data: docSnap.data()
         });
       });
+
       populateUnits();
+      populateBuildings();
+      updateScopeView();
     }
 
     async function loadExpenses() {
-      expensesTableBody.innerHTML = `<tr><td colspan="7" class="empty">جاري تحميل المصروفات...</td></tr>`;
+      expensesTableBody.innerHTML = `<tr><td colspan="8" class="empty">جاري تحميل المصروفات...</td></tr>`;
 
       const snapshot = await getDocs(query(collection(db, "expenses"), orderBy("createdAt", "desc")));
       allExpenses = [];
@@ -790,16 +933,32 @@
 
     async function saveExpense() {
       try {
-        const unitId = unitSelect.value;
+        const scope = scopeType.value;
         const payload = {
           periodType: periodType.value,
           category: category.value,
-          unitId,
-          unitLabel: unitId ? getUnitLabelById(unitId) : "-",
+          scope,
+          unitId: "",
+          unitLabel: "-",
+          propertyName: "",
           date: dateInput.value,
           amount: Number(amountInput.value || 0),
           description: descriptionInput.value.trim()
         };
+
+        if (scope === "unit") {
+          if (!unitSelect.value) throw new Error("اختر الوحدة.");
+          payload.unitId = unitSelect.value;
+          payload.unitLabel = getUnitLabelById(unitSelect.value);
+          const foundUnit = allUnits.find(item => item.id === unitSelect.value);
+          payload.propertyName = foundUnit?.data?.propertyName || "";
+        }
+
+        if (scope === "building") {
+          const building = buildingSelect.value.trim();
+          if (!building) throw new Error("اختر المبنى.");
+          payload.propertyName = building;
+        }
 
         if (!payload.date) throw new Error("التاريخ مطلوب.");
         if (payload.amount <= 0) throw new Error("المبلغ يجب أن يكون أكبر من صفر.");
@@ -829,10 +988,16 @@
 
       periodType.value = exp.periodType || "يومي";
       category.value = exp.category || "إيجار";
+      scopeType.value = exp.scope || "general";
+      updateScopeView();
+
       unitSelect.value = exp.unitId || "";
+      buildingSelect.value = exp.propertyName || "";
       dateInput.value = exp.date || "";
       amountInput.value = exp.amount ?? "";
       descriptionInput.value = exp.description || "";
+
+      renderScopeInfo();
 
       formTitle.textContent = "تعديل المصروف";
       saveBtn.textContent = "حفظ التعديلات";
@@ -872,8 +1037,10 @@
         const exp = item.data;
         return (
           String(exp.periodType || "").toLowerCase().includes(keyword) ||
+          String(exp.scope || "").toLowerCase().includes(keyword) ||
           String(exp.category || "").toLowerCase().includes(keyword) ||
           String(exp.unitLabel || "").toLowerCase().includes(keyword) ||
+          String(exp.propertyName || "").toLowerCase().includes(keyword) ||
           String(exp.date || "").toLowerCase().includes(keyword) ||
           String(exp.description || "").toLowerCase().includes(keyword)
         );
@@ -892,6 +1059,9 @@
       }
     }
 
+    scopeType.addEventListener("change", updateScopeView);
+    unitSelect.addEventListener("change", renderScopeInfo);
+    buildingSelect.addEventListener("change", renderScopeInfo);
     searchInput.addEventListener("input", filterExpenses);
 
     window.saveExpense = saveExpense;
