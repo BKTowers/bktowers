@@ -41,6 +41,7 @@ input{
   margin-bottom:15px;
   border-radius:10px;
   border:1px solid #ccc;
+  font-size:16px;
 }
 
 button{
@@ -51,11 +52,18 @@ button{
   border:none;
   border-radius:10px;
   cursor:pointer;
+  font-size:16px;
+}
+
+button:disabled{
+  opacity:.7;
+  cursor:not-allowed;
 }
 
 .msg{
   margin-top:10px;
   color:red;
+  min-height:22px;
 }
 </style>
 </head>
@@ -65,18 +73,18 @@ button{
 <div class="login-box">
   <div class="title">BkTowers</div>
 
-  <input type="text" id="loginValue" placeholder="البريد الإلكتروني أو اسم المستخدم">
+  <input type="text" id="username" placeholder="اسم المستخدم">
   <input type="password" id="password" placeholder="كلمة المرور">
 
-  <button onclick="login()">تسجيل الدخول</button>
+  <button id="loginBtn" onclick="login()">تسجيل الدخول</button>
 
   <div class="msg" id="msg"></div>
 </div>
 
 <script type="module">
-import { initializeApp } from "https://www.gstatic.com/firebasejs/12.11.0/firebase-app.js";
+import { initializeApp, getApps, getApp } from "https://www.gstatic.com/firebasejs/12.11.0/firebase-app.js";
 import { getAuth, signInWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/12.11.0/firebase-auth.js";
-import { getFirestore, collection, query, where, getDocs, doc, getDoc } from "https://www.gstatic.com/firebasejs/12.11.0/firebase-firestore.js";
+import { getFirestore, collection, getDocs } from "https://www.gstatic.com/firebasejs/12.11.0/firebase-firestore.js";
 
 const firebaseConfig = {
   apiKey: "AIzaSyDey3KL3qZUvZBVtFcB38xzBGx6qrG2WYY",
@@ -87,59 +95,136 @@ const firebaseConfig = {
   appId: "1:336608827796:web:4957fe0d411220f6a69781"
 };
 
-const app = initializeApp(firebaseConfig);
+const app = getApps().length ? getApp() : initializeApp(firebaseConfig);
 const auth = getAuth(app);
 const db = getFirestore(app);
 
-function isEmail(v){return v.includes("@")}
-
-async function findUser(username){
-  const q=query(collection(db,"users"),where("username","==",username.toLowerCase()));
-  const snap=await getDocs(q);
-  if(snap.empty)return null;
-  return snap.docs[0].data();
+function normalizeValue(value){
+  return String(value || "").trim().toLowerCase();
 }
 
-window.login=async function(){
-  const val=document.getElementById("loginValue").value.trim();
-  const pass=document.getElementById("password").value.trim();
-  const msg=document.getElementById("msg");
+function getEmailLocalPart(email){
+  const normalized = normalizeValue(email);
+  if(!normalized.includes("@")) return normalized;
+  return normalized.split("@")[0];
+}
 
-  msg.innerText="";
+function setMessage(text){
+  document.getElementById("msg").innerText = text;
+}
 
-  try{
-    let email=val;
+function setLoading(isLoading){
+  const btn = document.getElementById("loginBtn");
+  btn.disabled = isLoading;
+  btn.innerText = isLoading ? "جاري الدخول..." : "تسجيل الدخول";
+}
 
-    if(!isEmail(val)){
-      const user=await findUser(val);
-      if(!user){
-        msg.innerText="اسم المستخدم غير موجود";
-        return;
-      }
-      email=user.email;
-    }
+async function findUserByUsername(inputValue){
+  const target = normalizeValue(inputValue);
+  const snapshot = await getDocs(collection(db, "users"));
 
-    const cred=await signInWithEmailAndPassword(auth,email,pass);
+  if(snapshot.empty){
+    return null;
+  }
 
-    const snap=await getDoc(doc(db,"users",cred.user.uid));
+  let exactMatch = null;
+  let emailPrefixMatch = null;
+  let looseNameMatch = null;
 
-    if(!snap.exists()){
-      msg.innerText="بيانات المستخدم غير موجودة";
+  snapshot.forEach((docSnap) => {
+    const data = docSnap.data();
+
+    const username = normalizeValue(data.username);
+    const email = normalizeValue(data.email);
+    const emailPrefix = getEmailLocalPart(email);
+    const name = normalizeValue(data.name);
+
+    const candidate = {
+      id: docSnap.id,
+      ...data
+    };
+
+    if(username && username === target){
+      exactMatch = candidate;
       return;
     }
 
-    const data=snap.data();
+    if(emailPrefix && emailPrefix === target && !emailPrefixMatch){
+      emailPrefixMatch = candidate;
+    }
 
-    if(data.role==="admin"){
-      window.location.href="dashboard.html";
+    if(name && name === target && !looseNameMatch){
+      looseNameMatch = candidate;
+    }
+  });
+
+  return exactMatch || emailPrefixMatch || looseNameMatch || null;
+}
+
+window.login = async function(){
+  const username = document.getElementById("username").value;
+  const password = document.getElementById("password").value;
+
+  setMessage("");
+
+  if(!username.trim() || !password.trim()){
+    setMessage("اكتب اسم المستخدم وكلمة المرور");
+    return;
+  }
+
+  try{
+    setLoading(true);
+
+    const user = await findUserByUsername(username);
+
+    if(!user){
+      setMessage("اسم المستخدم غير موجود");
+      return;
+    }
+
+    if(!user.email){
+      setMessage("لا يوجد بريد إلكتروني لهذا المستخدم");
+      return;
+    }
+
+    await signInWithEmailAndPassword(auth, user.email, password);
+
+    localStorage.setItem("userId", user.id || "");
+    localStorage.setItem("username", user.username || "");
+    localStorage.setItem("name", user.name || "");
+    localStorage.setItem("role", user.role || "");
+    localStorage.setItem("email", user.email || "");
+
+    if(user.role === "admin"){
+      window.location.href = "dashboard.html";
     }else{
-      window.location.href="employee-dashboard.html";
+      window.location.href = "employee-dashboard.html";
     }
 
   }catch(e){
-    msg.innerText="بيانات الدخول غير صحيحة";
+    console.log("Login error:", e);
+
+    if(e.code === "auth/invalid-credential" || e.code === "auth/wrong-password"){
+      setMessage("كلمة المرور غير صحيحة");
+    }else if(e.code === "auth/user-not-found"){
+      setMessage("هذا المستخدم غير موجود في نظام الدخول");
+    }else if(e.code === "auth/invalid-email"){
+      setMessage("البريد الإلكتروني المخزن غير صالح");
+    }else{
+      setMessage("بيانات الدخول غير صحيحة");
+    }
+  }finally{
+    setLoading(false);
   }
 };
+
+document.getElementById("username").addEventListener("keydown", function(e){
+  if(e.key === "Enter") login();
+});
+
+document.getElementById("password").addEventListener("keydown", function(e){
+  if(e.key === "Enter") login();
+});
 </script>
 
 </body>
