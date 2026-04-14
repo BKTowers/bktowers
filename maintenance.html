@@ -14,6 +14,7 @@
       --muted: #4b5563;
       --border: #d7deea;
       --danger: #c62828;
+      --danger-dark: #a61f1f;
       --warning-bg: #fef3c7;
       --warning-text: #92400e;
       --info-bg: #dbeafe;
@@ -182,9 +183,17 @@
       color: #fff;
     }
 
+    .action-btn:hover {
+      background: #163b86;
+    }
+
     .logout-btn {
       background: var(--danger);
       color: #fff;
+    }
+
+    .logout-btn:hover {
+      background: var(--danger-dark);
     }
 
     .summary-grid {
@@ -349,9 +358,17 @@
       color: #fff;
     }
 
+    .primary-btn:hover {
+      background: #163b86;
+    }
+
     .secondary-btn {
       background: #edf2f7;
       color: #111827;
+    }
+
+    .secondary-btn:hover {
+      background: #e1e8f0;
     }
 
     .edit-btn {
@@ -366,6 +383,10 @@
       color: #fff;
       padding: 9px 14px;
       font-size: 13px;
+    }
+
+    .danger-btn:hover {
+      background: var(--danger-dark);
     }
 
     .message {
@@ -405,7 +426,7 @@
     table {
       width: 100%;
       border-collapse: collapse;
-      min-width: 1100px;
+      min-width: 1220px;
       background: #fff;
     }
 
@@ -440,6 +461,16 @@
       color: var(--warning-text);
     }
 
+    .scope-badge {
+      display: inline-block;
+      padding: 6px 10px;
+      border-radius: 999px;
+      font-size: 12px;
+      font-weight: 800;
+      background: var(--info-bg);
+      color: var(--info-text);
+    }
+
     .empty {
       text-align: center;
       color: var(--muted);
@@ -451,6 +482,10 @@
       display: flex;
       gap: 8px;
       flex-wrap: wrap;
+    }
+
+    .hidden {
+      display: none !important;
     }
 
     @media (max-width: 1350px) {
@@ -515,7 +550,7 @@
       <section class="topbar">
         <div class="topbar-title">
           <h1>الصيانة</h1>
-          <p>تسجيل أعمال الصيانة وربطها بالوحدات ومتابعة تكلفتها.</p>
+          <p>تسجيل أعمال الصيانة وربطها بالوحدات أو بالمبنى بالكامل ومتابعة تكلفتها.</p>
         </div>
 
         <div class="topbar-actions">
@@ -534,7 +569,7 @@
           <div class="value" id="totalCost">0</div>
         </div>
         <div class="summary-card">
-          <h3>عدد وحدات لها صيانة</h3>
+          <h3>عدد الأهداف المتأثرة</h3>
           <div class="value" id="affectedUnits">0</div>
         </div>
         <div class="summary-card">
@@ -547,14 +582,29 @@
         <div class="panel">
           <div class="panel-header">
             <h2 id="formTitle">إضافة صيانة جديدة</h2>
-            <p>اختر الوحدة وحدد نوع الصيانة وتكلفتها ووصفها.</p>
+            <p>اختر هل الصيانة لوحدة محددة أم للمبنى بالكامل، ثم أكمل البيانات.</p>
           </div>
 
           <div class="form-grid">
             <div class="form-group">
+              <label for="scopeType">نطاق الصيانة</label>
+              <select id="scopeType">
+                <option value="unit">وحدة</option>
+                <option value="building">مبنى كامل</option>
+              </select>
+            </div>
+
+            <div class="form-group" id="unitGroup">
               <label for="unitSelect">الوحدة</label>
               <select id="unitSelect">
                 <option value="">اختر الوحدة</option>
+              </select>
+            </div>
+
+            <div class="form-group hidden" id="buildingGroup">
+              <label for="buildingSelect">المبنى</label>
+              <select id="buildingSelect">
+                <option value="">اختر المبنى</option>
               </select>
             </div>
 
@@ -564,8 +614,8 @@
             </div>
 
             <div class="form-group full">
-              <label>بيانات الوحدة</label>
-              <div class="info-strip" id="unitInfo">اختر وحدة لعرض بياناتها.</div>
+              <label>البيانات المختارة</label>
+              <div class="info-strip" id="unitInfo">اختر وحدة أو مبنى لعرض البيانات.</div>
             </div>
 
             <div class="form-group">
@@ -616,14 +666,15 @@
           </div>
 
           <div class="table-tools">
-            <input type="text" id="searchInput" class="search-box" placeholder="ابحث بالوحدة أو النوع أو التاريخ أو البيان">
+            <input type="text" id="searchInput" class="search-box" placeholder="ابحث بالوحدة أو المبنى أو النوع أو التاريخ أو البيان">
           </div>
 
           <div class="table-wrap">
             <table>
               <thead>
                 <tr>
-                  <th>الوحدة</th>
+                  <th>النطاق</th>
+                  <th>المستهدف</th>
                   <th>التاريخ</th>
                   <th>نوع الصيانة</th>
                   <th>المبلغ</th>
@@ -633,7 +684,7 @@
               </thead>
               <tbody id="maintenanceTableBody">
                 <tr>
-                  <td colspan="6" class="empty">جاري تحميل الصيانة...</td>
+                  <td colspan="7" class="empty">جاري تحميل الصيانة...</td>
                 </tr>
               </tbody>
             </table>
@@ -644,7 +695,7 @@
   </div>
 
   <script type="module">
-    import { initializeApp } from "https://www.gstatic.com/firebasejs/12.11.0/firebase-app.js";
+    import { initializeApp, getApps, getApp } from "https://www.gstatic.com/firebasejs/12.11.0/firebase-app.js";
     import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/12.11.0/firebase-auth.js";
     import {
       getFirestore,
@@ -669,7 +720,7 @@
       appId: "1:336608827796:web:4957fe0d411220f6a69781"
     };
 
-    const app = initializeApp(firebaseConfig);
+    const app = getApps().length ? getApp() : initializeApp(firebaseConfig);
     const auth = getAuth(app);
     const db = getFirestore(app);
 
@@ -677,7 +728,11 @@
     const userEmailEl = document.getElementById("sidebarUserEmail");
     const userRoleEl = document.getElementById("sidebarUserRole");
 
+    const scopeType = document.getElementById("scopeType");
+    const unitGroup = document.getElementById("unitGroup");
+    const buildingGroup = document.getElementById("buildingGroup");
     const unitSelect = document.getElementById("unitSelect");
+    const buildingSelect = document.getElementById("buildingSelect");
     const dateInput = document.getElementById("date");
     const maintenanceType = document.getElementById("maintenanceType");
     const customType = document.getElementById("customType");
@@ -706,7 +761,11 @@
     }
 
     function focusAddForm() {
-      unitSelect.focus();
+      if (scopeType.value === "unit") {
+        unitSelect.focus();
+      } else {
+        buildingSelect.focus();
+      }
       window.scrollTo({ top: 0, behavior: "smooth" });
     }
 
@@ -714,19 +773,26 @@
       return Number(value || 0).toFixed(2);
     }
 
+    function getScopeLabel(scope) {
+      return scope === "building" ? "مبنى كامل" : "وحدة";
+    }
+
     function clearForm() {
       editingMaintenanceId = null;
+      scopeType.value = "unit";
       unitSelect.value = "";
+      buildingSelect.value = "";
       dateInput.value = "";
       maintenanceType.value = "كهرباء";
       customType.value = "";
       amountInput.value = "";
       descriptionInput.value = "";
-      unitInfo.textContent = "اختر وحدة لعرض بياناتها.";
+      unitInfo.textContent = "اختر وحدة أو مبنى لعرض البيانات.";
       formTitle.textContent = "إضافة صيانة جديدة";
       saveBtn.textContent = "حفظ الصيانة";
       setMessage("");
       toggleCustomTypeField();
+      updateScopeView();
     }
 
     function toggleCustomTypeField() {
@@ -736,6 +802,13 @@
       }
     }
 
+    function updateScopeView() {
+      const isBuilding = scopeType.value === "building";
+      unitGroup.classList.toggle("hidden", isBuilding);
+      buildingGroup.classList.toggle("hidden", !isBuilding);
+      renderTargetInfo();
+    }
+
     function populateUnits() {
       unitSelect.innerHTML = `<option value="">اختر الوحدة</option>`;
       allUnits.forEach((item) => {
@@ -743,13 +816,40 @@
       });
     }
 
+    function populateBuildings() {
+      const uniqueBuildings = [...new Set(
+        allUnits
+          .map(item => String(item.data.propertyName || "").trim())
+          .filter(Boolean)
+      )];
+
+      buildingSelect.innerHTML = `<option value="">اختر المبنى</option>`;
+      uniqueBuildings.forEach((name) => {
+        buildingSelect.innerHTML += `<option value="${name}">${name}</option>`;
+      });
+    }
+
     function getUnitById(unitId) {
       return allUnits.find(item => item.id === unitId) || null;
     }
 
-    function renderUnitInfo() {
-      const selectedUnit = getUnitById(unitSelect.value);
+    function renderTargetInfo() {
+      if (scopeType.value === "building") {
+        const propertyName = buildingSelect.value.trim();
+        if (!propertyName) {
+          unitInfo.textContent = "اختر مبنى لعرض بياناته.";
+          return;
+        }
 
+        const buildingUnits = allUnits.filter(item => String(item.data.propertyName || "").trim() === propertyName);
+        unitInfo.innerHTML = `
+          المبنى: ${propertyName}<br>
+          عدد الوحدات المرتبطة: ${buildingUnits.length}
+        `;
+        return;
+      }
+
+      const selectedUnit = getUnitById(unitSelect.value);
       if (!selectedUnit) {
         unitInfo.textContent = "اختر وحدة لعرض بياناتها.";
         return;
@@ -770,22 +870,37 @@
       return `${found.data.propertyName || ""} - ${found.data.unitNumber || ""}`;
     }
 
+    function getTargetLabel(row) {
+      if (row.scope === "building") {
+        return row.propertyName || "-";
+      }
+      return row.unitLabel || "-";
+    }
+
     function renderMaintenance(rows) {
       let html = "";
       let totalCount = rows.length;
       let totalCost = 0;
-      const unitSet = new Set();
+      const targetSet = new Set();
       const typeSet = new Set();
 
       rows.forEach((item) => {
         const row = item.data;
         totalCost += Number(row.amount || 0);
-        if (row.unitId) unitSet.add(row.unitId);
-        if (row.typeLabel) typeSet.add(row.typeLabel);
+
+        const affectedKey = row.scope === "building"
+          ? `building:${row.propertyName || ""}`
+          : `unit:${row.unitId || ""}`;
+        targetSet.add(affectedKey);
+
+        if (row.typeLabel) {
+          typeSet.add(row.typeLabel);
+        }
 
         html += `
           <tr>
-            <td>${row.unitLabel || "-"}</td>
+            <td><span class="scope-badge">${getScopeLabel(row.scope || "unit")}</span></td>
+            <td>${getTargetLabel(row)}</td>
             <td>${row.date || "-"}</td>
             <td><span class="type-badge">${row.typeLabel || "-"}</span></td>
             <td>${formatMoney(row.amount)} ر.س</td>
@@ -801,13 +916,13 @@
       });
 
       if (!html) {
-        html = `<tr><td colspan="6" class="empty">لا توجد نتائج مطابقة.</td></tr>`;
+        html = `<tr><td colspan="7" class="empty">لا توجد نتائج مطابقة.</td></tr>`;
       }
 
       maintenanceTableBody.innerHTML = html;
       totalMaintenanceEl.textContent = totalCount;
       totalCostEl.textContent = formatMoney(totalCost);
-      affectedUnitsEl.textContent = unitSet.size;
+      affectedUnitsEl.textContent = targetSet.size;
       typesCountEl.textContent = typeSet.size;
     }
 
@@ -820,11 +935,14 @@
           data: docSnap.data()
         });
       });
+
       populateUnits();
+      populateBuildings();
+      updateScopeView();
     }
 
     async function loadMaintenance() {
-      maintenanceTableBody.innerHTML = `<tr><td colspan="6" class="empty">جاري تحميل الصيانة...</td></tr>`;
+      maintenanceTableBody.innerHTML = `<tr><td colspan="7" class="empty">جاري تحميل الصيانة...</td></tr>`;
 
       const snapshot = await getDocs(query(collection(db, "maintenance"), orderBy("createdAt", "desc")));
       allMaintenance = [];
@@ -840,21 +958,37 @@
 
     async function saveMaintenance() {
       try {
-        const unitId = unitSelect.value;
+        const scope = scopeType.value;
         const typeValue = maintenanceType.value;
         const customTypeValue = customType.value.trim();
         const typeLabel = typeValue === "أخرى" ? customTypeValue : typeValue;
 
-        if (!unitId) throw new Error("اختر الوحدة.");
         if (!dateInput.value) throw new Error("التاريخ مطلوب.");
         if (!typeValue) throw new Error("نوع الصيانة مطلوب.");
         if (typeValue === "أخرى" && !customTypeValue) throw new Error("اكتب نوع الصيانة الآخر.");
         if (Number(amountInput.value || 0) <= 0) throw new Error("المبلغ يجب أن يكون أكبر من صفر.");
         if (!descriptionInput.value.trim()) throw new Error("البيان مطلوب.");
 
+        let unitId = "";
+        let unitLabel = "";
+        let propertyName = "";
+
+        if (scope === "building") {
+          propertyName = buildingSelect.value.trim();
+          if (!propertyName) throw new Error("اختر المبنى.");
+        } else {
+          unitId = unitSelect.value;
+          if (!unitId) throw new Error("اختر الوحدة.");
+          unitLabel = getUnitLabelById(unitId);
+          const unitData = getUnitById(unitId);
+          propertyName = unitData?.data?.propertyName || "";
+        }
+
         const payload = {
+          scope,
           unitId,
-          unitLabel: getUnitLabelById(unitId),
+          unitLabel,
+          propertyName,
           date: dateInput.value,
           maintenanceType: typeValue,
           customType: customTypeValue,
@@ -885,8 +1019,13 @@
       const row = item.data;
       editingMaintenanceId = item.id;
 
+      scopeType.value = row.scope || "unit";
+      updateScopeView();
+
       unitSelect.value = row.unitId || "";
-      renderUnitInfo();
+      buildingSelect.value = row.propertyName || "";
+      renderTargetInfo();
+
       dateInput.value = row.date || "";
       maintenanceType.value = row.maintenanceType || "كهرباء";
       customType.value = row.customType || "";
@@ -932,7 +1071,9 @@
       const filtered = allMaintenance.filter((item) => {
         const row = item.data;
         return (
+          String(row.scope || "").toLowerCase().includes(keyword) ||
           String(row.unitLabel || "").toLowerCase().includes(keyword) ||
+          String(row.propertyName || "").toLowerCase().includes(keyword) ||
           String(row.date || "").toLowerCase().includes(keyword) ||
           String(row.typeLabel || "").toLowerCase().includes(keyword) ||
           String(row.description || "").toLowerCase().includes(keyword)
@@ -953,7 +1094,9 @@
     }
 
     maintenanceType.addEventListener("change", toggleCustomTypeField);
-    unitSelect.addEventListener("change", renderUnitInfo);
+    unitSelect.addEventListener("change", renderTargetInfo);
+    buildingSelect.addEventListener("change", renderTargetInfo);
+    scopeType.addEventListener("change", updateScopeView);
     searchInput.addEventListener("input", filterMaintenance);
 
     window.saveMaintenance = saveMaintenance;
@@ -990,6 +1133,7 @@
         userRoleEl.textContent = "مدير";
 
         toggleCustomTypeField();
+        updateScopeView();
         await loadUnits();
         await loadMaintenance();
       } catch (error) {
