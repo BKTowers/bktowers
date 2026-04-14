@@ -1414,15 +1414,27 @@
       }
 
       try {
-        const userRef = doc(db, "users", user.uid);
-        const userSnap = await getDoc(userRef);
+       const userRef = doc(db, "users", user.uid);
+let userSnap = await getDoc(userRef);
+let userData = null;
 
-        if (!userSnap.exists()) {
-          window.location.href = "index.html";
-          return;
-        }
+if (userSnap.exists()) {
+  userData = userSnap.data();
+} else {
+  const usersSnapshot = await getDocs(collection(db, "users"));
+  usersSnapshot.forEach((docSnap) => {
+    if (userData) return;
+    const data = docSnap.data();
+    if ((data.email || "").toLowerCase() === (user.email || "").toLowerCase()) {
+      userData = data;
+    }
+  });
+}
 
-        const userData = userSnap.data();
+if (!userData) {
+  window.location.href = "index.html";
+  return;
+}
         const roleValue = userData.role || "employee";
 
         currentUserDocId = user.uid;
