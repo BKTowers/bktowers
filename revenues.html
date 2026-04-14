@@ -21,6 +21,8 @@
       --info-text: #1d4ed8;
       --manual-bg: #ede9fe;
       --manual-text: #6d28d9;
+      --warning-bg: #fef3c7;
+      --warning-text: #92400e;
       --shadow: 0 12px 30px rgba(15, 23, 42, 0.10);
       --radius: 18px;
     }
@@ -183,9 +185,17 @@
       color: #fff;
     }
 
+    .action-btn:hover {
+      background: #163b86;
+    }
+
     .logout-btn {
       background: var(--danger);
       color: #fff;
+    }
+
+    .logout-btn:hover {
+      background: var(--danger-dark);
     }
 
     .summary-grid {
@@ -325,6 +335,17 @@
       font-weight: 700;
     }
 
+    .info-strip {
+      background: #f8fbff;
+      border: 1px dashed var(--border);
+      border-radius: 14px;
+      padding: 12px;
+      font-size: 13px;
+      color: var(--muted);
+      line-height: 1.8;
+      font-weight: 700;
+    }
+
     .form-actions {
       display: flex;
       gap: 10px;
@@ -350,9 +371,17 @@
       color: #fff;
     }
 
+    .primary-btn:hover {
+      background: #163b86;
+    }
+
     .secondary-btn {
       background: #edf2f7;
       color: #111827;
+    }
+
+    .secondary-btn:hover {
+      background: #e1e8f0;
     }
 
     .edit-btn {
@@ -367,6 +396,10 @@
       color: #fff;
       padding: 9px 14px;
       font-size: 13px;
+    }
+
+    .danger-btn:hover {
+      background: var(--danger-dark);
     }
 
     .message {
@@ -406,7 +439,7 @@
     table {
       width: 100%;
       border-collapse: collapse;
-      min-width: 1200px;
+      min-width: 1400px;
       background: #fff;
     }
 
@@ -450,6 +483,17 @@
       color: var(--manual-text);
     }
 
+    .scope-badge {
+      display: inline-block;
+      padding: 6px 10px;
+      border-radius: 999px;
+      font-size: 12px;
+      font-weight: 800;
+      white-space: nowrap;
+      background: var(--warning-bg);
+      color: var(--warning-text);
+    }
+
     .empty {
       text-align: center;
       color: var(--muted);
@@ -461,6 +505,10 @@
       display: flex;
       gap: 8px;
       flex-wrap: wrap;
+    }
+
+    .hidden {
+      display: none !important;
     }
 
     @media (max-width: 1350px) {
@@ -525,7 +573,7 @@
       <section class="topbar">
         <div class="topbar-title">
           <h1>الإيرادات</h1>
-          <p>الإيرادات التلقائية من الحجوزات + الإيرادات الإضافية اليدوية.</p>
+          <p>الإيرادات التلقائية من الحجوزات + الإيرادات اليدوية العامة أو المرتبطة بوحدة أو مبنى.</p>
         </div>
 
         <div class="topbar-actions">
@@ -582,13 +630,31 @@
             </div>
 
             <div class="form-group">
+              <label for="scopeType">نطاق الإيراد اليدوي</label>
+              <select id="scopeType">
+                <option value="general">عام</option>
+                <option value="unit">وحدة</option>
+                <option value="building">مبنى كامل</option>
+              </select>
+            </div>
+
+            <div class="form-group">
               <label for="clientName">اسم العميل</label>
               <input type="text" id="clientName" placeholder="اختياري">
             </div>
 
-            <div class="form-group">
-              <label for="unitLabel">الوحدة</label>
-              <input type="text" id="unitLabel" placeholder="اختياري">
+            <div class="form-group" id="unitGroup">
+              <label for="unitSelect">الوحدة</label>
+              <select id="unitSelect">
+                <option value="">اختر الوحدة</option>
+              </select>
+            </div>
+
+            <div class="form-group hidden" id="buildingGroup">
+              <label for="buildingSelect">المبنى</label>
+              <select id="buildingSelect">
+                <option value="">اختر المبنى</option>
+              </select>
             </div>
 
             <div class="form-group">
@@ -596,7 +662,12 @@
               <input type="date" id="date">
             </div>
 
-            <div class="form-group">
+            <div class="form-group full">
+              <label>الربط الحالي</label>
+              <div class="info-strip" id="scopeInfo">هذا الإيراد اليدوي غير مرتبط بوحدة أو مبنى.</div>
+            </div>
+
+            <div class="form-group full">
               <label for="amount">المبلغ</label>
               <div class="money-box">
                 <input type="number" id="amount" min="0" step="0.01" placeholder="اكتب المبلغ">
@@ -632,7 +703,7 @@
           </div>
 
           <div class="table-tools">
-            <input type="text" id="searchInput" class="search-box" placeholder="ابحث بالعميل أو الوحدة أو المصدر أو التصنيف">
+            <input type="text" id="searchInput" class="search-box" placeholder="ابحث بالعميل أو الوحدة أو المبنى أو المصدر أو التصنيف">
           </div>
 
           <div class="table-wrap">
@@ -640,10 +711,11 @@
               <thead>
                 <tr>
                   <th>المصدر</th>
+                  <th>النطاق</th>
                   <th>نوع الفترة</th>
                   <th>التصنيف</th>
                   <th>العميل</th>
-                  <th>الوحدة</th>
+                  <th>المستهدف</th>
                   <th>التاريخ</th>
                   <th>المبلغ</th>
                   <th>البيان</th>
@@ -652,7 +724,7 @@
               </thead>
               <tbody id="revenuesTableBody">
                 <tr>
-                  <td colspan="9" class="empty">جاري تحميل الإيرادات...</td>
+                  <td colspan="10" class="empty">جاري تحميل الإيرادات...</td>
                 </tr>
               </tbody>
             </table>
@@ -663,7 +735,7 @@
   </div>
 
   <script type="module">
-    import { initializeApp } from "https://www.gstatic.com/firebasejs/12.11.0/firebase-app.js";
+    import { initializeApp, getApps, getApp } from "https://www.gstatic.com/firebasejs/12.11.0/firebase-app.js";
     import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/12.11.0/firebase-auth.js";
     import {
       getFirestore,
@@ -688,7 +760,7 @@
       appId: "1:336608827796:web:4957fe0d411220f6a69781"
     };
 
-    const app = initializeApp(firebaseConfig);
+    const app = getApps().length ? getApp() : initializeApp(firebaseConfig);
     const auth = getAuth(app);
     const db = getFirestore(app);
 
@@ -698,11 +770,16 @@
 
     const periodType = document.getElementById("periodType");
     const category = document.getElementById("category");
+    const scopeType = document.getElementById("scopeType");
     const clientName = document.getElementById("clientName");
-    const unitLabel = document.getElementById("unitLabel");
+    const unitGroup = document.getElementById("unitGroup");
+    const buildingGroup = document.getElementById("buildingGroup");
+    const unitSelect = document.getElementById("unitSelect");
+    const buildingSelect = document.getElementById("buildingSelect");
     const dateInput = document.getElementById("date");
     const amountInput = document.getElementById("amount");
     const descriptionInput = document.getElementById("description");
+    const scopeInfo = document.getElementById("scopeInfo");
     const formTitle = document.getElementById("formTitle");
     const saveBtn = document.getElementById("saveBtn");
     const formMessage = document.getElementById("formMessage");
@@ -716,6 +793,7 @@
 
     let allRows = [];
     let manualRows = [];
+    let allUnits = [];
     let editingManualId = null;
 
     function setMessage(text, type = "") {
@@ -725,7 +803,7 @@
     }
 
     function focusAddForm() {
-      document.getElementById("amount").focus();
+      amountInput.focus();
       window.scrollTo({ top: 0, behavior: "smooth" });
     }
 
@@ -733,18 +811,89 @@
       return Number(value || 0).toFixed(2);
     }
 
+    function getScopeLabel(scope) {
+      if (scope === "unit") return "وحدة";
+      if (scope === "building") return "مبنى كامل";
+      return "عام";
+    }
+
     function clearForm() {
       editingManualId = null;
       periodType.value = "يومي";
       category.value = "إيجار إضافي";
+      scopeType.value = "general";
       clientName.value = "";
-      unitLabel.value = "";
+      unitSelect.value = "";
+      buildingSelect.value = "";
       dateInput.value = "";
       amountInput.value = "";
       descriptionInput.value = "";
       formTitle.textContent = "إضافة إيراد يدوي";
       saveBtn.textContent = "حفظ الإيراد";
       setMessage("");
+      updateScopeView();
+    }
+
+    function populateUnits() {
+      unitSelect.innerHTML = `<option value="">اختر الوحدة</option>`;
+      allUnits.forEach((item) => {
+        unitSelect.innerHTML += `<option value="${item.id}">${item.data.propertyName || ""} - ${item.data.unitNumber || ""}</option>`;
+      });
+    }
+
+    function populateBuildings() {
+      const uniqueBuildings = [...new Set(
+        allUnits
+          .map(item => String(item.data.propertyName || "").trim())
+          .filter(Boolean)
+      )];
+
+      buildingSelect.innerHTML = `<option value="">اختر المبنى</option>`;
+      uniqueBuildings.forEach((name) => {
+        buildingSelect.innerHTML += `<option value="${name}">${name}</option>`;
+      });
+    }
+
+    function getUnitLabelById(unitId) {
+      const found = allUnits.find(item => item.id === unitId);
+      if (!found) return "-";
+      return `${found.data.propertyName || ""} - ${found.data.unitNumber || ""}`;
+    }
+
+    function updateScopeView() {
+      const scope = scopeType.value;
+      unitGroup.classList.toggle("hidden", scope !== "unit");
+      buildingGroup.classList.toggle("hidden", scope !== "building");
+      renderScopeInfo();
+    }
+
+    function renderScopeInfo() {
+      const scope = scopeType.value;
+
+      if (scope === "general") {
+        scopeInfo.textContent = "هذا الإيراد اليدوي غير مرتبط بوحدة أو مبنى.";
+        return;
+      }
+
+      if (scope === "building") {
+        const building = buildingSelect.value.trim();
+        if (!building) {
+          scopeInfo.textContent = "اختر المبنى لربط الإيراد به.";
+          return;
+        }
+
+        const buildingUnits = allUnits.filter(item => String(item.data.propertyName || "").trim() === building);
+        scopeInfo.innerHTML = `المبنى: ${building}<br>عدد الوحدات المرتبطة: ${buildingUnits.length}`;
+        return;
+      }
+
+      const unitId = unitSelect.value;
+      if (!unitId) {
+        scopeInfo.textContent = "اختر الوحدة لربط الإيراد بها.";
+        return;
+      }
+
+      scopeInfo.textContent = `الوحدة المختارة: ${getUnitLabelById(unitId)}`;
     }
 
     function mapStayToRevenue(stayItem) {
@@ -753,11 +902,14 @@
         id: `stay_${stayItem.id}`,
         sourceType: "stay",
         sourceLabel: "من الحجز",
+        scope: "unit",
         periodType: stay.rentalType || "-",
         category: "حجز / سكن",
         clientName: stay.clientName || "-",
+        targetLabel: stay.unitLabel || "-",
         unitLabel: stay.unitLabel || "-",
-        date: stay.checkIn || "-",
+        propertyName: stay.propertyName || "",
+        date: stay.checkIn || stay.date || "-",
         amount: Number(stay.paid || stay.amount || 0),
         description: stay.notes || "إيراد تلقائي من الحجز",
         raw: stay
@@ -770,10 +922,13 @@
         id: item.id,
         sourceType: "manual",
         sourceLabel: "إضافة يدوية",
+        scope: row.scope || "general",
         periodType: row.periodType || "-",
         category: row.category || "-",
         clientName: row.clientName || "-",
+        targetLabel: row.scope === "building" ? (row.propertyName || "-") : row.scope === "unit" ? (row.unitLabel || "-") : "إيراد عام",
         unitLabel: row.unitLabel || "-",
+        propertyName: row.propertyName || "",
         date: row.date || "-",
         amount: Number(row.amount || 0),
         description: row.description || "-",
@@ -801,10 +956,11 @@
                   : `<span class="source-badge source-manual">${row.sourceLabel}</span>`
               }
             </td>
+            <td><span class="scope-badge">${getScopeLabel(row.scope || "general")}</span></td>
             <td>${row.periodType || "-"}</td>
             <td>${row.category || "-"}</td>
             <td>${row.clientName || "-"}</td>
-            <td>${row.unitLabel || "-"}</td>
+            <td>${row.targetLabel || "-"}</td>
             <td>${row.date || "-"}</td>
             <td>${formatMoney(row.amount)} ر.س</td>
             <td>${row.description || "-"}</td>
@@ -825,7 +981,7 @@
       });
 
       if (!html) {
-        html = `<tr><td colspan="9" class="empty">لا توجد نتائج مطابقة.</td></tr>`;
+        html = `<tr><td colspan="10" class="empty">لا توجد نتائج مطابقة.</td></tr>`;
       }
 
       revenuesTableBody.innerHTML = html;
@@ -835,8 +991,23 @@
       totalEntriesEl.textContent = rows.length;
     }
 
+    async function loadUnits() {
+      const unitsSnapshot = await getDocs(query(collection(db, "units"), orderBy("createdAt", "desc")));
+      allUnits = [];
+      unitsSnapshot.forEach((docSnap) => {
+        allUnits.push({
+          id: docSnap.id,
+          data: docSnap.data()
+        });
+      });
+
+      populateUnits();
+      populateBuildings();
+      updateScopeView();
+    }
+
     async function loadAllRevenues() {
-      revenuesTableBody.innerHTML = `<tr><td colspan="9" class="empty">جاري تحميل الإيرادات...</td></tr>`;
+      revenuesTableBody.innerHTML = `<tr><td colspan="10" class="empty">جاري تحميل الإيرادات...</td></tr>`;
 
       const staysSnapshot = await getDocs(query(collection(db, "stays"), orderBy("createdAt", "desc")));
       const manualSnapshot = await getDocs(query(collection(db, "revenues"), orderBy("createdAt", "desc")));
@@ -868,16 +1039,35 @@
 
     async function saveManualRevenue() {
       try {
+        const scope = scopeType.value;
+
         const payload = {
           periodType: periodType.value,
           category: category.value,
+          scope,
           clientName: clientName.value.trim(),
-          unitLabel: unitLabel.value.trim(),
+          unitId: "",
+          unitLabel: "-",
+          propertyName: "",
           date: dateInput.value,
           amount: Number(amountInput.value || 0),
           description: descriptionInput.value.trim(),
           sourceType: "manual"
         };
+
+        if (scope === "unit") {
+          if (!unitSelect.value) throw new Error("اختر الوحدة.");
+          payload.unitId = unitSelect.value;
+          payload.unitLabel = getUnitLabelById(unitSelect.value);
+          const foundUnit = allUnits.find(item => item.id === unitSelect.value);
+          payload.propertyName = foundUnit?.data?.propertyName || "";
+        }
+
+        if (scope === "building") {
+          const building = buildingSelect.value.trim();
+          if (!building) throw new Error("اختر المبنى.");
+          payload.propertyName = building;
+        }
 
         if (!payload.date) throw new Error("التاريخ مطلوب.");
         if (payload.amount <= 0) throw new Error("المبلغ يجب أن يكون أكبر من صفر.");
@@ -907,11 +1097,16 @@
 
       periodType.value = row.periodType || "يومي";
       category.value = row.category || "إيجار إضافي";
+      scopeType.value = row.scope || "general";
       clientName.value = row.clientName || "";
-      unitLabel.value = row.unitLabel || "";
+      unitSelect.value = row.unitId || "";
+      buildingSelect.value = row.propertyName || "";
       dateInput.value = row.date || "";
       amountInput.value = row.amount ?? "";
       descriptionInput.value = row.description || "";
+
+      updateScopeView();
+      renderScopeInfo();
 
       formTitle.textContent = "تعديل الإيراد اليدوي";
       saveBtn.textContent = "حفظ التعديلات";
@@ -950,9 +1145,10 @@
       const filtered = allRows.filter((row) => {
         return (
           String(row.sourceLabel || "").toLowerCase().includes(keyword) ||
+          String(row.scope || "").toLowerCase().includes(keyword) ||
           String(row.category || "").toLowerCase().includes(keyword) ||
           String(row.clientName || "").toLowerCase().includes(keyword) ||
-          String(row.unitLabel || "").toLowerCase().includes(keyword) ||
+          String(row.targetLabel || "").toLowerCase().includes(keyword) ||
           String(row.periodType || "").toLowerCase().includes(keyword) ||
           String(row.description || "").toLowerCase().includes(keyword)
         );
@@ -971,6 +1167,9 @@
       }
     }
 
+    scopeType.addEventListener("change", updateScopeView);
+    unitSelect.addEventListener("change", renderScopeInfo);
+    buildingSelect.addEventListener("change", renderScopeInfo);
     searchInput.addEventListener("input", filterRows);
 
     window.saveManualRevenue = saveManualRevenue;
@@ -1006,6 +1205,7 @@
         userEmailEl.textContent = userData.email || user.email || "-";
         userRoleEl.textContent = "مدير";
 
+        await loadUnits();
         await loadAllRevenues();
       } catch (error) {
         window.location.href = "index.html";
