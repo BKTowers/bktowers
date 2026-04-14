@@ -14,13 +14,16 @@
       --muted: #4b5563;
       --border: #d7deea;
       --danger: #c62828;
+      --danger-dark: #a61f1f;
       --success: #166534;
       --warning: #92400e;
       --info: #1d4ed8;
+      --manual: #6d28d9;
       --success-bg: #dcfce7;
       --warning-bg: #fef3c7;
       --danger-bg: #fee2e2;
       --info-bg: #dbeafe;
+      --manual-bg: #ede9fe;
       --shadow: 0 12px 30px rgba(15, 23, 42, 0.10);
       --radius: 18px;
     }
@@ -169,7 +172,9 @@
 
     .logout-btn,
     .print-btn,
-    .export-btn {
+    .export-btn,
+    .primary-btn,
+    .secondary-btn {
       border: none;
       border-radius: 12px;
       padding: 12px 16px;
@@ -180,9 +185,15 @@
     }
 
     .print-btn,
-    .export-btn {
+    .export-btn,
+    .primary-btn {
       background: var(--primary);
       color: #fff;
+    }
+
+    .secondary-btn {
+      background: #edf2f7;
+      color: #111827;
     }
 
     .logout-btn {
@@ -190,9 +201,7 @@
       color: #fff;
     }
 
-    .filter-panel,
-    .stats-panel,
-    .table-panel {
+    .panel {
       background: var(--card);
       border-radius: var(--radius);
       box-shadow: var(--shadow);
@@ -201,9 +210,7 @@
       margin-bottom: 22px;
     }
 
-    .filter-panel h2,
-    .stats-panel h2,
-    .table-panel h2 {
+    .panel h2 {
       margin: 0 0 14px;
       font-size: 24px;
       color: var(--primary);
@@ -249,31 +256,11 @@
       flex-wrap: wrap;
     }
 
-    .primary-btn,
-    .secondary-btn {
-      border: none;
-      border-radius: 12px;
-      padding: 12px 16px;
-      cursor: pointer;
-      font-size: 14px;
-      font-weight: 800;
-      font-family: inherit;
-    }
-
-    .primary-btn {
-      background: var(--primary);
-      color: #fff;
-    }
-
-    .secondary-btn {
-      background: #edf2f7;
-      color: #111827;
-    }
-
     .stats-grid {
       display: grid;
-      grid-template-columns: repeat(5, minmax(0, 1fr));
+      grid-template-columns: repeat(4, minmax(0, 1fr));
       gap: 16px;
+      margin-bottom: 18px;
     }
 
     .stat-card {
@@ -291,18 +278,30 @@
     }
 
     .stat-card .value {
-      font-size: 28px;
+      font-size: 24px;
       font-weight: 800;
       color: var(--primary);
-      line-height: 1.3;
+      line-height: 1.4;
     }
 
-    .stat-card.profit .value {
-      color: var(--success);
+    .value-success {
+      color: var(--success) !important;
     }
 
-    .stat-card.cost .value {
-      color: var(--danger);
+    .value-danger {
+      color: var(--danger) !important;
+    }
+
+    .value-manual {
+      color: var(--manual) !important;
+    }
+
+    .section-note {
+      font-size: 13px;
+      color: var(--muted);
+      line-height: 1.8;
+      margin-top: 10px;
+      font-weight: 700;
     }
 
     .table-wrap {
@@ -315,7 +314,7 @@
     table {
       width: 100%;
       border-collapse: collapse;
-      min-width: 1100px;
+      min-width: 1200px;
       background: #fff;
     }
 
@@ -343,7 +342,7 @@
       font-weight: 800;
     }
 
-    .section-badge {
+    .badge {
       display: inline-block;
       padding: 6px 10px;
       border-radius: 999px;
@@ -352,9 +351,14 @@
       white-space: nowrap;
     }
 
-    .badge-revenue {
-      background: var(--success-bg);
-      color: var(--success);
+    .badge-stay {
+      background: var(--info-bg);
+      color: var(--info);
+    }
+
+    .badge-manual {
+      background: var(--manual-bg);
+      color: var(--manual);
     }
 
     .badge-expense {
@@ -367,18 +371,15 @@
       color: var(--warning);
     }
 
-    .subtables {
+    .badge-scope {
+      background: #edf2f7;
+      color: #111827;
+    }
+
+    .tables-grid {
       display: grid;
       grid-template-columns: 1fr;
       gap: 22px;
-    }
-
-    .report-note {
-      font-size: 13px;
-      color: var(--muted);
-      line-height: 1.8;
-      margin-top: 10px;
-      font-weight: 700;
     }
 
     @media (max-width: 1450px) {
@@ -409,6 +410,36 @@
       .stats-grid,
       .filter-grid {
         grid-template-columns: 1fr;
+      }
+    }
+
+    @media print {
+      .sidebar,
+      .topbar-actions,
+      .filter-actions,
+      .logout-btn,
+      .print-btn,
+      .export-btn,
+      button {
+        display: none !important;
+      }
+
+      .app-shell,
+      .main {
+        display: block;
+        padding: 0;
+        margin: 0;
+      }
+
+      body {
+        background: #fff;
+      }
+
+      .panel {
+        box-shadow: none;
+        border: 1px solid #ccc;
+        page-break-inside: avoid;
+        break-inside: avoid;
       }
     }
   </style>
@@ -443,7 +474,7 @@
       <section class="topbar">
         <div class="topbar-title">
           <h1>التقارير</h1>
-          <p>تقارير الأرباح والإيرادات والمصروفات والصيانة مع الفلترة والطباعة والتصدير.</p>
+          <p>تقارير شاملة للإيرادات والمصروفات والصيانة وصافي الربح مع تفصيل وتجميع.</p>
         </div>
 
         <div class="topbar-actions">
@@ -454,42 +485,9 @@
         </div>
       </section>
 
-      <section class="filter-panel">
+      <section class="panel">
         <h2>الفلاتر</h2>
-
         <div class="filter-grid">
-          <div class="form-group">
-            <label for="reportType">نوع التقرير</label>
-            <select id="reportType">
-              <option value="daily">يومي</option>
-              <option value="monthly">شهري</option>
-              <option value="yearly">سنوي</option>
-              <option value="custom">فترة مخصصة</option>
-            </select>
-          </div>
-
-          <div class="form-group">
-            <label for="filterDate">التاريخ</label>
-            <input type="date" id="filterDate">
-          </div>
-
-          <div class="form-group">
-            <label for="filterMonth">الشهر</label>
-            <input type="month" id="filterMonth">
-          </div>
-
-          <div class="form-group">
-            <label for="filterYear">السنة</label>
-            <input type="number" id="filterYear" placeholder="مثال 2026">
-          </div>
-
-          <div class="form-group">
-            <label for="unitFilter">الوحدة</label>
-            <select id="unitFilter">
-              <option value="">كل الوحدات</option>
-            </select>
-          </div>
-
           <div class="form-group">
             <label for="fromDate">من تاريخ</label>
             <input type="date" id="fromDate">
@@ -500,6 +498,33 @@
             <input type="date" id="toDate">
           </div>
 
+          <div class="form-group">
+            <label for="revenuePeriodFilter">نوع الإيراد</label>
+            <select id="revenuePeriodFilter">
+              <option value="">الكل</option>
+              <option value="يومي">يومي</option>
+              <option value="شهري">شهري</option>
+              <option value="سنوي">سنوي</option>
+            </select>
+          </div>
+
+          <div class="form-group">
+            <label for="scopeFilter">النطاق</label>
+            <select id="scopeFilter">
+              <option value="">الكل</option>
+              <option value="unit">وحدة</option>
+              <option value="building">مبنى كامل</option>
+              <option value="general">عام</option>
+            </select>
+          </div>
+
+          <div class="form-group">
+            <label for="targetFilter">المستهدف</label>
+            <select id="targetFilter">
+              <option value="">الكل</option>
+            </select>
+          </div>
+
           <div class="form-group" style="grid-column: 1 / -1;">
             <div class="filter-actions">
               <button class="primary-btn" onclick="applyFilters()">تطبيق الفلتر</button>
@@ -508,29 +533,55 @@
           </div>
         </div>
 
-        <div class="report-note">
-          زر الطباعة الآن يطبع نسخة مستقلة مرتبة مثل ملف HTML، ومناسبة لـ A4.
+        <div class="section-note">
+          فلتر نوع الإيراد يجمع كل اليومي أو الشهري أو السنوي على مستوى النظام كله، ثم يمكن تضييقه بالنطاق أو المستهدف.
         </div>
       </section>
 
-      <section class="stats-panel">
-        <h2>ملخص التقرير</h2>
+      <section class="panel">
+        <h2>الملخص المالي</h2>
         <div class="stats-grid">
           <div class="stat-card">
             <h3>إجمالي الإيرادات</h3>
-            <div class="value" id="totalRevenue">0</div>
+            <div class="value" id="totalRevenue">0 ر.س</div>
           </div>
-          <div class="stat-card cost">
+          <div class="stat-card">
+            <h3>إجمالي اليومي</h3>
+            <div class="value" id="dailyRevenue">0 ر.س</div>
+          </div>
+          <div class="stat-card">
+            <h3>إجمالي الشهري</h3>
+            <div class="value" id="monthlyRevenue">0 ر.س</div>
+          </div>
+          <div class="stat-card">
+            <h3>إجمالي السنوي</h3>
+            <div class="value" id="yearlyRevenue">0 ر.س</div>
+          </div>
+
+          <div class="stat-card">
+            <h3>إيرادات الحجوزات</h3>
+            <div class="value" id="stayRevenue">0 ر.س</div>
+          </div>
+          <div class="stat-card">
+            <h3>الإيرادات اليدوية المرتبطة</h3>
+            <div class="value value-manual" id="manualLinkedRevenue">0 ر.س</div>
+          </div>
+          <div class="stat-card">
+            <h3>الإيرادات اليدوية العامة</h3>
+            <div class="value value-manual" id="manualGeneralRevenue">0 ر.س</div>
+          </div>
+          <div class="stat-card">
             <h3>إجمالي المصروفات</h3>
-            <div class="value" id="totalExpenses">0</div>
+            <div class="value value-danger" id="totalExpenses">0 ر.س</div>
           </div>
-          <div class="stat-card cost">
+
+          <div class="stat-card">
             <h3>إجمالي الصيانة</h3>
-            <div class="value" id="totalMaintenance">0</div>
+            <div class="value value-danger" id="totalMaintenance">0 ر.س</div>
           </div>
-          <div class="stat-card profit">
+          <div class="stat-card">
             <h3>صافي الربح</h3>
-            <div class="value" id="netProfit">0</div>
+            <div class="value value-success" id="netProfit">0 ر.س</div>
           </div>
           <div class="stat-card">
             <h3>عدد السجلات</h3>
@@ -539,59 +590,62 @@
         </div>
       </section>
 
-      <section class="subtables">
-        <section class="table-panel">
-          <h2>الإيرادات</h2>
+      <section class="tables-grid">
+        <section class="panel">
+          <h2>تفصيل الإيرادات</h2>
           <div class="table-wrap">
             <table>
               <thead>
                 <tr>
                   <th>المصدر</th>
-                  <th>النوع</th>
+                  <th>النطاق</th>
+                  <th>نوع الإيراد</th>
+                  <th>التصنيف</th>
                   <th>العميل</th>
-                  <th>الوحدة</th>
+                  <th>المستهدف</th>
                   <th>التاريخ</th>
                   <th>المبلغ</th>
                   <th>البيان</th>
                 </tr>
               </thead>
               <tbody id="revenuesBody">
-                <tr><td colspan="7" class="empty">جاري تحميل الإيرادات...</td></tr>
+                <tr><td colspan="9" class="empty">جاري تحميل الإيرادات...</td></tr>
               </tbody>
             </table>
           </div>
         </section>
 
-        <section class="table-panel">
-          <h2>المصروفات</h2>
+        <section class="panel">
+          <h2>تفصيل المصروفات</h2>
           <div class="table-wrap">
             <table>
               <thead>
                 <tr>
-                  <th>القسم</th>
-                  <th>النوع</th>
-                  <th>الوحدة</th>
+                  <th>النطاق</th>
+                  <th>التصنيف</th>
+                  <th>المستهدف</th>
+                  <th>نوع الفترة</th>
                   <th>التاريخ</th>
                   <th>المبلغ</th>
                   <th>البيان</th>
                 </tr>
               </thead>
               <tbody id="expensesBody">
-                <tr><td colspan="6" class="empty">جاري تحميل المصروفات...</td></tr>
+                <tr><td colspan="7" class="empty">جاري تحميل المصروفات...</td></tr>
               </tbody>
             </table>
           </div>
         </section>
 
-        <section class="table-panel">
-          <h2>الصيانة</h2>
+        <section class="panel">
+          <h2>تفصيل الصيانة</h2>
           <div class="table-wrap">
             <table>
               <thead>
                 <tr>
-                  <th>القسم</th>
+                  <th>النطاق</th>
                   <th>نوع الصيانة</th>
-                  <th>الوحدة</th>
+                  <th>المستهدف</th>
                   <th>التاريخ</th>
                   <th>المبلغ</th>
                   <th>البيان</th>
@@ -603,12 +657,75 @@
             </table>
           </div>
         </section>
+
+        <section class="panel">
+          <h2>تجميع حسب الوحدات</h2>
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr>
+                  <th>الوحدة</th>
+                  <th>إيرادات الحجوزات</th>
+                  <th>الإيرادات اليدوية</th>
+                  <th>المصروفات</th>
+                  <th>الصيانة</th>
+                  <th>صافي الربح</th>
+                </tr>
+              </thead>
+              <tbody id="unitsSummaryBody">
+                <tr><td colspan="6" class="empty">جاري التحميل...</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </section>
+
+        <section class="panel">
+          <h2>تجميع حسب المباني</h2>
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr>
+                  <th>المبنى</th>
+                  <th>إيرادات الحجوزات</th>
+                  <th>الإيرادات اليدوية</th>
+                  <th>المصروفات</th>
+                  <th>الصيانة</th>
+                  <th>صافي الربح</th>
+                </tr>
+              </thead>
+              <tbody id="buildingsSummaryBody">
+                <tr><td colspan="6" class="empty">جاري التحميل...</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </section>
+
+        <section class="panel">
+          <h2>الإيرادات اليدوية العامة</h2>
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr>
+                  <th>نوع الإيراد</th>
+                  <th>التصنيف</th>
+                  <th>العميل</th>
+                  <th>التاريخ</th>
+                  <th>المبلغ</th>
+                  <th>البيان</th>
+                </tr>
+              </thead>
+              <tbody id="generalManualBody">
+                <tr><td colspan="6" class="empty">جاري التحميل...</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </section>
       </section>
     </main>
   </div>
 
   <script type="module">
-    import { initializeApp } from "https://www.gstatic.com/firebasejs/12.11.0/firebase-app.js";
+    import { initializeApp, getApps, getApp } from "https://www.gstatic.com/firebasejs/12.11.0/firebase-app.js";
     import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/12.11.0/firebase-auth.js";
     import {
       getFirestore,
@@ -629,7 +746,7 @@
       appId: "1:336608827796:web:4957fe0d411220f6a69781"
     };
 
-    const app = initializeApp(firebaseConfig);
+    const app = getApps().length ? getApp() : initializeApp(firebaseConfig);
     const auth = getAuth(app);
     const db = getFirestore(app);
 
@@ -637,15 +754,19 @@
     const userEmailEl = document.getElementById("sidebarUserEmail");
     const userRoleEl = document.getElementById("sidebarUserRole");
 
-    const reportTypeEl = document.getElementById("reportType");
-    const filterDateEl = document.getElementById("filterDate");
-    const filterMonthEl = document.getElementById("filterMonth");
-    const filterYearEl = document.getElementById("filterYear");
     const fromDateEl = document.getElementById("fromDate");
     const toDateEl = document.getElementById("toDate");
-    const unitFilterEl = document.getElementById("unitFilter");
+    const targetFilterEl = document.getElementById("targetFilter");
+    const scopeFilterEl = document.getElementById("scopeFilter");
+    const revenuePeriodFilterEl = document.getElementById("revenuePeriodFilter");
 
     const totalRevenueEl = document.getElementById("totalRevenue");
+    const dailyRevenueEl = document.getElementById("dailyRevenue");
+    const monthlyRevenueEl = document.getElementById("monthlyRevenue");
+    const yearlyRevenueEl = document.getElementById("yearlyRevenue");
+    const stayRevenueEl = document.getElementById("stayRevenue");
+    const manualLinkedRevenueEl = document.getElementById("manualLinkedRevenue");
+    const manualGeneralRevenueEl = document.getElementById("manualGeneralRevenue");
     const totalExpensesEl = document.getElementById("totalExpenses");
     const totalMaintenanceEl = document.getElementById("totalMaintenance");
     const netProfitEl = document.getElementById("netProfit");
@@ -654,6 +775,9 @@
     const revenuesBody = document.getElementById("revenuesBody");
     const expensesBody = document.getElementById("expensesBody");
     const maintenanceBody = document.getElementById("maintenanceBody");
+    const unitsSummaryBody = document.getElementById("unitsSummaryBody");
+    const buildingsSummaryBody = document.getElementById("buildingsSummaryBody");
+    const generalManualBody = document.getElementById("generalManualBody");
 
     let staysRows = [];
     let manualRevenueRows = [];
@@ -663,7 +787,10 @@
     let currentFilteredData = {
       revenues: [],
       expenses: [],
-      maintenance: []
+      maintenance: [],
+      manualGeneral: [],
+      unitsSummary: [],
+      buildingsSummary: []
     };
 
     function formatMoneyNumber(value) {
@@ -679,79 +806,90 @@
       return `"${str.replace(/"/g, '""')}"`;
     }
 
-    function getReportTypeLabel() {
-      const map = {
-        daily: "يومي",
-        monthly: "شهري",
-        yearly: "سنوي",
-        custom: "فترة مخصصة"
-      };
-      return map[reportTypeEl.value] || "-";
+    function getScopeLabel(scope) {
+      if (scope === "unit") return "وحدة";
+      if (scope === "building") return "مبنى كامل";
+      return "عام";
     }
 
-    function buildReportSummaryText() {
-      const unitLabel = unitFilterEl.value || "كل الوحدات";
-      return `نوع التقرير: ${getReportTypeLabel()} | الوحدة: ${unitLabel}`;
+    function getDateValue(dateStr) {
+      if (!dateStr) return "";
+      return String(dateStr).slice(0, 10);
     }
 
-    function populateUnitsFilter() {
-      unitFilterEl.innerHTML = `<option value="">كل الوحدات</option>`;
-      unitsRows.forEach((item) => {
-        const label = `${item.data.propertyName || ""} - ${item.data.unitNumber || ""}`;
-        unitFilterEl.innerHTML += `<option value="${label}">${label}</option>`;
-      });
-    }
+    function inDateRange(dateStr) {
+      const normalized = getDateValue(dateStr);
+      if (!normalized) return false;
 
-    function getDateMode() {
-      return reportTypeEl.value;
-    }
-
-    function matchDate(dateStr) {
-      if (!dateStr) return false;
-
-      const mode = getDateMode();
-
-      if (mode === "daily") {
-        if (!filterDateEl.value) return true;
-        return dateStr === filterDateEl.value;
-      }
-
-      if (mode === "monthly") {
-        if (!filterMonthEl.value) return true;
-        return dateStr.startsWith(filterMonthEl.value);
-      }
-
-      if (mode === "yearly") {
-        if (!filterYearEl.value) return true;
-        return dateStr.startsWith(String(filterYearEl.value));
-      }
-
-      if (mode === "custom") {
-        const from = fromDateEl.value;
-        const to = toDateEl.value;
-        if (!from && !to) return true;
-        if (from && dateStr < from) return false;
-        if (to && dateStr > to) return false;
-        return true;
-      }
-
+      if (fromDateEl.value && normalized < fromDateEl.value) return false;
+      if (toDateEl.value && normalized > toDateEl.value) return false;
       return true;
     }
 
-    function matchUnit(unitLabel) {
-      if (!unitFilterEl.value) return true;
-      return String(unitLabel || "") === unitFilterEl.value;
+    function matchScope(row) {
+      if (!scopeFilterEl.value) return true;
+      return String(row.scope || "") === scopeFilterEl.value;
+    }
+
+    function matchTarget(row) {
+      if (!targetFilterEl.value) return true;
+      return String(row.targetLabel || "") === targetFilterEl.value;
+    }
+
+    function matchRevenuePeriod(row) {
+      if (!revenuePeriodFilterEl.value) return true;
+      return String(row.periodType || "") === revenuePeriodFilterEl.value;
+    }
+
+    function setTargetsFilterOptions() {
+      const targets = new Set();
+
+      staysRows.forEach(item => {
+        const row = item.data;
+        if (row.unitLabel) targets.add(row.unitLabel);
+        if (row.propertyName) targets.add(row.propertyName);
+      });
+
+      manualRevenueRows.forEach(item => {
+        const row = item.data;
+        if ((row.scope || "general") === "building" && row.propertyName) targets.add(row.propertyName);
+        if ((row.scope || "general") === "unit" && row.unitLabel && row.unitLabel !== "-") targets.add(row.unitLabel);
+      });
+
+      expensesRows.forEach(item => {
+        const row = item.data;
+        if ((row.scope || "general") === "building" && row.propertyName) targets.add(row.propertyName);
+        if ((row.scope || "general") === "unit" && row.unitLabel && row.unitLabel !== "-") targets.add(row.unitLabel);
+      });
+
+      maintenanceRows.forEach(item => {
+        const row = item.data;
+        if ((row.scope || "unit") === "building" && row.propertyName) targets.add(row.propertyName);
+        if ((row.scope || "unit") === "unit" && row.unitLabel && row.unitLabel !== "-") targets.add(row.unitLabel);
+      });
+
+      const currentValue = targetFilterEl.value;
+      targetFilterEl.innerHTML = `<option value="">الكل</option>`;
+      [...targets].sort((a, b) => a.localeCompare(b, 'ar')).forEach(target => {
+        targetFilterEl.innerHTML += `<option value="${target}">${target}</option>`;
+      });
+      targetFilterEl.value = currentValue;
     }
 
     function mapStayRevenue(item) {
       const row = item.data;
       return {
         section: "revenue",
-        source: "من الحجز",
-        type: row.rentalType || "-",
+        sourceType: "stay",
+        sourceLabel: "من الحجز",
+        scope: "unit",
+        periodType: row.rentalType || "-",
+        category: "حجز / سكن",
         client: row.clientName || "-",
-        unit: row.unitLabel || "-",
-        date: row.checkIn || "-",
+        targetLabel: row.unitLabel || "-",
+        unitLabel: row.unitLabel || "-",
+        propertyName: row.propertyName || "",
+        date: row.checkIn || row.date || "-",
         amount: Number(row.paid || row.amount || 0),
         description: row.notes || "إيراد تلقائي من الحجز"
       };
@@ -759,12 +897,24 @@
 
     function mapManualRevenue(item) {
       const row = item.data;
+      const scope = row.scope || "general";
+      const targetLabel = scope === "building"
+        ? (row.propertyName || "-")
+        : scope === "unit"
+          ? (row.unitLabel || "-")
+          : "إيراد عام";
+
       return {
         section: "revenue",
-        source: "إضافة يدوية",
-        type: row.category || "-",
+        sourceType: "manual",
+        sourceLabel: "إضافة يدوية",
+        scope,
+        periodType: row.periodType || "-",
+        category: row.category || "-",
         client: row.clientName || "-",
-        unit: row.unitLabel || "-",
+        targetLabel,
+        unitLabel: row.unitLabel || "-",
+        propertyName: row.propertyName || "",
         date: row.date || "-",
         amount: Number(row.amount || 0),
         description: row.description || "-"
@@ -773,11 +923,22 @@
 
     function mapExpense(item) {
       const row = item.data;
+      const scope = row.scope || "general";
+      const targetLabel = scope === "building"
+        ? (row.propertyName || "-")
+        : scope === "unit"
+          ? (row.unitLabel || "-")
+          : "مصروف عام";
+
       return {
         section: "expense",
+        scope,
         label: "مصروف",
         type: row.category || "-",
-        unit: row.unitLabel || "-",
+        periodType: row.periodType || "-",
+        targetLabel,
+        unitLabel: row.unitLabel || "-",
+        propertyName: row.propertyName || "",
         date: row.date || "-",
         amount: Number(row.amount || 0),
         description: row.description || "-"
@@ -786,46 +947,137 @@
 
     function mapMaintenance(item) {
       const row = item.data;
+      const scope = row.scope || "unit";
+      const targetLabel = scope === "building"
+        ? (row.propertyName || "-")
+        : (row.unitLabel || "-");
+
       return {
         section: "maintenance",
+        scope,
         label: "صيانة",
         type: row.typeLabel || "-",
-        unit: row.unitLabel || "-",
+        targetLabel,
+        unitLabel: row.unitLabel || "-",
+        propertyName: row.propertyName || "",
         date: row.date || "-",
         amount: Number(row.amount || 0),
         description: row.description || "-"
       };
     }
 
+    function addNumber(map, key, field, value) {
+      if (!map[key]) {
+        map[key] = {
+          label: key,
+          stayRevenue: 0,
+          manualRevenue: 0,
+          expenses: 0,
+          maintenance: 0,
+          netProfit: 0
+        };
+      }
+      map[key][field] += Number(value || 0);
+    }
+
+    function buildUnitsSummary(revenues, expenses, maintenance) {
+      const map = {};
+
+      revenues.forEach(row => {
+        if (row.scope === "unit" && row.targetLabel && row.targetLabel !== "-") {
+          if (row.sourceType === "stay") addNumber(map, row.targetLabel, "stayRevenue", row.amount);
+          else addNumber(map, row.targetLabel, "manualRevenue", row.amount);
+        }
+      });
+
+      expenses.forEach(row => {
+        if (row.scope === "unit" && row.targetLabel && row.targetLabel !== "-" && row.targetLabel !== "مصروف عام") {
+          addNumber(map, row.targetLabel, "expenses", row.amount);
+        }
+      });
+
+      maintenance.forEach(row => {
+        if (row.scope === "unit" && row.targetLabel && row.targetLabel !== "-") {
+          addNumber(map, row.targetLabel, "maintenance", row.amount);
+        }
+      });
+
+      const rows = Object.values(map);
+      rows.forEach(row => {
+        row.netProfit = row.stayRevenue + row.manualRevenue - row.expenses - row.maintenance;
+      });
+
+      return rows.sort((a, b) => a.label.localeCompare(b.label, 'ar'));
+    }
+
+    function buildBuildingsSummary(revenues, expenses, maintenance) {
+      const map = {};
+
+      revenues.forEach(row => {
+        const buildingLabel = row.scope === "building" ? row.targetLabel : row.propertyName;
+        if (buildingLabel && buildingLabel !== "-") {
+          if (row.sourceType === "stay") addNumber(map, buildingLabel, "stayRevenue", row.amount);
+          else addNumber(map, buildingLabel, "manualRevenue", row.amount);
+        }
+      });
+
+      expenses.forEach(row => {
+        const buildingLabel = row.scope === "building" ? row.targetLabel : row.propertyName;
+        if (buildingLabel && buildingLabel !== "-" && buildingLabel !== "مصروف عام") {
+          addNumber(map, buildingLabel, "expenses", row.amount);
+        }
+      });
+
+      maintenance.forEach(row => {
+        const buildingLabel = row.scope === "building" ? row.targetLabel : row.propertyName;
+        if (buildingLabel && buildingLabel !== "-") {
+          addNumber(map, buildingLabel, "maintenance", row.amount);
+        }
+      });
+
+      const rows = Object.values(map);
+      rows.forEach(row => {
+        row.netProfit = row.stayRevenue + row.manualRevenue - row.expenses - row.maintenance;
+      });
+
+      return rows.sort((a, b) => a.label.localeCompare(b.label, 'ar'));
+    }
+
     function filterAllData() {
       const revenues = [
         ...staysRows.map(mapStayRevenue),
         ...manualRevenueRows.map(mapManualRevenue)
-      ].filter(row => matchDate(row.date) && matchUnit(row.unit));
+      ].filter(row => inDateRange(row.date) && matchRevenuePeriod(row) && matchScope(row) && matchTarget(row));
 
       const expenses = expensesRows
         .map(mapExpense)
-        .filter(row => matchDate(row.date) && matchUnit(row.unit));
+        .filter(row => inDateRange(row.date) && matchScope(row) && matchTarget(row));
 
       const maintenance = maintenanceRows
         .map(mapMaintenance)
-        .filter(row => matchDate(row.date) && matchUnit(row.unit));
+        .filter(row => inDateRange(row.date) && matchScope(row) && matchTarget(row));
 
-      return { revenues, expenses, maintenance };
+      const manualGeneral = revenues.filter(row => row.sourceType === "manual" && row.scope === "general");
+      const unitsSummary = buildUnitsSummary(revenues, expenses, maintenance);
+      const buildingsSummary = buildBuildingsSummary(revenues, expenses, maintenance);
+
+      return { revenues, expenses, maintenance, manualGeneral, unitsSummary, buildingsSummary };
     }
 
     function renderRevenueTable(rows) {
       if (!rows.length) {
-        revenuesBody.innerHTML = `<tr><td colspan="7" class="empty">لا توجد بيانات إيرادات مطابقة.</td></tr>`;
+        revenuesBody.innerHTML = `<tr><td colspan="9" class="empty">لا توجد بيانات إيرادات مطابقة.</td></tr>`;
         return;
       }
 
       revenuesBody.innerHTML = rows.map(row => `
         <tr>
-          <td><span class="section-badge badge-revenue">${row.source}</span></td>
-          <td>${row.type}</td>
+          <td><span class="badge ${row.sourceType === 'stay' ? 'badge-stay' : 'badge-manual'}">${row.sourceLabel}</span></td>
+          <td><span class="badge badge-scope">${getScopeLabel(row.scope)}</span></td>
+          <td>${row.periodType}</td>
+          <td>${row.category}</td>
           <td>${row.client}</td>
-          <td>${row.unit}</td>
+          <td>${row.targetLabel}</td>
           <td>${row.date}</td>
           <td>${formatMoney(row.amount)}</td>
           <td>${row.description}</td>
@@ -835,15 +1087,16 @@
 
     function renderExpenseTable(rows) {
       if (!rows.length) {
-        expensesBody.innerHTML = `<tr><td colspan="6" class="empty">لا توجد بيانات مصروفات مطابقة.</td></tr>`;
+        expensesBody.innerHTML = `<tr><td colspan="7" class="empty">لا توجد بيانات مصروفات مطابقة.</td></tr>`;
         return;
       }
 
       expensesBody.innerHTML = rows.map(row => `
         <tr>
-          <td><span class="section-badge badge-expense">${row.label}</span></td>
+          <td><span class="badge badge-scope">${getScopeLabel(row.scope)}</span></td>
           <td>${row.type}</td>
-          <td>${row.unit}</td>
+          <td>${row.targetLabel}</td>
+          <td>${row.periodType}</td>
           <td>${row.date}</td>
           <td>${formatMoney(row.amount)}</td>
           <td>${row.description}</td>
@@ -859,9 +1112,63 @@
 
       maintenanceBody.innerHTML = rows.map(row => `
         <tr>
-          <td><span class="section-badge badge-maintenance">${row.label}</span></td>
+          <td><span class="badge badge-scope">${getScopeLabel(row.scope)}</span></td>
           <td>${row.type}</td>
-          <td>${row.unit}</td>
+          <td>${row.targetLabel}</td>
+          <td>${row.date}</td>
+          <td>${formatMoney(row.amount)}</td>
+          <td>${row.description}</td>
+        </tr>
+      `).join("");
+    }
+
+    function renderUnitsSummary(rows) {
+      if (!rows.length) {
+        unitsSummaryBody.innerHTML = `<tr><td colspan="6" class="empty">لا توجد بيانات مطابقة.</td></tr>`;
+        return;
+      }
+
+      unitsSummaryBody.innerHTML = rows.map(row => `
+        <tr>
+          <td>${row.label}</td>
+          <td>${formatMoney(row.stayRevenue)}</td>
+          <td>${formatMoney(row.manualRevenue)}</td>
+          <td>${formatMoney(row.expenses)}</td>
+          <td>${formatMoney(row.maintenance)}</td>
+          <td>${formatMoney(row.netProfit)}</td>
+        </tr>
+      `).join("");
+    }
+
+    function renderBuildingsSummary(rows) {
+      if (!rows.length) {
+        buildingsSummaryBody.innerHTML = `<tr><td colspan="6" class="empty">لا توجد بيانات مطابقة.</td></tr>`;
+        return;
+      }
+
+      buildingsSummaryBody.innerHTML = rows.map(row => `
+        <tr>
+          <td>${row.label}</td>
+          <td>${formatMoney(row.stayRevenue)}</td>
+          <td>${formatMoney(row.manualRevenue)}</td>
+          <td>${formatMoney(row.expenses)}</td>
+          <td>${formatMoney(row.maintenance)}</td>
+          <td>${formatMoney(row.netProfit)}</td>
+        </tr>
+      `).join("");
+    }
+
+    function renderGeneralManual(rows) {
+      if (!rows.length) {
+        generalManualBody.innerHTML = `<tr><td colspan="6" class="empty">لا توجد إيرادات يدوية عامة مطابقة.</td></tr>`;
+        return;
+      }
+
+      generalManualBody.innerHTML = rows.map(row => `
+        <tr>
+          <td>${row.periodType}</td>
+          <td>${row.category}</td>
+          <td>${row.client}</td>
           <td>${row.date}</td>
           <td>${formatMoney(row.amount)}</td>
           <td>${row.description}</td>
@@ -871,12 +1178,34 @@
 
     function renderSummary(data) {
       const totalRevenue = data.revenues.reduce((sum, row) => sum + Number(row.amount || 0), 0);
+      const dailyRevenue = data.revenues.filter(r => r.periodType === "يومي").reduce((sum, row) => sum + Number(row.amount || 0), 0);
+      const monthlyRevenue = data.revenues.filter(r => r.periodType === "شهري").reduce((sum, row) => sum + Number(row.amount || 0), 0);
+      const yearlyRevenue = data.revenues.filter(r => r.periodType === "سنوي").reduce((sum, row) => sum + Number(row.amount || 0), 0);
+
+      const stayRevenue = data.revenues
+        .filter(row => row.sourceType === "stay")
+        .reduce((sum, row) => sum + Number(row.amount || 0), 0);
+
+      const manualLinkedRevenue = data.revenues
+        .filter(row => row.sourceType === "manual" && row.scope !== "general")
+        .reduce((sum, row) => sum + Number(row.amount || 0), 0);
+
+      const manualGeneralRevenue = data.revenues
+        .filter(row => row.sourceType === "manual" && row.scope === "general")
+        .reduce((sum, row) => sum + Number(row.amount || 0), 0);
+
       const totalExpenses = data.expenses.reduce((sum, row) => sum + Number(row.amount || 0), 0);
       const totalMaintenance = data.maintenance.reduce((sum, row) => sum + Number(row.amount || 0), 0);
       const netProfit = totalRevenue - totalExpenses - totalMaintenance;
       const totalRecords = data.revenues.length + data.expenses.length + data.maintenance.length;
 
       totalRevenueEl.textContent = formatMoney(totalRevenue);
+      dailyRevenueEl.textContent = formatMoney(dailyRevenue);
+      monthlyRevenueEl.textContent = formatMoney(monthlyRevenue);
+      yearlyRevenueEl.textContent = formatMoney(yearlyRevenue);
+      stayRevenueEl.textContent = formatMoney(stayRevenue);
+      manualLinkedRevenueEl.textContent = formatMoney(manualLinkedRevenue);
+      manualGeneralRevenueEl.textContent = formatMoney(manualGeneralRevenue);
       totalExpensesEl.textContent = formatMoney(totalExpenses);
       totalMaintenanceEl.textContent = formatMoney(totalMaintenance);
       netProfitEl.textContent = formatMoney(netProfit);
@@ -886,21 +1215,33 @@
     function applyFilters() {
       const data = filterAllData();
       currentFilteredData = data;
+
       renderRevenueTable(data.revenues);
       renderExpenseTable(data.expenses);
       renderMaintenanceTable(data.maintenance);
+      renderUnitsSummary(data.unitsSummary);
+      renderBuildingsSummary(data.buildingsSummary);
+      renderGeneralManual(data.manualGeneral);
       renderSummary(data);
     }
 
     function resetFilters() {
-      reportTypeEl.value = "daily";
-      filterDateEl.value = "";
-      filterMonthEl.value = "";
-      filterYearEl.value = "";
       fromDateEl.value = "";
       toDateEl.value = "";
-      unitFilterEl.value = "";
+      targetFilterEl.value = "";
+      scopeFilterEl.value = "";
+      revenuePeriodFilterEl.value = "";
       applyFilters();
+    }
+
+    function buildFilterSummaryText() {
+      return `
+        من تاريخ: ${fromDateEl.value || "البداية"} |
+        إلى تاريخ: ${toDateEl.value || "النهاية"} |
+        نوع الإيراد: ${revenuePeriodFilterEl.value || "الكل"} |
+        النطاق: ${scopeFilterEl.value ? getScopeLabel(scopeFilterEl.value) : "الكل"} |
+        المستهدف: ${targetFilterEl.value || "الكل"}
+      `.replace(/\s+/g, ' ').trim();
     }
 
     function buildPrintableHtml() {
@@ -912,10 +1253,26 @@
       const revenueRows = currentFilteredData.revenues.length
         ? currentFilteredData.revenues.map(row => `
           <tr>
-            <td>${row.source}</td>
-            <td>${row.type}</td>
+            <td>${row.sourceLabel}</td>
+            <td>${getScopeLabel(row.scope)}</td>
+            <td>${row.periodType}</td>
+            <td>${row.category}</td>
             <td>${row.client}</td>
-            <td>${row.unit}</td>
+            <td>${row.targetLabel}</td>
+            <td>${row.date}</td>
+            <td>${formatMoney(row.amount)}</td>
+            <td>${row.description}</td>
+          </tr>
+        `).join("")
+        : `<tr><td colspan="9">لا توجد بيانات.</td></tr>`;
+
+      const expenseRows = currentFilteredData.expenses.length
+        ? currentFilteredData.expenses.map(row => `
+          <tr>
+            <td>${getScopeLabel(row.scope)}</td>
+            <td>${row.type}</td>
+            <td>${row.targetLabel}</td>
+            <td>${row.periodType}</td>
             <td>${row.date}</td>
             <td>${formatMoney(row.amount)}</td>
             <td>${row.description}</td>
@@ -923,25 +1280,12 @@
         `).join("")
         : `<tr><td colspan="7">لا توجد بيانات.</td></tr>`;
 
-      const expenseRows = currentFilteredData.expenses.length
-        ? currentFilteredData.expenses.map(row => `
-          <tr>
-            <td>${row.label}</td>
-            <td>${row.type}</td>
-            <td>${row.unit}</td>
-            <td>${row.date}</td>
-            <td>${formatMoney(row.amount)}</td>
-            <td>${row.description}</td>
-          </tr>
-        `).join("")
-        : `<tr><td colspan="6">لا توجد بيانات.</td></tr>`;
-
       const maintenanceRowsHtml = currentFilteredData.maintenance.length
         ? currentFilteredData.maintenance.map(row => `
           <tr>
-            <td>${row.label}</td>
+            <td>${getScopeLabel(row.scope)}</td>
             <td>${row.type}</td>
-            <td>${row.unit}</td>
+            <td>${row.targetLabel}</td>
             <td>${row.date}</td>
             <td>${formatMoney(row.amount)}</td>
             <td>${row.description}</td>
@@ -958,67 +1302,22 @@
 <style>
   @page { size: A4 portrait; margin: 10mm; }
   * { box-sizing: border-box; }
-  body {
-    font-family: Arial, sans-serif;
-    color: #111;
-    direction: rtl;
-    margin: 0;
-    background: #fff;
-  }
-  h1, h2 {
-    margin: 0 0 8px;
-  }
-  .box {
-    border: 1px solid #ccc;
-    border-radius: 10px;
-    padding: 12px;
-    margin-bottom: 12px;
-    page-break-inside: avoid;
-    break-inside: avoid;
-  }
-  .stats {
-    display: grid;
-    grid-template-columns: repeat(4, 1fr);
-    gap: 10px;
-    margin-top: 10px;
-  }
-  .stat {
-    border: 1px solid #ddd;
-    padding: 10px;
-    border-radius: 8px;
-  }
-  .stat strong {
-    display: block;
-    margin-bottom: 6px;
-    font-size: 12px;
-  }
-  .stat span {
-    font-size: 14px;
-    font-weight: bold;
-  }
-  table {
-    width: 100%;
-    border-collapse: collapse;
-    margin-top: 8px;
-    table-layout: fixed;
-  }
-  th, td {
-    border: 1px solid #ddd;
-    padding: 6px;
-    font-size: 11px;
-    word-break: break-word;
-    text-align: right;
-    vertical-align: top;
-  }
-  th {
-    background: #f2f2f2;
-  }
+  body { font-family: Arial, sans-serif; direction: rtl; margin: 0; color: #111; background: #fff; }
+  h1, h2 { margin: 0 0 8px; }
+  .box { border: 1px solid #ccc; border-radius: 10px; padding: 12px; margin-bottom: 12px; page-break-inside: avoid; break-inside: avoid; }
+  .stats { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; margin-top: 10px; }
+  .stat { border: 1px solid #ddd; padding: 10px; border-radius: 8px; }
+  .stat strong { display: block; margin-bottom: 6px; font-size: 12px; }
+  .stat span { font-size: 14px; font-weight: bold; }
+  table { width: 100%; border-collapse: collapse; margin-top: 8px; table-layout: fixed; }
+  th, td { border: 1px solid #ddd; padding: 6px; font-size: 11px; word-break: break-word; text-align: right; vertical-align: top; }
+  th { background: #f2f2f2; }
 </style>
 </head>
 <body>
   <div class="box">
-    <h1>BkTowers - تقرير مالي</h1>
-    <div>${buildReportSummaryText()}</div>
+    <h1>BkTowers - تقرير شامل</h1>
+    <div>${buildFilterSummaryText()}</div>
     <div class="stats">
       <div class="stat"><strong>إجمالي الإيرادات</strong><span>${formatMoney(totalRevenue)}</span></div>
       <div class="stat"><strong>إجمالي المصروفات</strong><span>${formatMoney(totalExpenses)}</span></div>
@@ -1033,9 +1332,11 @@
       <thead>
         <tr>
           <th>المصدر</th>
-          <th>النوع</th>
+          <th>النطاق</th>
+          <th>نوع الإيراد</th>
+          <th>التصنيف</th>
           <th>العميل</th>
-          <th>الوحدة</th>
+          <th>المستهدف</th>
           <th>التاريخ</th>
           <th>المبلغ</th>
           <th>البيان</th>
@@ -1050,9 +1351,10 @@
     <table>
       <thead>
         <tr>
-          <th>القسم</th>
-          <th>النوع</th>
-          <th>الوحدة</th>
+          <th>النطاق</th>
+          <th>التصنيف</th>
+          <th>المستهدف</th>
+          <th>نوع الفترة</th>
           <th>التاريخ</th>
           <th>المبلغ</th>
           <th>البيان</th>
@@ -1067,9 +1369,9 @@
     <table>
       <thead>
         <tr>
-          <th>القسم</th>
+          <th>النطاق</th>
           <th>نوع الصيانة</th>
-          <th>الوحدة</th>
+          <th>المستهدف</th>
           <th>التاريخ</th>
           <th>المبلغ</th>
           <th>البيان</th>
@@ -1088,7 +1390,7 @@
       const printWindow = window.open("", "_blank", "width=1200,height=900");
 
       if (!printWindow) {
-        alert("المتصفح منع نافذة الطباعة. اسمح بفتح النوافذ المنبثقة ثم حاول مرة أخرى.");
+        alert("المتصفح منع نافذة الطباعة. اسمح بالنوافذ المنبثقة ثم حاول مرة أخرى.");
         return;
       }
 
@@ -1099,9 +1401,7 @@
       printWindow.onload = function () {
         printWindow.focus();
         printWindow.print();
-        setTimeout(() => {
-          printWindow.close();
-        }, 300);
+        setTimeout(() => printWindow.close(), 300);
       };
     }
 
@@ -1109,10 +1409,11 @@
       const lines = [];
       lines.push([
         "القسم",
-        "المصدر/النوع",
-        "التفصيل",
+        "المصدر",
+        "النطاق",
+        "النوع/التصنيف",
         "العميل",
-        "الوحدة",
+        "المستهدف",
         "التاريخ",
         "المبلغ",
         "البيان"
@@ -1121,10 +1422,11 @@
       currentFilteredData.revenues.forEach(row => {
         lines.push([
           "إيراد",
-          row.source,
-          row.type,
+          row.sourceLabel,
+          getScopeLabel(row.scope),
+          row.category,
           row.client,
-          row.unit,
+          row.targetLabel,
           row.date,
           formatMoneyNumber(row.amount),
           row.description
@@ -1134,10 +1436,11 @@
       currentFilteredData.expenses.forEach(row => {
         lines.push([
           "مصروف",
-          row.label,
+          "مصروف",
+          getScopeLabel(row.scope),
           row.type,
           "",
-          row.unit,
+          row.targetLabel,
           row.date,
           formatMoneyNumber(row.amount),
           row.description
@@ -1147,10 +1450,11 @@
       currentFilteredData.maintenance.forEach(row => {
         lines.push([
           "صيانة",
-          row.label,
+          "صيانة",
+          getScopeLabel(row.scope),
           row.type,
           "",
-          row.unit,
+          row.targetLabel,
           row.date,
           formatMoneyNumber(row.amount),
           row.description
@@ -1214,7 +1518,7 @@
         unitsRows.push({ id: docSnap.id, data: docSnap.data() });
       });
 
-      populateUnitsFilter();
+      setTargetsFilterOptions();
       applyFilters();
     }
 
@@ -1228,13 +1532,11 @@
       }
     }
 
-    reportTypeEl.addEventListener("change", applyFilters);
-    filterDateEl.addEventListener("change", applyFilters);
-    filterMonthEl.addEventListener("change", applyFilters);
-    filterYearEl.addEventListener("input", applyFilters);
     fromDateEl.addEventListener("change", applyFilters);
     toDateEl.addEventListener("change", applyFilters);
-    unitFilterEl.addEventListener("change", applyFilters);
+    targetFilterEl.addEventListener("change", applyFilters);
+    scopeFilterEl.addEventListener("change", applyFilters);
+    revenuePeriodFilterEl.addEventListener("change", applyFilters);
 
     window.logout = logout;
     window.printReport = printReport;
