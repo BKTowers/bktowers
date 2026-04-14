@@ -327,7 +327,6 @@ body {
     <h3>تنبيه</h3>
     <div class="note">
       هذه الصفحة مخصصة للموظف فقط، وصلاحيته الحالية تقتصر على تسجيل العملاء والحجوزات فقط.
-      لا يمكنه الوصول إلى لوحة التحكم أو الإيرادات أو المصروفات أو الصيانة أو التقارير أو إدارة الموظفين.
     </div>
   </div>
 
@@ -356,7 +355,7 @@ body {
     </div>
 
     <div class="modal-note">
-      سيتم تحديث كلمة المرور لحسابك الحالي، وكذلك تحديثها داخل بيانات المستخدم في النظام.
+      سيتم تحديث كلمة المرور لحسابك الحالي وكذلك تحديثها داخل بيانات النظام.
     </div>
 
     <div id="passwordMessage" class="message"></div>
@@ -383,7 +382,9 @@ import {
   doc,
   getDoc,
   updateDoc,
-  serverTimestamp
+  serverTimestamp,
+  collection,
+  getDocs
 } from "https://www.gstatic.com/firebasejs/12.11.0/firebase-firestore.js";
 
 const firebaseConfig = {
@@ -405,6 +406,10 @@ const passwordModal = document.getElementById("passwordModal");
 
 let currentUserDocId = null;
 let currentUserData = null;
+
+function normalizeValue(value){
+  return String(value || "").trim().toLowerCase();
+}
 
 function setPageMessage(text, type = "") {
   pageMessage.textContent = text;
@@ -431,6 +436,35 @@ function openPasswordModal() {
 
 function closePasswordModal() {
   passwordModal.classList.remove("show");
+}
+
+async function findUserData(firebaseUser){
+  const ref = doc(db, "users", firebaseUser.uid);
+  const snap = await getDoc(ref);
+
+  if(snap.exists()){
+    return {
+      id: snap.id,
+      ...snap.data()
+    };
+  }
+
+  const usersSnapshot = await getDocs(collection(db, "users"));
+  let found = null;
+
+  usersSnapshot.forEach((docSnap) => {
+    if(found) return;
+
+    const data = docSnap.data();
+    if(normalizeValue(data.email) === normalizeValue(firebaseUser.email)){
+      found = {
+        id: docSnap.id,
+        ...data
+      };
+    }
+  });
+
+  return found;
 }
 
 async function changeMyPassword() {
@@ -505,39 +539,26 @@ onAuthStateChanged(auth, async (user) => {
   }
 
   try {
-  const userRef = doc(db, "users", user.uid);
-let userSnap = await getDoc(userRef);
-let userData = null;
+    const userDataFull = await findUserData(user);
 
-if (userSnap.exists()) {
-  userData = userSnap.data();
-} else {
-  const usersSnapshot = await getDocs(collection(db, "users"));
-  usersSnapshot.forEach((docSnap) => {
-    if (userData) return;
-    const data = docSnap.data();
-    if ((data.email || "").toLowerCase() === (user.email || "").toLowerCase()) {
-      userData = data;
+    if (!userDataFull) {
+      window.location.href = "index.html";
+      return;
     }
-  });
-}
 
-if (!userData) {
-  window.location.href = "index.html";
-  return;
-}
-    currentUserDocId = user.uid;
-    currentUserData = data;
+    currentUserDocId = userDataFull.id;
+    currentUserData = userDataFull;
 
-    if (data.role === "admin") {
+    if (userDataFull.role === "admin") {
       window.location.href = "dashboard.html";
       return;
     }
 
-    document.getElementById("name").innerText = data.name || "-";
-    document.getElementById("email").innerText = data.email || "-";
+    document.getElementById("name").innerText = userDataFull.name || "-";
+    document.getElementById("email").innerText = userDataFull.email || "-";
     document.getElementById("role").innerText = "موظف";
-    document.getElementById("nationalId").innerText = data.nationalId || "-";
+    document.getElementById("nationalId").innerText = userDataFull.nationalId || "-";
+
   } catch (error) {
     window.location.href = "index.html";
   }
