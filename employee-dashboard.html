@@ -505,15 +505,27 @@ onAuthStateChanged(auth, async (user) => {
   }
 
   try {
-    const ref = doc(db, "users", user.uid);
-    const snap = await getDoc(ref);
+  const userRef = doc(db, "users", user.uid);
+let userSnap = await getDoc(userRef);
+let userData = null;
 
-    if (!snap.exists()) {
-      window.location.href = "index.html";
-      return;
+if (userSnap.exists()) {
+  userData = userSnap.data();
+} else {
+  const usersSnapshot = await getDocs(collection(db, "users"));
+  usersSnapshot.forEach((docSnap) => {
+    if (userData) return;
+    const data = docSnap.data();
+    if ((data.email || "").toLowerCase() === (user.email || "").toLowerCase()) {
+      userData = data;
     }
+  });
+}
 
-    const data = snap.data();
+if (!userData) {
+  window.location.href = "index.html";
+  return;
+}
     currentUserDocId = user.uid;
     currentUserData = data;
 
