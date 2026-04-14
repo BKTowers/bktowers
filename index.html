@@ -41,6 +41,7 @@ input{
   margin-bottom:15px;
   border-radius:10px;
   border:1px solid #ccc;
+  font-size:16px;
 }
 
 button{
@@ -51,11 +52,18 @@ button{
   border:none;
   border-radius:10px;
   cursor:pointer;
+  font-size:16px;
+}
+
+button:disabled{
+  opacity:.7;
+  cursor:not-allowed;
 }
 
 .msg{
   margin-top:10px;
   color:red;
+  min-height:22px;
 }
 </style>
 </head>
@@ -65,18 +73,18 @@ button{
 <div class="login-box">
   <div class="title">BkTowers</div>
 
-  <input type="text" id="loginValue" placeholder="البريد الإلكتروني أو اسم المستخدم">
+  <input type="text" id="loginValue" placeholder="اسم المستخدم أو البريد الإلكتروني">
   <input type="password" id="password" placeholder="كلمة المرور">
 
-  <button onclick="login()">تسجيل الدخول</button>
+  <button id="loginBtn" onclick="login()">تسجيل الدخول</button>
 
   <div class="msg" id="msg"></div>
 </div>
 
 <script type="module">
-import { initializeApp } from "https://www.gstatic.com/firebasejs/12.11.0/firebase-app.js";
+import { initializeApp, getApps, getApp } from "https://www.gstatic.com/firebasejs/12.11.0/firebase-app.js";
 import { getAuth, signInWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/12.11.0/firebase-auth.js";
-import { getFirestore, collection, query, where, getDocs, doc, getDoc } from "https://www.gstatic.com/firebasejs/12.11.0/firebase-firestore.js";
+import { getFirestore, collection, getDocs, doc, getDoc } from "https://www.gstatic.com/firebasejs/12.11.0/firebase-firestore.js";
 
 const firebaseConfig = {
   apiKey: "AIzaSyDey3KL3qZUvZBVtFcB38xzBGx6qrG2WYY",
@@ -87,59 +95,187 @@ const firebaseConfig = {
   appId: "1:336608827796:web:4957fe0d411220f6a69781"
 };
 
-const app = initializeApp(firebaseConfig);
+const app = getApps().length ? getApp() : initializeApp(firebaseConfig);
 const auth = getAuth(app);
 const db = getFirestore(app);
 
-function isEmail(v){return v.includes("@")}
-
-async function findUser(username){
-  const q=query(collection(db,"users"),where("username","==",username.toLowerCase()));
-  const snap=await getDocs(q);
-  if(snap.empty)return null;
-  return snap.docs[0].data();
+function normalizeValue(value){
+  return String(value || "").trim().toLowerCase();
 }
 
-window.login=async function(){
-  const val=document.getElementById("loginValue").value.trim();
-  const pass=document.getElementById("password").value.trim();
-  const msg=document.getElementById("msg");
+function isEmail(value){
+  return normalizeValue(value).includes("@");
+}
 
-  msg.innerText="";
+function getEmailPrefix(email){
+  const normalized = normalizeValue(email);
+  if(!normalized.includes("@")) return normalized;
+  return normalized.split("@")[0];
+}
 
-  try{
-    let email=val;
+function setMessage(text){
+  document.getElementById("msg").innerText = text;
+}
 
-    if(!isEmail(val)){
-      const user=await findUser(val);
-      if(!user){
-        msg.innerText="اسم المستخدم غير موجود";
-        return;
-      }
-      email=user.email;
-    }
+function setLoading(isLoading){
+  const btn = document.getElementById("loginBtn");
+  btn.disabled = isLoading;
+  btn.innerText = isLoading ? "جاري الدخول..." : "تسجيل الدخول";
+}
 
-    const cred=await signInWithEmailAndPassword(auth,email,pass);
+async function findUserByLoginValue(loginValue){
+  const target = normalizeValue(loginValue);
 
-    const snap=await getDoc(doc(db,"users",cred.user.uid));
+  const snapshot = await getDocs(collection(db, "users"));
+  if(snapshot.empty) return null;
 
-    if(!snap.exists()){
-      msg.innerText="بيانات المستخدم غير موجودة";
+  let exactUsername = null;
+  let exactEmail = null;
+  let emailPrefix = null;
+
+  snapshot.forEach((docSnap) => {
+    if(exactUsername || exactEmail) return;
+
+    const data = docSnap.data();
+    const username = normalizeValue(data.username);
+    const email = normalizeValue(data.email);
+    const prefix = getEmailPrefix(email);
+
+    const candidate = {
+      id: docSnap.id,
+      ...data
+    };
+
+    if(email && email === target){
+      exactEmail = candidate;
       return;
     }
 
-    const data=snap.data();
+    if(username && username === target){
+      exactUsername = candidate;
+      return;
+    }
 
-    if(data.role==="admin"){
-      window.location.href="dashboard.html";
+    if(prefix && prefix === target && !emailPrefix){
+      emailPrefix = candidate;
+    }
+  });
+
+  return exactEmail || exactUsername || emailPrefix || null;
+}
+
+async function findUserDataAfterAuth(firebaseUser, fallbackEmail){
+  const byUidRef = doc(db, "users", firebaseUser.uid);
+  const byUidSnap = await getDoc(byUidRef);
+
+  if(byUidSnap.exists()){
+    return {
+      id: byUidSnap.id,
+      ...byUidSnap.data()
+    };
+  }
+
+  const snapshot = await getDocs(collection(db, "users"));
+  const authEmail = normalizeValue(firebaseUser.email || fallbackEmail || "");
+
+  let found = null;
+
+  snapshot.forEach((docSnap) => {
+    if(found) return;
+
+    const data = docSnap.data();
+    const email = normalizeValue(data.email);
+
+    if(email && email === authEmail){
+      found = {
+        id: docSnap.id,
+        ...data
+      };
+    }
+  });
+
+  return found;
+}
+
+window.login = async function(){
+  const loginValue = document.getElementById("loginValue").value.trim();
+  const password = document.getElementById("password").value.trim();
+
+  setMessage("");
+
+  if(!loginValue || !password){
+    setMessage("اكتب اسم المستخدم أو البريد الإلكتروني وكلمة المرور");
+    return;
+  }
+
+  try{
+    setLoading(true);
+
+    let emailToLogin = "";
+
+    if(isEmail(loginValue)){
+      emailToLogin = normalizeValue(loginValue);
     }else{
-      window.location.href="employee-dashboard.html";
+      const foundUser = await findUserByLoginValue(loginValue);
+
+      if(!foundUser){
+        setMessage("اسم المستخدم غير موجود");
+        return;
+      }
+
+      if(!foundUser.email){
+        setMessage("لا يوجد بريد إلكتروني مرتبط بهذا المستخدم");
+        return;
+      }
+
+      emailToLogin = normalizeValue(foundUser.email);
+    }
+
+    const cred = await signInWithEmailAndPassword(auth, emailToLogin, password);
+
+    const fullUserData = await findUserDataAfterAuth(cred.user, emailToLogin);
+
+    if(!fullUserData){
+      setMessage("تم تسجيل الدخول لكن بيانات المستخدم داخل users غير موجودة");
+      return;
+    }
+
+    localStorage.setItem("userId", fullUserData.id || "");
+    localStorage.setItem("username", fullUserData.username || "");
+    localStorage.setItem("name", fullUserData.name || "");
+    localStorage.setItem("role", fullUserData.role || "");
+    localStorage.setItem("email", fullUserData.email || cred.user.email || "");
+
+    if(fullUserData.role === "admin"){
+      window.location.href = "dashboard.html";
+    }else{
+      window.location.href = "employee-dashboard.html";
     }
 
   }catch(e){
-    msg.innerText="بيانات الدخول غير صحيحة";
+    console.log("Login error:", e);
+
+    if(e.code === "auth/invalid-credential" || e.code === "auth/wrong-password"){
+      setMessage("كلمة المرور غير صحيحة");
+    }else if(e.code === "auth/user-not-found"){
+      setMessage("هذا الحساب غير موجود في Authentication");
+    }else if(e.code === "auth/invalid-email"){
+      setMessage("البريد الإلكتروني غير صالح");
+    }else{
+      setMessage("تعذر تسجيل الدخول");
+    }
+  }finally{
+    setLoading(false);
   }
 };
+
+document.getElementById("loginValue").addEventListener("keydown", function(e){
+  if(e.key === "Enter") login();
+});
+
+document.getElementById("password").addEventListener("keydown", function(e){
+  if(e.key === "Enter") login();
+});
 </script>
 
 </body>
